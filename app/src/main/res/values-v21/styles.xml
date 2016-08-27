@@ -1,0 +1,34 @@
+<resources>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="AppTheme.SignInTheme" parent="Theme.AppCompat">
+        <item name="colorAccent">#aaffffff</item>
+        <!--<item name="android:fontFamily">sans-serif-light</item>-->
+        <item name="android:textColor">@android:color/white</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="SignInTitle">
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Inverse</item>
+        <!--<item name="android:fontFamily">sans-serif-light</item>-->
+        <item name="android:textSize">40sp</item>
+    </style>
+
+    <style name="SignInInputFields">
+        <item name="android:textColor">@android:color/white</item>
+        <!--<item name="android:fontFamily">sans-serif-light</item>-->
+    </style>
+
+    <style name="SignInButton" parent="Base.Widget.AppCompat.Button.Borderless.Colored">
+        <item name="android:background">@drawable/sign_in_button_normal</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+</resources>

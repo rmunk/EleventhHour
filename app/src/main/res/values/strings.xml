@@ -1,0 +1,47 @@
+<resources>
+    <string name="app_name">Eleventh Hour</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+
+    <!-- SignInActivity -->
+    <string name="sign_in_create_account">Create account</string>
+    <string name="sign_in_forgot_password">Forgot password?</string>
+    <string name="msg_sign_in_account_refresh_succeded">Your account info has been refreshed.</string>
+    <string name="msg_sign_in_account_refresh_failed">We couldn\'t get latest info about your account from the server. Don\'t worry, you can try refreshing manually later.</string>
+
+    <!-- SignInFragment -->
+    <string name="sign_in_username_or_email">Username or email</string>
+    <string name="sign_in_password">Password</string>
+    <string name="sign_in_action">Sign in</string>
+    <string name="msg_sign_in_wrong_credentials">Wrong username or password.</string>
+    <string name="msg_sign_in_error">Sorry, we are unable to sign you in at the moment. Please try again later.</string>
+    <string name="msg_sign_in_no_network">You need network access to sign in.</string>
+    <string name="msg_sign_in_google_failed">Sorry, there was a problem signing you in with your Google account. Please try again later.</string>
+
+    <!-- RegisterFragment -->
+    <string name="register_display_name">Name</string>
+    <string name="register_email">Email</string>
+    <string name="register_password">Password</string>
+    <string name="register_action">Create account</string>
+    <string name="msg_register_error">Sorry, we are unable to create your account. Please try again later.</string>
+    <string name="msg_register_user_already_exists">User with that email already exists.</string>
+    <string name="msg_register_user_already_exists_action">Forgot password?</string>
+    <string name="msg_register_no_network">You need network access to sign up.</string>
+    <string name="msg_register_invalid_display_name">Name must be at least 3 characters long</string>
+    <string name="msg_register_invalid_email">Please enter valid email address.</string>
+    <string name="msg_register_invalid_password">Password must be at least 6 characters long</string>
+
+    <!-- ForgotPasswordFragment -->
+    <string name="forgot_password_email">Email</string>
+    <string name="forgot_password_action">Send email</string>
+    <string name="msg_forgot_password">Enter your email address and we will send you a link to reset your password.</string>
+    <string name="msg_forgot_password_success">We have sent you an email with the password reset link.</string>
+    <string name="msg_forgot_password_user_does_not_exist">User with that email is not registered.</string>
+    <string name="msg_forgot_password_user_does_not_exist_action">Create account</string>
+    <string name="msg_forgot_password_fail">Sending email has failed. Please check that your email address is correct.</string>
+
+</resources>
