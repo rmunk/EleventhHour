@@ -31,6 +31,7 @@ import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.ui.MainActivity;
+import hr.nas2skupa.eleventhhour.ui.MainActivity_;
 import hr.nas2skupa.eleventhhour.utils.NetworkUtils;
 
 /**
@@ -125,6 +126,7 @@ public class RegisterFragment extends Fragment {
                         progressBar.setVisibility(View.GONE);
                         if (!task.isSuccessful() || FirebaseAuth.getInstance().getCurrentUser() == null) {
                             Log.w(TAG, "signInWithEmail", task.getException());
+                            //noinspection ThrowableResultOfMethodCallIgnored
                             if (task.getException() instanceof FirebaseAuthUserCollisionException) {
                                 Snackbar.make(layoutMain, R.string.msg_register_user_already_exists, Snackbar.LENGTH_INDEFINITE)
                                         .setAction(R.string.msg_register_user_already_exists_action, new View.OnClickListener() {
@@ -151,6 +153,7 @@ public class RegisterFragment extends Fragment {
                                 .setDisplayName(name)
                                 .build();
 
+                        //noinspection ConstantConditions
                         FirebaseAuth.getInstance().getCurrentUser().updateProfile(profileUpdates)
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
@@ -161,7 +164,10 @@ public class RegisterFragment extends Fragment {
                                     }
                                 });
 
-                        startActivity(new Intent(getContext(), MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+                        MainActivity_.intent(getContext())
+                                .action(MainActivity.HOME)
+                                .flags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)
+                                .start();
                     }
                 });
     }

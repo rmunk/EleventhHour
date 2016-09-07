@@ -2,6 +2,7 @@ package hr.nas2skupa.eleventhhour.ui.auth;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Matrix;
 import android.os.Bundle;
@@ -24,10 +25,12 @@ import com.google.firebase.auth.FirebaseUser;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.RootContext;
 import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.ui.MainActivity;
+import hr.nas2skupa.eleventhhour.ui.MainActivity_;
 
 
 @EActivity(R.layout.activity_sign_in)
@@ -52,12 +55,15 @@ public class SignInActivity extends FragmentActivity {
     @ViewById(R.id.text_sign_in_message)
     TextView textSignInMessage;
 
+    private Context context;
     private GoogleApiClient googleApiClient;
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        context = this;
 
         if (getIntent().getAction().equals(ACTION_SIGN_OUT)) {
             FirebaseAuth.getInstance().signOut();
@@ -70,7 +76,10 @@ public class SignInActivity extends FragmentActivity {
                 if (user != null) {
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    startActivity(new Intent(getBaseContext(), MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+                    MainActivity_.intent(context)
+                            .action(MainActivity.HOME)
+                            .flags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)
+                            .start();
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
@@ -96,8 +105,8 @@ public class SignInActivity extends FragmentActivity {
 
     @AfterViews
     public void afterViews() {
-        if (getIntent().getAction() == ACTION_SIGN_OUT)
-            textSignInMessage.setText("Signing out...");
+        if (getIntent().getAction().equals(ACTION_SIGN_OUT))
+            textSignInMessage.setText(R.string.sign_in_signing_out);
         layoutMain.post(new Runnable() {
             @Override
             public void run() {
@@ -117,7 +126,7 @@ public class SignInActivity extends FragmentActivity {
     /**
      * Sets the ImageView scale type to crop top
      *
-     * @param view
+     * @param view image view to crop
      */
     private void setImageViewTopCrop(ImageView view) {
         float scaleX = ((float) view.getWidth()) / view.getDrawable().getIntrinsicWidth();

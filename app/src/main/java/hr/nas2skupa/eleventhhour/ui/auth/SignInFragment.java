@@ -38,6 +38,7 @@ import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.ui.MainActivity;
+import hr.nas2skupa.eleventhhour.ui.MainActivity_;
 import hr.nas2skupa.eleventhhour.utils.NetworkUtils;
 
 /**
@@ -141,7 +142,10 @@ public class SignInFragment extends Fragment implements GoogleApiClient.OnConnec
                             return;
                         }
 
-                        startActivity(new Intent(getContext(), MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+                        MainActivity_.intent(getContext())
+                                .action(MainActivity.HOME)
+                                .flags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)
+                                .start();
                     }
                 });
     }
@@ -220,7 +224,10 @@ public class SignInFragment extends Fragment implements GoogleApiClient.OnConnec
                             return;
                         }
 
-                        startActivity(new Intent(getContext(), MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+                        MainActivity_.intent(getContext())
+                                .action(MainActivity.HOME)
+                                .flags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)
+                                .start();
                     }
                 });
     }
