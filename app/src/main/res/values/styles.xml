@@ -46,4 +46,8 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <style name="CategoryTitle" parent="Base.TextAppearance.AppCompat.Title">
+        <item name="android:textSize">16sp</item>
+    </style>
+
 </resources>

@@ -6,12 +6,26 @@
 
     <string name="action_settings">Settings</string>
 
+    <!-- Activity and fragment titles -->
+    <string name="title_fragment_home">Home</string>
+
+    <!-- Categories -->
+    <string name="category_health">Health</string>
+    <string name="category_repair">Repair</string>
+    <string name="category_beauty">Beauty</string>
+    <string name="category_intellect">Intellect</string>
+    <string name="category_home">Home</string>
+    <string name="category_leisure">Leisure</string>
+    <string name="category_travel">Travel</string>
+    <string name="category_transport">Transport</string>
+    <string name="category_fun">Fun</string>
+
 
     <!-- SignInActivity -->
+    <string name="sign_in_signing_in">Signing in…</string>
+    <string name="sign_in_signing_out">Signing out…</string>
     <string name="sign_in_create_account">Create account</string>
     <string name="sign_in_forgot_password">Forgot password?</string>
-    <string name="msg_sign_in_account_refresh_succeded">Your account info has been refreshed.</string>
-    <string name="msg_sign_in_account_refresh_failed">We couldn\'t get latest info about your account from the server. Don\'t worry, you can try refreshing manually later.</string>
 
     <!-- SignInFragment -->
     <string name="sign_in_username_or_email">Username or email</string>
@@ -43,5 +57,9 @@
     <string name="msg_forgot_password_user_does_not_exist">User with that email is not registered.</string>
     <string name="msg_forgot_password_user_does_not_exist_action">Create account</string>
     <string name="msg_forgot_password_fail">Sending email has failed. Please check that your email address is correct.</string>
+
+    <!-- CategoryActivity -->
+    <string name="category_pick_a_subcategory">Pick a subcategory</string>
+
 
 </resources>
