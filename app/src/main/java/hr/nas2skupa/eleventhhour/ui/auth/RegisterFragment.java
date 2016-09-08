@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
@@ -126,7 +125,6 @@ public class RegisterFragment extends Fragment {
                         progressBar.setVisibility(View.GONE);
                         if (!task.isSuccessful() || FirebaseAuth.getInstance().getCurrentUser() == null) {
                             Log.w(TAG, "signInWithEmail", task.getException());
-                            //noinspection ThrowableResultOfMethodCallIgnored
                             if (task.getException() instanceof FirebaseAuthUserCollisionException) {
                                 Snackbar.make(layoutMain, R.string.msg_register_user_already_exists, Snackbar.LENGTH_INDEFINITE)
                                         .setAction(R.string.msg_register_user_already_exists_action, new View.OnClickListener() {
@@ -153,7 +151,6 @@ public class RegisterFragment extends Fragment {
                                 .setDisplayName(name)
                                 .build();
 
-                        //noinspection ConstantConditions
                         FirebaseAuth.getInstance().getCurrentUser().updateProfile(profileUpdates)
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
