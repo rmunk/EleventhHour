@@ -20,3 +20,14 @@
 # Firebase Authentication
 -keepattributes Signature
 -keepattributes *Annotation*
+
+
+# Firebase Realtime Database
+-keepattributes Signature
+-keepclassmembers class hr.nas2skupa.eleventhhour.model.** {
+  *;
+}
+
+
+# Picasso
+-dontwarn com.squareup.okhttp.**

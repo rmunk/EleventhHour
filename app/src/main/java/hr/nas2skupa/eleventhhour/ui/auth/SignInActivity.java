@@ -2,7 +2,6 @@ package hr.nas2skupa.eleventhhour.ui.auth;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Matrix;
 import android.os.Bundle;
@@ -10,7 +9,6 @@ import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -19,12 +17,15 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.model.User;
 import hr.nas2skupa.eleventhhour.ui.MainActivity;
 import hr.nas2skupa.eleventhhour.ui.MainActivity_;
 
@@ -37,9 +38,6 @@ public class SignInActivity extends FragmentActivity {
     private static final long ANIMATION_DELAY = 1000;
     private static final long ANIMATION_DURATION = 500;
 
-    private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
-
     @ViewById(R.id.layout_main)
     FrameLayout layoutMain;
     @ViewById(R.id.layout_content)
@@ -51,36 +49,23 @@ public class SignInActivity extends FragmentActivity {
     @ViewById(R.id.text_sign_in_message)
     TextView textSignInMessage;
 
-    private Context context;
-
+    private FirebaseAuth auth;
+    private FirebaseAuth.AuthStateListener authListener;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        context = this;
-
         if (getIntent().getAction().equals(ACTION_SIGN_OUT)) {
             FirebaseAuth.getInstance().signOut();
         }
-        mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
+        auth = FirebaseAuth.getInstance();
+        authListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    MainActivity_.intent(context)
-                            .action(MainActivity.HOME)
-                            .flags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)
-                            .start();
-                } else {
-                    // User is signed out
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
-                    showSignInFragment();
-                }
-                // ...
+                if (user != null) onAuthSuccess(user);
+                else showSignInFragment();
             }
         };
     }
@@ -93,8 +78,8 @@ public class SignInActivity extends FragmentActivity {
     @Override
     public void onStop() {
         super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
+        if (authListener != null) {
+            auth.removeAuthStateListener(authListener);
         }
     }
 
@@ -115,7 +100,7 @@ public class SignInActivity extends FragmentActivity {
         setImageViewTopCrop(imageSplashBackground);
         setImageViewTopCrop(imageSplashOverlay);
 
-        mAuth.addAuthStateListener(mAuthListener);
+        auth.addAuthStateListener(authListener);
     }
 
     /**
@@ -182,4 +167,16 @@ public class SignInActivity extends FragmentActivity {
                 .start();
     }
 
+    private void onAuthSuccess(FirebaseUser firebaseUser) {
+        // Write the new user
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        User user = new User(firebaseUser.getDisplayName(), firebaseUser.getEmail(), firebaseUser.getPhotoUrl());
+        database.child("users").child(firebaseUser.getUid()).setValue(user);
+
+        // Go to MainActivity
+        MainActivity_.intent(this)
+                .action(MainActivity.HOME)
+                .flags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)
+                .start();
+    }
 }

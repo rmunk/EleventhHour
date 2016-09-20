@@ -1,7 +1,9 @@
 package hr.nas2skupa.eleventhhour.ui;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -9,12 +11,21 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.TextView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.model.User;
 import hr.nas2skupa.eleventhhour.ui.auth.SignInActivity;
 import hr.nas2skupa.eleventhhour.ui.auth.SignInActivity_;
 
@@ -32,9 +43,11 @@ public class MainActivity extends AppCompatActivity
     @ViewById(R.id.drawer)
     DrawerLayout drawer;
 
+    private DatabaseReference database;
+
     void initToolbar(@ViewById(R.id.toolbar) Toolbar toolbar,
                      @ViewById(R.id.drawer) DrawerLayout drawer,
-                     @ViewById(R.id.nav_view) NavigationView navigationView) {
+                     @ViewById(R.id.nav_view) NavigationView navView) {
         toolbar.setTitle(R.string.title_fragment_home);
         setSupportActionBar(toolbar);
 
@@ -43,7 +56,31 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        navigationView.setNavigationItemSelectedListener(this);
+        navView.setNavigationItemSelectedListener(this);
+        final TextView username = (TextView) navView.getHeaderView(0).findViewById(R.id.txt_drawer_username);
+        final TextView email = (TextView) navView.getHeaderView(0).findViewById(R.id.txt_drawer_email);
+        database.child("users")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        User user = dataSnapshot.getValue(User.class);
+                        username.setText(user.getUsername());
+                        email.setText(user.getEmail());
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        database = FirebaseDatabase.getInstance().getReference();
     }
 
     @Override

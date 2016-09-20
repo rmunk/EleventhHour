@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_health"
+    android:layout_width="104dp"
+    android:layout_height="144dp"
+    android:layout_margin="4dp"
+    android:transitionName="category_card">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/img_category_icon"
+            android:layout_width="104dp"
+            android:layout_height="104dp"
+            android:background="@color/category_health"
+            android:scaleType="fitXY"
+            android:src="@drawable/category_health"
+            android:transitionName="category_icon"
+            app:srcCompat="@drawable/category_health" />
+
+        <TextView
+            android:id="@+id/txt_category_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/category_health"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="16sp"
+            android:transitionName="category_title" />
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

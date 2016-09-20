@@ -20,7 +20,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
@@ -29,6 +32,7 @@ import org.androidannotations.annotations.TextChange;
 import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.model.User;
 import hr.nas2skupa.eleventhhour.ui.MainActivity;
 import hr.nas2skupa.eleventhhour.ui.MainActivity_;
 import hr.nas2skupa.eleventhhour.utils.NetworkUtils;
@@ -123,50 +127,68 @@ public class RegisterFragment extends Fragment {
                         Log.d(TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
 
                         progressBar.setVisibility(View.GONE);
-                        if (!task.isSuccessful() || FirebaseAuth.getInstance().getCurrentUser() == null) {
+
+                        // Registration failed
+                        if (!task.isSuccessful()) {
                             Log.w(TAG, "signInWithEmail", task.getException());
                             if (task.getException() instanceof FirebaseAuthUserCollisionException) {
-                                Snackbar.make(layoutMain, R.string.msg_register_user_already_exists, Snackbar.LENGTH_INDEFINITE)
-                                        .setAction(R.string.msg_register_user_already_exists_action, new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View view) {
-                                                Bundle args = new Bundle();
-                                                args.putString("email", email);
-                                                ForgotPasswordFragment_ fragment = new ForgotPasswordFragment_();
-                                                fragment.setArguments(args);
-                                                getActivity().getSupportFragmentManager().beginTransaction()
-                                                        .replace(R.id.fragment_container, fragment, "ForgotPasswordFragment")
-                                                        .addToBackStack("ForgotPasswordFragment")
-                                                        .commit();
-                                            }
-                                        }).show();
-                            }
-                            else {
+                                showUserExistsMessage(email);
+                            } else {
                                 Snackbar.make(layoutMain, R.string.msg_register_error, Snackbar.LENGTH_LONG).show();
                             }
                             return;
                         }
 
-                        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                .setDisplayName(name)
-                                .build();
-
-                        FirebaseAuth.getInstance().getCurrentUser().updateProfile(profileUpdates)
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            Log.d(TAG, "User profile updated.");
-                                        }
-                                    }
-                                });
-
-                        MainActivity_.intent(getContext())
-                                .action(MainActivity.HOME)
-                                .flags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)
-                                .start();
+                        final FirebaseUser firebaseUser = task.getResult().getUser();
+                        updateUserProfile(firebaseUser, name);
                     }
                 });
+    }
+
+    private void updateUserProfile(final FirebaseUser firebaseUser, String name) {
+        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                .setDisplayName(name)
+                .build();
+        firebaseUser.updateProfile(profileUpdates)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (!task.isSuccessful()) {
+                            firebaseUser.delete();
+                            Snackbar.make(layoutMain, R.string.msg_register_error, Snackbar.LENGTH_LONG).show();
+                        } else onAuthSuccess(firebaseUser);
+                    }
+                });
+    }
+
+    private void showUserExistsMessage(final String email) {
+        Snackbar.make(layoutMain, R.string.msg_register_user_already_exists, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.msg_register_user_already_exists_action, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Bundle args = new Bundle();
+                        args.putString("email", email);
+                        ForgotPasswordFragment_ fragment = new ForgotPasswordFragment_();
+                        fragment.setArguments(args);
+                        getActivity().getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.fragment_container, fragment, "ForgotPasswordFragment")
+                                .addToBackStack("ForgotPasswordFragment")
+                                .commit();
+                    }
+                }).show();
+    }
+
+    private void onAuthSuccess(FirebaseUser firebaseUser) {
+        // Write the new user
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        User user = new User(firebaseUser.getDisplayName(), firebaseUser.getEmail(), firebaseUser.getPhotoUrl());
+        database.child("users").child(firebaseUser.getUid()).setValue(user);
+
+        // Go to MainActivity
+        MainActivity_.intent(getContext())
+                .action(MainActivity.HOME)
+                .flags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)
+                .start();
     }
 
     private void hideKeyboard() {
