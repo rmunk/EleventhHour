@@ -25,8 +25,8 @@ import hr.nas2skupa.eleventhhour.model.Subcategory;
 /**
  * A simple {@link Fragment} subclass.
  */
-@EFragment(R.layout.fragment_subcategory)
-public class SubcategoryFragment extends Fragment {
+@EFragment(R.layout.fragment_subcategories)
+public class SubcategoriesFragment extends Fragment {
     @FragmentArg
     String categoryKey;
 
@@ -37,7 +37,7 @@ public class SubcategoryFragment extends Fragment {
     private FirebaseRecyclerAdapter<Subcategory, SubcategoryViewHolder> adapter;
     private LinearLayoutManager manager;
 
-    public SubcategoryFragment() {
+    public SubcategoriesFragment() {
         // Required empty public constructor
     }
 

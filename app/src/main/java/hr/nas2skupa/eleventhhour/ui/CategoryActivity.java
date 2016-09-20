@@ -57,8 +57,8 @@ public class CategoryActivity extends AppCompatActivity {
 
     @UiThread(delay = 500)
     public void setSubcategoryFragment() {
-        SubcategoryFragment fragment = SubcategoryFragment_.builder().categoryKey(categoryKey).build();
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment, "SubcategoryFragment").commit();
+        SubcategoriesFragment fragment = SubcategoriesFragment_.builder().categoryKey(categoryKey).build();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment, "SubcategoriesFragment").commit();
     }
 
     @Override
