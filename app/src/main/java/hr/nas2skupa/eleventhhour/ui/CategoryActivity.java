@@ -24,9 +24,16 @@ import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
+import hr.nas2skupa.eleventhhour.ProvidersFragment;
+import hr.nas2skupa.eleventhhour.ProvidersFragment_;
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.events.SubcategorySelectedEvent;
 import hr.nas2skupa.eleventhhour.model.Category;
+import hr.nas2skupa.eleventhhour.model.Subcategory;
+import hr.nas2skupa.eleventhhour.utils.Utils;
 
 
 @EActivity(R.layout.activity_category)
@@ -34,6 +41,8 @@ import hr.nas2skupa.eleventhhour.model.Category;
 public class CategoryActivity extends AppCompatActivity {
     @Extra
     String categoryKey;
+    @Extra
+    String subcategoryKey;
 
     @ViewById(R.id.main_layout)
     ViewGroup mainLayout;
@@ -42,6 +51,8 @@ public class CategoryActivity extends AppCompatActivity {
 
     @ViewById(R.id.txt_category_name)
     TextView txtCategoryName;
+    @ViewById(R.id.txt_subcategory_name)
+    TextView txtSubcategoryName;
     @ViewById(R.id.img_category_icon)
     ImageView imgCategoryIcon;
 
@@ -58,7 +69,16 @@ public class CategoryActivity extends AppCompatActivity {
     @UiThread(delay = 500)
     public void setSubcategoryFragment() {
         SubcategoriesFragment fragment = SubcategoriesFragment_.builder().categoryKey(categoryKey).build();
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment, "SubcategoriesFragment").commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, fragment, "SubcategoriesFragment").commit();
+    }
+
+    @UiThread(delay = 500)
+    public void setProvidersFragment() {
+        ProvidersFragment fragment = ProvidersFragment_.builder().subcategoryKey(subcategoryKey).build();
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container, fragment, "ProvidersFragment")
+                .addToBackStack("ProvidersFragment")
+                .commit();
     }
 
     @Override
@@ -73,19 +93,22 @@ public class CategoryActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
 
-        // Add value event listener to the category
+        EventBus.getDefault().register(this);
+
         categoryListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Get Post object and use the values to update the UI
                 Category category = dataSnapshot.getValue(Category.class);
+                if (category == null) return;
+
                 int color;
                 try {
                     color = Color.parseColor(category.getColor());
                 } catch (Exception e) {
                     color = getResources().getColor(R.color.colorPrimary);
                 }
-                txtCategoryName.setText(category.getLocaleName());
+                txtCategoryName.setText(Utils.getLocaleName(category.getName()));
                 appBar.setBackgroundColor(color);
                 Picasso.with(CategoryActivity.this).load(category.getIcon()).into(imgCategoryIcon);
                 imgCategoryIcon.setBackgroundColor(color);
@@ -105,7 +128,8 @@ public class CategoryActivity extends AppCompatActivity {
     public void onStop() {
         super.onStop();
 
-        // Remove category value event listener
+        EventBus.getDefault().unregister(this);
+
         if (categoryListener != null) {
             categoryReference.removeEventListener(categoryListener);
         }
@@ -119,5 +143,43 @@ public class CategoryActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        if (getFragmentManager().findFragmentById(R.id.fragment_container) == null) {
+            setSubcategoryFragment();
+            txtSubcategoryName.setText(R.string.category_pick_a_subcategory);
+        }
+    }
+
+    @Subscribe
+    public void openSubcategory(SubcategorySelectedEvent event) {
+        subcategoryKey = event.getSubcategoryKey();
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
+                .child("subcategories")
+                .child(categoryKey)
+                .child(subcategoryKey);
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Subcategory subcategory = dataSnapshot.getValue(Subcategory.class);
+                if (subcategory == null) return;
+                txtSubcategoryName.setText(Utils.getLocaleName(subcategory.getName()));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        getSupportFragmentManager().beginTransaction()
+                .remove(getSupportFragmentManager().findFragmentById(R.id.fragment_container))
+                .commit();
+        setProvidersFragment();
     }
 }

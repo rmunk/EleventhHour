@@ -16,43 +16,32 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
-import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
-import java.util.Locale;
-
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.model.Category;
+import hr.nas2skupa.eleventhhour.utils.Utils;
 
 @EFragment(R.layout.fragment_home)
 public class HomeFragment extends Fragment {
     @ViewById(R.id.categories_list)
     RecyclerView recyclerView;
 
-    private DatabaseReference database;
-    private FirebaseRecyclerAdapter<Category, CategoryViewHolder> adapter;
-    private LinearLayoutManager manager;
-
     public HomeFragment() {
         // Required empty public constructor
-    }
-
-    @AfterViews
-    public void afterViews() {
-        database = FirebaseDatabase.getInstance().getReference();
-        recyclerView.setHasFixedSize(true);
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        manager = new GridLayoutManager(getContext(), 3);
+        LinearLayoutManager manager = new GridLayoutManager(getContext(), 3);
         recyclerView.setLayoutManager(manager);
 
-        Query query = database.child("categories").orderByChild("name/" + Locale.getDefault().getISO3Language());
-        adapter = new FirebaseRecyclerAdapter<Category, CategoryViewHolder>(Category.class, R.layout.item_category
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        Query query = database.child("categories").orderByChild("name/" + Utils.getLanguageIso());
+        FirebaseRecyclerAdapter<Category, CategoryViewHolder> adapter = new FirebaseRecyclerAdapter<Category, CategoryViewHolder>(Category.class, R.layout.item_category
                 , CategoryViewHolder.class, query) {
             @Override
             protected void populateViewHolder(final CategoryViewHolder viewHolder, final Category model, int position) {

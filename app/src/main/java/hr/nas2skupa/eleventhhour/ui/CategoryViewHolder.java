@@ -12,6 +12,7 @@ import com.squareup.picasso.Picasso;
 
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.model.Category;
+import hr.nas2skupa.eleventhhour.utils.Utils;
 
 /**
  * Created by nas2skupa on 18/09/16.
@@ -29,7 +30,7 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bindToSubcategory(final Category category) {
-        titleView.setText(category.getLocaleName());
+        titleView.setText(Utils.getLocaleName(category.getName()));
         try {
             iconView.setBackgroundColor(Color.parseColor(category.getColor()));
         } catch (Exception ignored) {

@@ -1,4 +1,4 @@
-package hr.nas2skupa.eleventhhour.ui;
+package hr.nas2skupa.eleventhhour;
 
 
 import android.os.Build;
@@ -10,7 +10,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Explode;
 import android.transition.Fade;
-import android.view.View;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
@@ -20,25 +19,24 @@ import com.google.firebase.database.Query;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
-import org.greenrobot.eventbus.EventBus;
 
-import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.events.SubcategorySelectedEvent;
-import hr.nas2skupa.eleventhhour.model.Subcategory;
+import hr.nas2skupa.eleventhhour.model.Provider;
+import hr.nas2skupa.eleventhhour.ui.ProviderViewHolder;
 import hr.nas2skupa.eleventhhour.utils.Utils;
+
 
 /**
  * A simple {@link Fragment} subclass.
  */
 @EFragment(R.layout.fragment_recycler_view)
-public class SubcategoriesFragment extends Fragment {
+public class ProvidersFragment extends Fragment {
     @FragmentArg
-    String categoryKey;
+    String subcategoryKey;
 
     @ViewById(R.id.recycler_view)
     RecyclerView recyclerView;
 
-    public SubcategoriesFragment() {
+    public ProvidersFragment() {
         // Required empty public constructor
     }
 
@@ -58,24 +56,15 @@ public class SubcategoriesFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        Query query = database.child("subcategories").child(categoryKey).orderByChild("name/" + Utils.getLanguageIso());
-        FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<Subcategory, SubcategoryViewHolder>(
-                Subcategory.class,
-                R.layout.item_subcategory,
-                SubcategoryViewHolder.class,
+        Query query = database.child("subcategory_providers").child(subcategoryKey).orderByChild("name/" + Utils.getLanguageIso());
+        FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<Provider, ProviderViewHolder>(
+                Provider.class,
+                R.layout.item_provider,
+                ProviderViewHolder.class,
                 query) {
             @Override
-            protected void populateViewHolder(final SubcategoryViewHolder viewHolder, Subcategory model, int position) {
-                final DatabaseReference categoryRef = getRef(position);
-                final String subcategoryKey = categoryRef.getKey();
-
-                viewHolder.bindToSubcategory(model);
-                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        EventBus.getDefault().post(new SubcategorySelectedEvent(subcategoryKey));
-                    }
-                });
+            protected void populateViewHolder(ProviderViewHolder viewHolder, Provider model, int position) {
+                viewHolder.bindToProvider(model);
             }
         };
         recyclerView.setAdapter(adapter);

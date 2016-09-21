@@ -4,10 +4,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import java.util.Locale;
-
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.model.Subcategory;
+import hr.nas2skupa.eleventhhour.utils.Utils;
 
 /**
  * Created by nas2skupa on 18/09/16.
@@ -23,6 +22,6 @@ public class SubcategoryViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bindToSubcategory(Subcategory subcategory) {
-        titleView.setText(subcategory.getLocaleName(Locale.getDefault().getISO3Language()));
+        titleView.setText(Utils.getLocaleName(subcategory.getName()));
     }
 }
