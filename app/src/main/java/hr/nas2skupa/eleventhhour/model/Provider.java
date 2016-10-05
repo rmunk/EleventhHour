@@ -9,6 +9,8 @@ import hr.nas2skupa.eleventhhour.utils.Utils;
  */
 
 public class Provider {
+    private String key;
+
     private HashMap<String, String> name = new HashMap<>();
     private float rating = 0;
     private Location location;
@@ -27,6 +29,14 @@ public class Provider {
     public Provider() {
     }
 
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
     public String getName() {
         return Utils.getLocaleString(name);
     }
@@ -35,7 +45,7 @@ public class Provider {
         return rating;
     }
 
-    public boolean hasSale() {
+    public boolean isSale() {
         return sale;
     }
 

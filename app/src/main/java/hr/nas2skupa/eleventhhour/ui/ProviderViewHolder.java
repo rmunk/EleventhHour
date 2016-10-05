@@ -9,10 +9,13 @@ import android.widget.TextView;
 
 import com.google.firebase.database.FirebaseDatabase;
 
+import org.greenrobot.eventbus.Subscribe;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.events.FavoriteStatusChangedEvent;
 import hr.nas2skupa.eleventhhour.model.Provider;
 import hr.nas2skupa.eleventhhour.utils.Utils;
 
@@ -37,10 +40,6 @@ public class ProviderViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.txt_hours) TextView txtHours;
 
     @BindView(R.id.btn_favourite) ImageView btnFavourite;
-
-    private String categoryKey;
-    private String subcategoryKey;
-    private String providerKey;
     private Provider provider;
 
 
@@ -50,14 +49,11 @@ public class ProviderViewHolder extends RecyclerView.ViewHolder {
         ButterKnife.bind(this, itemView);
     }
 
-    public void bindToProvider(String categoryKey, String subcategoryKey, String providerKey, Provider provider) {
-        this.categoryKey = categoryKey;
-        this.subcategoryKey = subcategoryKey;
-        this.providerKey = providerKey;
+    public void bindToProvider(Provider provider) {
         this.provider = provider;
 
         txtProviderName.setText(provider.getName());
-        imgSale.setVisibility(provider.hasSale() ? View.VISIBLE : View.GONE);
+        imgSale.setVisibility(provider.isSale() ? View.VISIBLE : View.GONE);
         imgFavorite.setVisibility(provider.isFavorite() ? View.VISIBLE : View.GONE);
         ratingBar.setRating(provider.getRating());
 
@@ -77,11 +73,6 @@ public class ProviderViewHolder extends RecyclerView.ViewHolder {
         btnFavourite.setImageResource(provider.isFavorite() ? R.drawable.ic_heart_broken_black_24dp : R.drawable.ic_favorite_black_36dp);
     }
 
-    public void setFavorite(boolean favorite) {
-        imgFavorite.setVisibility(favorite ? View.VISIBLE : View.GONE);
-        btnFavourite.setImageResource(favorite ? R.drawable.ic_heart_broken_black_24dp : R.drawable.ic_favorite_black_36dp);
-    }
-
     public void showDetails(boolean show) {
         details.setVisibility(show ? View.VISIBLE : View.GONE);
     }
@@ -93,16 +84,27 @@ public class ProviderViewHolder extends RecyclerView.ViewHolder {
 
     @OnClick(R.id.btn_favourite)
     public void toggleToFavorite() {
+        provider.setFavorite(!provider.isFavorite());
         FirebaseDatabase.getInstance().getReference()
                 .child("users")
                 .child(Utils.getMyUid())
                 .child("favorites")
-                .child(providerKey)
-                .setValue(!provider.isFavorite());
+                .child(provider.getKey())
+                .setValue(provider.isFavorite() ? true : null);
     }
 
     @OnClick(R.id.btn_schedule)
     public void scheduleService() {
+
+    }
+
+    @Subscribe
+    public void updateFavorite(FavoriteStatusChangedEvent event) {
+        if (!event.getProviderKey().equals(provider.getKey())) return;
+
+        provider.setFavorite(event.isFavorite());
+        imgFavorite.setVisibility(provider.isFavorite() ? View.VISIBLE : View.GONE);
+        btnFavourite.setImageResource(provider.isFavorite() ? R.drawable.ic_heart_broken_black_24dp : R.drawable.ic_favorite_black_36dp);
 
     }
 }

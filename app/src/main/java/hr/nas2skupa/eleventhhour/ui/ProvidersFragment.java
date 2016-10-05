@@ -17,18 +17,22 @@ import android.view.Gravity;
 import android.view.View;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
+import org.greenrobot.eventbus.EventBus;
+
+import java.util.HashMap;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.events.FavoriteStatusChangedEvent;
 import hr.nas2skupa.eleventhhour.model.Provider;
 import hr.nas2skupa.eleventhhour.utils.Utils;
 
@@ -46,6 +50,10 @@ public class ProvidersFragment extends Fragment {
     @ViewById(R.id.recycler_view)
     RecyclerView recyclerView;
 
+    private ChildEventListener favoriteChangedListener;
+    private DatabaseReference favoriteReference;
+    private HashMap<String, Boolean> favorites = new HashMap<>();
+
     public ProvidersFragment() {
         // Required empty public constructor
     }
@@ -53,6 +61,11 @@ public class ProvidersFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        favoriteReference = FirebaseDatabase.getInstance().getReference()
+                .child("users")
+                .child(Utils.getMyUid())
+                .child("favorites");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) setTransitions();
     }
@@ -76,29 +89,14 @@ public class ProvidersFragment extends Fragment {
             public int expandedPosition = -1;
 
             @Override
-            protected void populateViewHolder(final ProviderViewHolder viewHolder, final Provider model, final int position) {
-                final DatabaseReference categoryRef = getRef(position);
-                final String providerKey = categoryRef.getKey();
+            protected void populateViewHolder(final ProviderViewHolder viewHolder, final Provider provider, final int position) {
+                provider.setKey(getRef(position).getKey());
 
-                FirebaseDatabase.getInstance().getReference()
-                        .child("users")
-                        .child(Utils.getMyUid())
-                        .child("favorites")
-                        .child(providerKey)
-                        .addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                boolean favorite = dataSnapshot.exists() ? dataSnapshot.getValue(boolean.class) : false;
-                                model.setFavorite(favorite);
-                                viewHolder.setFavorite(favorite);
-                            }
+                provider.setFavorite(favorites.containsKey(provider.getKey())
+                        ? favorites.get(provider.getKey())
+                        : false);
 
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-                viewHolder.bindToProvider(categoryKey, subcategoryKey, providerKey, model);
+                viewHolder.bindToProvider(provider);
 
                 final boolean isExpanded = position == expandedPosition;
                 viewHolder.showDetails(isExpanded);
@@ -116,8 +114,67 @@ public class ProvidersFragment extends Fragment {
                     }
                 });
             }
+
+            @Override
+            public void onViewAttachedToWindow(ProviderViewHolder holder) {
+                super.onViewAttachedToWindow(holder);
+
+                EventBus.getDefault().register(holder);
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(ProviderViewHolder holder) {
+                super.onViewDetachedFromWindow(holder);
+
+                EventBus.getDefault().unregister(holder);
+            }
         };
         recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        favoriteChangedListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                favorites.put(dataSnapshot.getKey(), dataSnapshot.getValue(boolean.class));
+                EventBus.getDefault().post(new FavoriteStatusChangedEvent(dataSnapshot.getKey(), dataSnapshot.getValue(boolean.class)));
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                favorites.put(dataSnapshot.getKey(), dataSnapshot.getValue(boolean.class));
+                EventBus.getDefault().post(new FavoriteStatusChangedEvent(dataSnapshot.getKey(), dataSnapshot.getValue(boolean.class)));
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                favorites.remove(dataSnapshot.getKey());
+                EventBus.getDefault().post(new FavoriteStatusChangedEvent(dataSnapshot.getKey(), false));
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+
+        favoriteReference.addChildEventListener(favoriteChangedListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        if (favoriteChangedListener != null) {
+            favoriteReference.removeEventListener(favoriteChangedListener);
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
