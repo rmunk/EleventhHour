@@ -1,5 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_main"
     style="@style/AppTheme.SignInTheme"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -8,8 +10,7 @@
     android:paddingRight="24dp"
     android:theme="@style/AppTheme.SignInTheme"
     tools:background="@drawable/splash_background"
-    tools:layout="@layout/activity_sign_in"
-    android:id="@+id/layout_main">
+    tools:layout="@layout/activity_sign_in">
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/layout_email"
@@ -25,7 +26,6 @@
             android:hint="@string/sign_in_username_or_email"
             android:inputType="textPersonName"
             android:maxLines="1"
-            android:singleLine="true"
             android:text="ranko.munk@gmail.com" />
     </android.support.design.widget.TextInputLayout>
 
@@ -45,7 +45,6 @@
             android:imeOptions="actionGo"
             android:inputType="textPassword"
             android:maxLines="1"
-            android:singleLine="true"
             android:text="ranko123" />
     </android.support.design.widget.TextInputLayout>
 
@@ -56,8 +55,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/layout_password"
         android:layout_gravity="end"
-        android:text="@string/sign_in_action"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:text="@string/sign_in_action" />
 
     <Button
         android:id="@+id/button_register"
@@ -81,11 +80,11 @@
         android:text="@string/sign_in_forgot_password" />
 
     <FrameLayout
+        android:id="@+id/layout_progress"
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:layout_below="@+id/button_forgot_password"
-        android:layout_marginTop="16dp"
-        android:id="@+id/layout_progress">
+        android:layout_marginTop="16dp">
 
         <ProgressBar
             android:id="@+id/progress_bar"
@@ -98,47 +97,46 @@
     </FrameLayout>
 
     <TextView
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Or simply sign in using your social account"
-        android:id="@+id/textView"
+        android:layout_below="@+id/layout_progress"
         android:layout_centerHorizontal="true"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead.Inverse"
-        android:layout_below="@+id/layout_progress" />
+        android:text="@string/sign_in_with_social_account"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead.Inverse" />
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:id="@+id/layout_social"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/textView"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="24dp"
-        android:id="@+id/layout_social"
-        android:layout_below="@+id/textView">
+        android:orientation="horizontal">
 
-        <ImageView
+        <AppCompatImageView
+            android:id="@+id/button_google_plus"
             android:layout_width="56dp"
             android:layout_height="56dp"
-            android:id="@+id/button_google_plus"
-            android:src="@drawable/google_plus_box"
             android:layout_margin="16dp"
             android:tint="#ccffffff"
-            />
+            app:srcCompat="@drawable/google_plus_box" />
 
-        <ImageView
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+        <android.support.v7.widget.AppCompatImageView
             android:id="@+id/button_facebook"
-            android:src="@drawable/facebook_box"
-            android:layout_margin="16dp"
-            android:tint="#ccffffff" />
-
-        <ImageView
             android:layout_width="56dp"
             android:layout_height="56dp"
-            android:id="@+id/button_twitter"
-            android:src="@drawable/twitter_box"
             android:layout_margin="16dp"
-            android:tint="#ccffffff" />
+            android:tint="#ccffffff"
+            app:srcCompat="@drawable/facebook_box" />
+
+        <AppCompatImageView
+            android:id="@+id/button_twitter"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_margin="16dp"
+            android:tint="#ccffffff"
+            app:srcCompat="@drawable/twitter_box" />
     </LinearLayout>
 
 </RelativeLayout>

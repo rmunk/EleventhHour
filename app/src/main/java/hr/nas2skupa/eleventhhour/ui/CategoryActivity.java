@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -27,13 +28,10 @@ import org.androidannotations.annotations.ViewById;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import hr.nas2skupa.eleventhhour.ProvidersFragment;
-import hr.nas2skupa.eleventhhour.ProvidersFragment_;
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.events.SubcategorySelectedEvent;
 import hr.nas2skupa.eleventhhour.model.Category;
 import hr.nas2skupa.eleventhhour.model.Subcategory;
-import hr.nas2skupa.eleventhhour.utils.Utils;
 
 
 @EActivity(R.layout.activity_category)
@@ -53,6 +51,8 @@ public class CategoryActivity extends AppCompatActivity {
     TextView txtCategoryName;
     @ViewById(R.id.txt_subcategory_name)
     TextView txtSubcategoryName;
+    @ViewById(R.id.category_background)
+    ImageView categoryBackground;
     @ViewById(R.id.img_category_icon)
     ImageView imgCategoryIcon;
 
@@ -98,7 +98,6 @@ public class CategoryActivity extends AppCompatActivity {
         categoryListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                // Get Post object and use the values to update the UI
                 Category category = dataSnapshot.getValue(Category.class);
                 if (category == null) return;
 
@@ -106,17 +105,16 @@ public class CategoryActivity extends AppCompatActivity {
                 try {
                     color = Color.parseColor(category.getColor());
                 } catch (Exception e) {
-                    color = getResources().getColor(R.color.colorPrimary);
+                    color = ContextCompat.getColor(CategoryActivity.this, R.color.colorPrimary);
                 }
-                txtCategoryName.setText(Utils.getLocaleName(category.getName()));
+                txtCategoryName.setText(category.getName());
                 appBar.setBackgroundColor(color);
-                Picasso.with(CategoryActivity.this).load(category.getIcon()).into(imgCategoryIcon);
-                imgCategoryIcon.setBackgroundColor(color);
+                Picasso.with(CategoryActivity.this).load(category.getIcon()).fit().into(imgCategoryIcon);
+                categoryBackground.setBackgroundColor(color);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // Getting Category failed, show a message
                 Snackbar.make(mainLayout, "Failed to load category.",
                         Snackbar.LENGTH_LONG).show();
             }
@@ -168,7 +166,7 @@ public class CategoryActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Subcategory subcategory = dataSnapshot.getValue(Subcategory.class);
                 if (subcategory == null) return;
-                txtSubcategoryName.setText(Utils.getLocaleName(subcategory.getName()));
+                txtSubcategoryName.setText(subcategory.getName());
             }
 
             @Override

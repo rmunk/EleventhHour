@@ -2,6 +2,8 @@ package hr.nas2skupa.eleventhhour.model;
 
 import java.util.HashMap;
 
+import hr.nas2skupa.eleventhhour.utils.Utils;
+
 /**
  * Created by nas2skupa on 18/09/16.
  */
@@ -11,7 +13,7 @@ public class Subcategory {
     public Subcategory() {
     }
 
-    public HashMap<String, String> getName() {
-        return name;
+    public String getName() {
+        return Utils.getLocaleString(name);
     }
 }

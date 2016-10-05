@@ -6,7 +6,6 @@ import android.widget.TextView;
 
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.model.Subcategory;
-import hr.nas2skupa.eleventhhour.utils.Utils;
 
 /**
  * Created by nas2skupa on 18/09/16.
@@ -22,6 +21,6 @@ public class SubcategoryViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bindToSubcategory(Subcategory subcategory) {
-        titleView.setText(Utils.getLocaleName(subcategory.getName()));
+        titleView.setText(subcategory.getName());
     }
 }

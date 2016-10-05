@@ -30,7 +30,6 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.CategoryActivity_"
-            android:label="Pick a subcategory"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
 

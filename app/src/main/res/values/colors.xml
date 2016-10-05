@@ -7,7 +7,7 @@
     <color name="blue_grey_500">#607D8B</color>
     <color name="blue_grey_600">#546E7A</color>
     <color name="blue_grey_700">#455A64</color>
-    <color name="blue_grey_800">#37474F</color>
+    <color name="blue_grey_800">#37474f</color>
     <color name="blue_grey_900">#263238</color>
 
     <color name="category_health">#80c5c3</color>
@@ -19,4 +19,8 @@
     <color name="category_travel">#E0A12D</color>
     <color name="category_transport">#919294</color>
     <color name="category_fun">#816981</color>
+
+    <color name="sale">#1565c0</color>
+    <color name="favorite">#c62828</color>
+    <color name="divider">#e0e0e0</color>
 </resources>

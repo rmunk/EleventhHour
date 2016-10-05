@@ -8,8 +8,9 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.transition.Explode;
 import android.transition.Fade;
+import android.transition.Slide;
+import android.view.Gravity;
 import android.view.View;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -25,6 +26,7 @@ import org.greenrobot.eventbus.EventBus;
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.events.SubcategorySelectedEvent;
 import hr.nas2skupa.eleventhhour.model.Subcategory;
+import hr.nas2skupa.eleventhhour.ui.helpers.SimpleDividerItemDecoration;
 import hr.nas2skupa.eleventhhour.utils.Utils;
 
 /**
@@ -56,6 +58,7 @@ public class SubcategoriesFragment extends Fragment {
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(manager);
         recyclerView.setHasFixedSize(true);
+        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         Query query = database.child("subcategories").child(categoryKey).orderByChild("name/" + Utils.getLanguageIso());
@@ -86,9 +89,9 @@ public class SubcategoriesFragment extends Fragment {
         setAllowEnterTransitionOverlap(false);
         setAllowReturnTransitionOverlap(false);
 
-        setEnterTransition(new Fade().setStartDelay(500).setDuration(500));
-        setReenterTransition(new Fade().setStartDelay(500).setDuration(500));
-        setExitTransition(new Explode().setDuration(500));
-        setReturnTransition(new Explode().setDuration(500));
+        setEnterTransition(new Fade());
+        setReenterTransition(new Fade());
+        setExitTransition(new Slide(Gravity.TOP));
+        setReturnTransition(new Slide(Gravity.TOP));
     }
 }

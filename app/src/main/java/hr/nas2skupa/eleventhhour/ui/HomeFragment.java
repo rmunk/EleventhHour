@@ -61,7 +61,12 @@ public class HomeFragment extends Fragment {
     }
 
     private void startCategoryActivity(View card, String categoryKey) {
-        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), Pair.create(card, "category_card"));
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                getActivity(),
+                Pair.create(card.findViewById(R.id.category_background), "category_header"),
+                Pair.create(card.findViewById(R.id.img_category_icon), "category_icon"),
+                Pair.create(card.findViewById(R.id.txt_category_name), "category_title")
+        );
         CategoryActivity_.intent(getContext())
                 .categoryKey(categoryKey)
                 .withOptions(options.toBundle())

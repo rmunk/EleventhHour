@@ -30,19 +30,16 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.EditorAction;
 import org.androidannotations.annotations.TextChange;
 import org.androidannotations.annotations.ViewById;
+import org.greenrobot.eventbus.EventBus;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.model.User;
-import hr.nas2skupa.eleventhhour.ui.MainActivity;
-import hr.nas2skupa.eleventhhour.ui.MainActivity_;
+import hr.nas2skupa.eleventhhour.events.AuthSuccessfullEvent;
 import hr.nas2skupa.eleventhhour.utils.NetworkUtils;
 
 /**
@@ -146,7 +143,9 @@ public class SignInFragment extends Fragment implements GoogleApiClient.OnConnec
                             return;
                         }
 
-                        onAuthSuccess(task.getResult().getUser());
+                        FirebaseUser user = task.getResult().getUser();
+                        if (user != null)
+                            EventBus.getDefault().post(new AuthSuccessfullEvent(user));
                     }
                 });
     }
@@ -225,7 +224,9 @@ public class SignInFragment extends Fragment implements GoogleApiClient.OnConnec
                             return;
                         }
 
-                        onAuthSuccess(task.getResult().getUser());
+                        FirebaseUser user = task.getResult().getUser();
+                        if (user != null)
+                            EventBus.getDefault().post(new AuthSuccessfullEvent(user));
                     }
                 });
     }
@@ -233,19 +234,6 @@ public class SignInFragment extends Fragment implements GoogleApiClient.OnConnec
     private void hideKeyboard() {
         InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(layoutMain.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-    }
-
-    private void onAuthSuccess(FirebaseUser firebaseUser) {
-        // Write the new user
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        User user = new User(firebaseUser.getDisplayName(), firebaseUser.getEmail(), firebaseUser.getPhotoUrl());
-        database.child("users").child(firebaseUser.getUid()).setValue(user);
-
-        // Go to MainActivity
-        MainActivity_.intent(getContext())
-                .action(MainActivity.HOME)
-                .flags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)
-                .start();
     }
 
     @Override

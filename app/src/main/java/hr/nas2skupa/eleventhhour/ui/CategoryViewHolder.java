@@ -12,14 +12,14 @@ import com.squareup.picasso.Picasso;
 
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.model.Category;
-import hr.nas2skupa.eleventhhour.utils.Utils;
 
 /**
  * Created by nas2skupa on 18/09/16.
  */
 public class CategoryViewHolder extends RecyclerView.ViewHolder {
-    public TextView titleView;
+    private TextView titleView;
     private ImageView iconView;
+    private ImageView backgroundView;
 
 
     public CategoryViewHolder(View itemView) {
@@ -27,12 +27,13 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder {
 
         titleView = (TextView) itemView.findViewById(R.id.txt_category_name);
         iconView = (ImageView) itemView.findViewById(R.id.img_category_icon);
+        backgroundView = (ImageView) itemView.findViewById(R.id.category_background);
     }
 
     public void bindToSubcategory(final Category category) {
-        titleView.setText(Utils.getLocaleName(category.getName()));
+        titleView.setText(category.getName());
         try {
-            iconView.setBackgroundColor(Color.parseColor(category.getColor()));
+            backgroundView.setBackgroundColor(Color.parseColor(category.getColor()));
         } catch (Exception ignored) {
 
         }

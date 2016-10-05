@@ -15,17 +15,22 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
+import java.util.HashMap;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.model.User;
+import hr.nas2skupa.eleventhhour.events.AuthSuccessfullEvent;
 import hr.nas2skupa.eleventhhour.ui.MainActivity;
 import hr.nas2skupa.eleventhhour.ui.MainActivity_;
 
@@ -64,7 +69,7 @@ public class SignInActivity extends FragmentActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) onAuthSuccess(user);
+                if (user != null) EventBus.getDefault().post(new AuthSuccessfullEvent(user));
                 else showSignInFragment();
             }
         };
@@ -73,6 +78,8 @@ public class SignInActivity extends FragmentActivity {
     @Override
     public void onStart() {
         super.onStart();
+
+        EventBus.getDefault().register(this);
     }
 
     @Override
@@ -81,6 +88,8 @@ public class SignInActivity extends FragmentActivity {
         if (authListener != null) {
             auth.removeAuthStateListener(authListener);
         }
+
+        EventBus.getDefault().unregister(this);
     }
 
     @AfterViews
@@ -167,16 +176,30 @@ public class SignInActivity extends FragmentActivity {
                 .start();
     }
 
-    private void onAuthSuccess(FirebaseUser firebaseUser) {
-        // Write the new user
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        User user = new User(firebaseUser.getDisplayName(), firebaseUser.getEmail(), firebaseUser.getPhotoUrl());
-        database.child("users").child(firebaseUser.getUid()).setValue(user);
+    @Subscribe
+    public void onAuthSuccess(AuthSuccessfullEvent event) {
+        FirebaseUser firebaseUser = event.getFirebaseUser();
 
-        // Go to MainActivity
-        MainActivity_.intent(this)
-                .action(MainActivity.HOME)
-                .flags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)
-                .start();
+        HashMap<String, Object> userMap = new HashMap<>();
+        userMap.put("username", firebaseUser.getDisplayName());
+        userMap.put("email", firebaseUser.getEmail());
+        if (firebaseUser.getPhotoUrl() != null)
+            userMap.put("pictureUrl", firebaseUser.getPhotoUrl().toString());
+
+        FirebaseDatabase.getInstance().getReference().child("users")
+                .child(firebaseUser.getUid())
+                .updateChildren(userMap)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            // Go to MainActivity
+                            MainActivity_.intent(SignInActivity.this)
+                                    .action(MainActivity.HOME)
+                                    .flags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    .start();
+                        } else showSignInFragment();
+                    }
+                });
     }
 }

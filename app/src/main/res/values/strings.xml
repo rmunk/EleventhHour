@@ -31,6 +31,7 @@
     <string name="sign_in_username_or_email">Username or email</string>
     <string name="sign_in_password">Password</string>
     <string name="sign_in_action">Sign in</string>
+    <string name="sign_in_with_social_account">Or simply sign in using your social account</string>
     <string name="msg_sign_in_wrong_credentials">Wrong username or password.</string>
     <string name="msg_sign_in_error">Sorry, we are unable to sign you in at the moment. Please try again later.</string>
     <string name="msg_sign_in_no_network">You need network access to sign in.</string>

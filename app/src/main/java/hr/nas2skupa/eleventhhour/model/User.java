@@ -4,6 +4,8 @@ import android.net.Uri;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 
+import java.util.HashMap;
+
 /**
  * User
  */
@@ -13,6 +15,7 @@ public class User {
     private String username;
     private String email;
     private String pictureUrl;
+    private HashMap<String, Boolean> favorites;
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -28,24 +31,16 @@ public class User {
         return username;
     }
 
-    public void setUsername(final String newUsername) {
-        username = newUsername;
-    }
-
     public String getEmail() {
         return email;
-    }
-
-    public void setEmail(final String newEmail) {
-        email = newEmail;
     }
 
     public String getPictureUrl() {
         return pictureUrl;
     }
 
-    public void setPictureUrl(String pictureUrl) {
-        this.pictureUrl = pictureUrl;
+    public HashMap<String, Boolean> getFavorites() {
+        return favorites;
     }
 }
 
