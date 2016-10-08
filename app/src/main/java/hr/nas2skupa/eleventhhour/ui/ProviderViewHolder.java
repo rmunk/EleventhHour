@@ -28,7 +28,7 @@ public class ProviderViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.txt_provider_name) TextView txtProviderName;
     @BindView(R.id.img_favorite) ImageView imgFavorite;
     @BindView(R.id.img_sale) ImageView imgSale;
-    @BindView(R.id.rating_bar) RatingBar ratingBar;
+    @BindView(R.id.rating_indicator) RatingBar ratingIndicator;
     @BindView(R.id.txt_distance) TextView txtDistance;
 
     @BindView(R.id.provider_details) ViewGroup details;
@@ -55,7 +55,7 @@ public class ProviderViewHolder extends RecyclerView.ViewHolder {
         txtProviderName.setText(provider.getName());
         imgSale.setVisibility(provider.isSale() ? View.VISIBLE : View.GONE);
         imgFavorite.setVisibility(provider.isFavorite() ? View.VISIBLE : View.GONE);
-        ratingBar.setRating(provider.getRating());
+        ratingIndicator.setRating(provider.getRating());
 
         txtDescription.setText(provider.getDescription());
         txtDescription.setVisibility(txtDescription.getText().length() > 0 ? View.VISIBLE : View.GONE);
@@ -75,11 +75,6 @@ public class ProviderViewHolder extends RecyclerView.ViewHolder {
 
     public void showDetails(boolean show) {
         details.setVisibility(show ? View.VISIBLE : View.GONE);
-    }
-
-    @OnClick(R.id.btn_rate)
-    public void rateProvider() {
-
     }
 
     @OnClick(R.id.btn_favourite)

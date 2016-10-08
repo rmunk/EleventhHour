@@ -74,12 +74,14 @@ public class ProvidersFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        LinearLayoutManager manager = new LinearLayoutManager(getActivity());
+        final LinearLayoutManager manager = new LinearLayoutManager(getActivity());
+        manager.setReverseLayout(true);
+        manager.setStackFromEnd(true);
         recyclerView.setLayoutManager(manager);
         recyclerView.setHasFixedSize(true);
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        Query query = database.child("providers").child(subcategoryKey).orderByChild("txtCategoryName/" + Utils.getLanguageIso());
+        Query query = database.child("providers").child(subcategoryKey).orderByChild("rating");
         FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<Provider, ProviderViewHolder>(
                 Provider.class,
                 R.layout.item_provider,

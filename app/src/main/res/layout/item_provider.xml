@@ -57,7 +57,7 @@
             app:srcCompat="@drawable/ic_redeem_black_24dp" />
 
         <RatingBar
-            android:id="@+id/rating_bar"
+            android:id="@+id/rating_indicator"
             style="@style/Widget.AppCompat.RatingBar.Small"
             android:layout_width="0dp"
             android:layout_height="16dp"
@@ -74,8 +74,8 @@
             android:paddingBottom="8dp"
             android:text="320 m"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            app:layout_constraintLeft_toLeftOf="@+id/rating_bar"
-            app:layout_constraintTop_toBottomOf="@+id/rating_bar"
+            app:layout_constraintLeft_toLeftOf="@+id/rating_indicator"
+            app:layout_constraintTop_toBottomOf="@+id/rating_indicator"
             tools:text="320 m" />
 
         <android.support.constraint.ConstraintLayout
@@ -200,19 +200,8 @@
                 app:layout_constraintTop_toTopOf="@+id/btn_schedule"
                 app:srcCompat="@drawable/ic_favorite_black_36dp" />
 
-            <ImageView
-                android:id="@+id/btn_rate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:tint="@color/colorAccent"
-                android:visibility="gone"
-                app:layout_constraintRight_toLeftOf="@+id/btn_favourite"
-                app:layout_constraintTop_toTopOf="@+id/btn_favourite"
-                app:srcCompat="@drawable/ic_star_black_24dp" />
-
             <RatingBar
-                android:id="@+id/ratingBar"
+                android:id="@+id/rating_bar"
                 style="@style/Widget.AppCompat.RatingBar.Indicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -221,7 +210,8 @@
                 android:isIndicator="false"
                 app:layout_constraintBottom_toBottomOf="@+id/btn_favourite"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/btn_favourite" />
+                app:layout_constraintTop_toTopOf="@+id/btn_favourite"
+                android:stepSize="1"/>
         </android.support.constraint.ConstraintLayout>
 
 
