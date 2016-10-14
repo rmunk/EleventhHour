@@ -178,6 +178,7 @@ public class SignInActivity extends FragmentActivity {
 
     @Subscribe(sticky = true)
     public void onAuthSuccess(AuthSuccessfulEvent event) {
+        EventBus.getDefault().removeStickyEvent(event);
         FirebaseUser firebaseUser = event.getFirebaseUser();
 
         HashMap<String, Object> userMap = new HashMap<>();
