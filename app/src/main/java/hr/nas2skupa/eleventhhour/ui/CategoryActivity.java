@@ -1,11 +1,14 @@
 package hr.nas2skupa.eleventhhour.ui;
 
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -29,6 +32,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.events.ProviderSelectedEvent;
 import hr.nas2skupa.eleventhhour.events.SubcategorySelectedEvent;
 import hr.nas2skupa.eleventhhour.model.Category;
 import hr.nas2skupa.eleventhhour.model.Subcategory;
@@ -56,7 +60,7 @@ public class CategoryActivity extends AppCompatActivity {
     @ViewById(R.id.img_category_icon)
     ImageView imgCategoryIcon;
 
-    void setToolbar(@ViewById(R.id.app_bar) AppBarLayout appBar, @ViewById(R.id.toolbar) Toolbar toolbar) {
+    void setToolbar(@ViewById(R.id.toolbar) Toolbar toolbar) {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -68,12 +72,14 @@ public class CategoryActivity extends AppCompatActivity {
 
     @UiThread(delay = 500)
     public void setSubcategoryFragment() {
+        if (isFinishing()) return;
         SubcategoriesFragment fragment = SubcategoriesFragment_.builder().categoryKey(categoryKey).build();
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, fragment, "SubcategoriesFragment").commit();
     }
 
     @UiThread(delay = 500)
     public void setProvidersFragment() {
+        if (isFinishing()) return;
         ProvidersFragment fragment = ProvidersFragment_.builder().subcategoryKey(subcategoryKey).build();
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.fragment_container, fragment, "ProvidersFragment")
@@ -109,6 +115,9 @@ public class CategoryActivity extends AppCompatActivity {
                 }
                 txtCategoryName.setText(category.getName());
                 appBar.setBackgroundColor(color);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    getWindow().setStatusBarColor(color);
+                }
                 Picasso.with(CategoryActivity.this).load(category.getIcon()).fit().into(imgCategoryIcon);
                 categoryBackground.setBackgroundColor(color);
             }
@@ -179,5 +188,17 @@ public class CategoryActivity extends AppCompatActivity {
                 .remove(getSupportFragmentManager().findFragmentById(R.id.fragment_container))
                 .commit();
         setProvidersFragment();
+    }
+
+    @Subscribe
+    public void openProviderPage(ProviderSelectedEvent event) {
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                this,
+                Pair.create(event.getView().findViewById(R.id.layout_main), "provider_card")
+        );
+        ProviderActivity_.intent(this)
+                .providerKey(event.getProviderKey())
+                .withOptions(options.toBundle())
+                .start();
     }
 }

@@ -1,123 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/layout_main"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="4dp"
-    android:layout_marginTop="4dp"
-    android:transitionName="provider_card">
+                                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                                    xmlns:tools="http://schemas.android.com/tools"
+                                    android:id="@+id/layout_main"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="4dp"
+                                    android:layout_marginLeft="8dp"
+                                    android:layout_marginRight="8dp"
+                                    android:layout_marginTop="4dp"
+                                    android:transitionName="provider_card">
 
-    <android.support.constraint.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/txt_provider_name"
-            android:layout_width="0dp"
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/provider_summary"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:ellipsize="end"
-            android:maxLines="2"
-            android:scrollHorizontally="true"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/img_favorite"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Poliklinika sunce" />
-
-        <ImageView
-            android:id="@+id/img_favorite"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            android:tint="@color/colorAccent"
-            app:layout_constraintLeft_toRightOf="@+id/txt_provider_name"
-            app:layout_constraintRight_toLeftOf="@+id/img_sale"
-            app:layout_constraintTop_toTopOf="@+id/txt_provider_name"
-            app:srcCompat="@drawable/ic_favorite_black_24dp" />
-
-        <ImageView
-            android:id="@+id/img_sale"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:layout_marginEnd="16dp"
+            android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
-            android:tint="@color/sale"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/img_favorite"
-            app:srcCompat="@drawable/ic_redeem_black_24dp" />
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp">
 
-        <RatingBar
-            android:id="@+id/rating_indicator"
-            style="@style/Widget.AppCompat.RatingBar.Small"
-            android:layout_width="0dp"
-            android:layout_height="16dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintLeft_toLeftOf="@+id/txt_provider_name"
-            app:layout_constraintTop_toBottomOf="@+id/txt_provider_name"
-            tools:rating="3.3" />
+            <TextView
+                android:id="@+id/txt_provider_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:scrollHorizontally="true"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Poliklinika sunce"/>
 
-        <TextView
-            android:id="@+id/txt_distance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:paddingBottom="8dp"
-            android:text="320 m"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            app:layout_constraintLeft_toLeftOf="@+id/rating_indicator"
-            app:layout_constraintTop_toBottomOf="@+id/rating_indicator"
-            tools:text="320 m" />
+            <ImageView
+                android:id="@+id/img_favorite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:tint="@color/colorAccent"
+                app:layout_constraintBottom_toBottomOf="@+id/img_sale"
+                app:layout_constraintRight_toLeftOf="@+id/img_sale"
+                app:layout_constraintTop_toTopOf="@+id/img_sale"
+                app:srcCompat="@drawable/ic_favorite_black_24dp"/>
+
+            <ImageView
+                android:id="@+id/img_sale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tint="@color/sale"
+                app:layout_constraintBottom_toBottomOf="@+id/txt_provider_name"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/txt_provider_name"
+                app:srcCompat="@drawable/ic_redeem_black_24dp"/>
+
+            <RatingBar
+                android:id="@+id/rating_indicator"
+                style="@style/Widget.AppCompat.RatingBar.Small"
+                android:layout_width="0dp"
+                android:layout_height="16dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintLeft_toLeftOf="@+id/txt_provider_name"
+                app:layout_constraintTop_toBottomOf="@+id/txt_provider_name"
+                tools:rating="3.3"/>
+
+            <TextView
+                android:id="@+id/txt_distance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="320 m"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                app:layout_constraintLeft_toLeftOf="@+id/rating_indicator"
+                app:layout_constraintTop_toBottomOf="@+id/rating_indicator"
+                tools:text="320 m"/>
+
+            <ImageView
+                android:id="@+id/img_expand"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:alpha="0.54"
+                app:layout_constraintBottom_toBottomOf="@+id/txt_distance"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/txt_distance"
+                app:srcCompat="@drawable/ic_expand_more_black_24dp"/>
+        </android.support.constraint.ConstraintLayout>
+
+        <View
+            android:id="@+id/separator1"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider"
+            android:visibility="gone"
+            tools:visibility="visible"/>
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/provider_details"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="vertical"
+            android:layout_margin="16dp"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txt_distance"
-            app:layout_constraintVertical_bias="1.0"
             tools:visibility="visible">
 
             <TextView
                 android:id="@+id/txt_description"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                app:layout_constraintHorizontal_bias="0.12"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="Sustav Poliklinika Sunce danas je najveći privatni zdravstveni sustav u Hrvatskoj kojeg čini sedam moderno opremljenih poliklinika." />
+                tools:text="Sustav Poliklinika Sunce danas je najveći privatni zdravstveni sustav u Hrvatskoj kojeg čini sedam moderno opremljenih poliklinika."/>
 
             <TextView
                 android:id="@+id/txt_phone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:drawableLeft="@drawable/ic_phone_black_18dp"
                 android:drawablePadding="8dp"
                 app:layout_constraintLeft_toLeftOf="@+id/txt_description"
                 app:layout_constraintTop_toBottomOf="@+id/txt_description"
-                tools:text="0800 85 88" />
+                tools:text="0800 85 88"/>
 
             <TextView
                 android:id="@+id/txt_address"
@@ -126,9 +139,9 @@
                 android:layout_marginTop="8dp"
                 android:drawableLeft="@drawable/ic_place_black_18dp"
                 android:drawablePadding="8dp"
-                app:layout_constraintLeft_toLeftOf="@+id/txt_phone"
+                app:layout_constraintLeft_toLeftOf="@+id/txt_description"
                 app:layout_constraintTop_toBottomOf="@+id/txt_phone"
-                tools:text="Trnjanska cesta 108, 10000, Zagreb" />
+                tools:text="Trnjanska cesta 108, 10000, Zagreb"/>
 
             <TextView
                 android:id="@+id/txt_web"
@@ -137,9 +150,9 @@
                 android:layout_marginTop="8dp"
                 android:drawableLeft="@drawable/ic_mail_outline_black_18dp"
                 android:drawablePadding="8dp"
-                app:layout_constraintLeft_toLeftOf="@+id/txt_address"
+                app:layout_constraintLeft_toLeftOf="@+id/txt_description"
                 app:layout_constraintTop_toBottomOf="@+id/txt_address"
-                tools:text="www.poliklinika.sunce.hr" />
+                tools:text="www.poliklinika.sunce.hr"/>
 
             <TextView
                 android:id="@+id/txt_email"
@@ -148,9 +161,9 @@
                 android:layout_marginTop="8dp"
                 android:drawableLeft="@drawable/ic_web_black_18dp"
                 android:drawablePadding="8dp"
-                app:layout_constraintLeft_toLeftOf="@+id/txt_web"
+                app:layout_constraintLeft_toLeftOf="@+id/txt_description"
                 app:layout_constraintTop_toBottomOf="@+id/txt_web"
-                tools:text="info@poliklinika.sunce.hr" />
+                tools:text="info@poliklinika.sunce.hr"/>
 
             <TextView
                 android:id="@+id/txt_hours"
@@ -159,34 +172,42 @@
                 android:layout_marginTop="8dp"
                 android:drawableLeft="@drawable/ic_access_time_black_18dp"
                 android:drawablePadding="8dp"
-                app:layout_constraintLeft_toLeftOf="@+id/txt_email"
+                app:layout_constraintLeft_toLeftOf="@+id/txt_description"
                 app:layout_constraintTop_toBottomOf="@+id/txt_email"
-                tools:text=" 8:00 - 20:00" />
+                tools:text=" 8:00 - 20:00"/>
+        </android.support.constraint.ConstraintLayout>
 
-            <View
-                android:id="@+id/view"
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_marginTop="16dp"
-                android:background="@color/divider"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/txt_hours" />
+        <View
+            android:id="@+id/separator2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider"
+            android:visibility="gone"
+            tools:visibility="visible"/>
 
-            <ImageView
-                android:id="@+id/btn_schedule"
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/provider_action"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <RatingBar
+                android:id="@+id/rating_bar"
+                style="@style/Widget.AppCompat.RatingBar.Indicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginTop="8dp"
-                android:padding="8dp"
-                android:tint="@color/colorAccent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/view"
-                app:srcCompat="@drawable/ic_watch_later_black_36dp" />
+                android:isIndicator="false"
+                android:stepSize="1"
+                app:layout_constraintBottom_toBottomOf="@+id/btn_schedule"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/btn_schedule"/>
 
             <ImageView
                 android:id="@+id/btn_favourite"
@@ -196,25 +217,21 @@
                 android:layout_marginRight="8dp"
                 android:padding="8dp"
                 android:tint="@color/colorAccent"
+                app:layout_constraintBottom_toBottomOf="@+id/btn_schedule"
                 app:layout_constraintRight_toLeftOf="@+id/btn_schedule"
                 app:layout_constraintTop_toTopOf="@+id/btn_schedule"
-                app:srcCompat="@drawable/ic_favorite_black_36dp" />
+                app:srcCompat="@drawable/ic_favorite_black_36dp"/>
 
-            <RatingBar
-                android:id="@+id/rating_bar"
-                style="@style/Widget.AppCompat.RatingBar.Indicator"
+            <ImageView
+                android:id="@+id/btn_schedule"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginStart="16dp"
-                android:isIndicator="false"
-                app:layout_constraintBottom_toBottomOf="@+id/btn_favourite"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/btn_favourite"
-                android:stepSize="1"/>
+                android:padding="8dp"
+                android:tint="@color/colorAccent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_watch_later_black_36dp"/>
         </android.support.constraint.ConstraintLayout>
-
-
-    </android.support.constraint.ConstraintLayout>
-
+    </LinearLayout>
 </android.support.v7.widget.CardView>

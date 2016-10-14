@@ -33,6 +33,7 @@ import java.util.HashMap;
 
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.events.FavoriteStatusChangedEvent;
+import hr.nas2skupa.eleventhhour.events.UserRatingChangedEvent;
 import hr.nas2skupa.eleventhhour.model.Provider;
 import hr.nas2skupa.eleventhhour.utils.Utils;
 
@@ -50,9 +51,13 @@ public class ProvidersFragment extends Fragment {
     @ViewById(R.id.recycler_view)
     RecyclerView recyclerView;
 
-    private ChildEventListener favoriteChangedListener;
     private DatabaseReference favoriteReference;
+    private ChildEventListener favoriteChangedListener;
     private HashMap<String, Boolean> favorites = new HashMap<>();
+
+    private DatabaseReference ratingReference;
+    private ChildEventListener ratingChangedListener;
+    private HashMap<String, Float> ratings = new HashMap<>();
 
     public ProvidersFragment() {
         // Required empty public constructor
@@ -66,6 +71,11 @@ public class ProvidersFragment extends Fragment {
                 .child("users")
                 .child(Utils.getMyUid())
                 .child("favorites");
+
+        ratingReference = FirebaseDatabase.getInstance().getReference()
+                .child("users")
+                .child(Utils.getMyUid())
+                .child("ratings");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) setTransitions();
     }
@@ -98,6 +108,10 @@ public class ProvidersFragment extends Fragment {
                         ? favorites.get(provider.getKey())
                         : false);
 
+                provider.setUserRating(ratings.containsKey(provider.getKey())
+                        ? ratings.get(provider.getKey())
+                        : 0f);
+
                 viewHolder.bindToProvider(provider);
 
                 final boolean isExpanded = position == expandedPosition;
@@ -106,13 +120,16 @@ public class ProvidersFragment extends Fragment {
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        expandedPosition = isExpanded ? -1 : position;
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                             Transition transition = new AutoTransition();
-                            transition.setDuration(200);
+                            transition.setDuration(100);
                             TransitionManager.beginDelayedTransition(recyclerView, transition);
                         }
-                        notifyDataSetChanged();
+
+                        notifyItemChanged(expandedPosition);
+                        expandedPosition = isExpanded ? -1 : position;
+                        notifyItemChanged(position);
+                        recyclerView.scrollToPosition(position);
                     }
                 });
             }
@@ -166,17 +183,48 @@ public class ProvidersFragment extends Fragment {
 
             }
         };
-
         favoriteReference.addChildEventListener(favoriteChangedListener);
+
+        ratingChangedListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                ratings.put(dataSnapshot.getKey(), dataSnapshot.getValue(float.class));
+                EventBus.getDefault().post(new UserRatingChangedEvent(dataSnapshot.getKey(), dataSnapshot.getValue(float.class)));
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                ratings.put(dataSnapshot.getKey(), dataSnapshot.getValue(float.class));
+                EventBus.getDefault().post(new UserRatingChangedEvent(dataSnapshot.getKey(), dataSnapshot.getValue(float.class)));
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                ratings.remove(dataSnapshot.getKey());
+                EventBus.getDefault().post(new UserRatingChangedEvent(dataSnapshot.getKey(), 0f));
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        ratingReference.addChildEventListener(ratingChangedListener);
     }
 
     @Override
     public void onStop() {
         super.onStop();
 
-        if (favoriteChangedListener != null) {
+        if (favoriteChangedListener != null)
             favoriteReference.removeEventListener(favoriteChangedListener);
-        }
+        if (ratingChangedListener != null)
+            ratingReference.removeEventListener(ratingChangedListener);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)

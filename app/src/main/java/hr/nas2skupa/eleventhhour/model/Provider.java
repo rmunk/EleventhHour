@@ -15,7 +15,6 @@ public class Provider {
     private float rating = 0;
     private Location location;
     private boolean sale;
-    private boolean favorite;
 
     private String description;
     private String phone;
@@ -24,6 +23,10 @@ public class Provider {
     private String email;
     private String hours;
     private HashMap<String, Boolean> payment = new HashMap<>();
+
+    // User related properties
+    private boolean favorite;
+    private float userRating;
 
 
     public Provider() {
@@ -47,14 +50,6 @@ public class Provider {
 
     public boolean isSale() {
         return sale;
-    }
-
-    public boolean isFavorite() {
-        return favorite;
-    }
-
-    public void setFavorite(boolean favorite) {
-        this.favorite = favorite;
     }
 
     public String getDescription() {
@@ -83,5 +78,23 @@ public class Provider {
 
     public HashMap<String, Boolean> getPayment() {
         return payment;
+    }
+
+
+    // User related properties
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
+    }
+
+    public float getUserRating() {
+        return userRating;
+    }
+
+    public void setUserRating(float userRating) {
+        this.userRating = userRating;
     }
 }
