@@ -6,10 +6,10 @@ import com.google.firebase.auth.FirebaseUser;
  * Created by nas2skupa on 05/10/2016.
  */
 
-public class AuthSuccessfullEvent {
+public class AuthSuccessfulEvent {
     FirebaseUser firebaseUser;
 
-    public AuthSuccessfullEvent(FirebaseUser firebaseUser) {
+    public AuthSuccessfulEvent(FirebaseUser firebaseUser) {
         this.firebaseUser = firebaseUser;
     }
 

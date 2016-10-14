@@ -39,7 +39,7 @@ import org.androidannotations.annotations.ViewById;
 import org.greenrobot.eventbus.EventBus;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.events.AuthSuccessfullEvent;
+import hr.nas2skupa.eleventhhour.events.AuthSuccessfulEvent;
 import hr.nas2skupa.eleventhhour.utils.NetworkUtils;
 
 /**
@@ -145,7 +145,7 @@ public class SignInFragment extends Fragment implements GoogleApiClient.OnConnec
 
                         FirebaseUser user = task.getResult().getUser();
                         if (user != null)
-                            EventBus.getDefault().post(new AuthSuccessfullEvent(user));
+                            EventBus.getDefault().postSticky(new AuthSuccessfulEvent(user));
                     }
                 });
     }
@@ -226,7 +226,7 @@ public class SignInFragment extends Fragment implements GoogleApiClient.OnConnec
 
                         FirebaseUser user = task.getResult().getUser();
                         if (user != null)
-                            EventBus.getDefault().post(new AuthSuccessfullEvent(user));
+                            EventBus.getDefault().postSticky(new AuthSuccessfulEvent(user));
                     }
                 });
     }

@@ -30,7 +30,7 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.HashMap;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.events.AuthSuccessfullEvent;
+import hr.nas2skupa.eleventhhour.events.AuthSuccessfulEvent;
 import hr.nas2skupa.eleventhhour.ui.MainActivity;
 import hr.nas2skupa.eleventhhour.ui.MainActivity_;
 
@@ -69,7 +69,7 @@ public class SignInActivity extends FragmentActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) EventBus.getDefault().post(new AuthSuccessfullEvent(user));
+                if (user != null) EventBus.getDefault().postSticky(new AuthSuccessfulEvent(user));
                 else showSignInFragment();
             }
         };
@@ -176,8 +176,8 @@ public class SignInActivity extends FragmentActivity {
                 .start();
     }
 
-    @Subscribe
-    public void onAuthSuccess(AuthSuccessfullEvent event) {
+    @Subscribe(sticky = true)
+    public void onAuthSuccess(AuthSuccessfulEvent event) {
         FirebaseUser firebaseUser = event.getFirebaseUser();
 
         HashMap<String, Object> userMap = new HashMap<>();
