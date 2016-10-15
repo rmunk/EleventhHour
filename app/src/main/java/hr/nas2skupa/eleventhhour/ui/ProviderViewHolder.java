@@ -92,8 +92,8 @@ public class ProviderViewHolder extends RecyclerView.ViewHolder {
         separator2.setVisibility(show ? View.VISIBLE : View.GONE);
         viewAction.setVisibility(show ? View.VISIBLE : View.GONE);
         ObjectAnimator anim = show
-                ? ObjectAnimator.ofFloat(imgExpand, "rotation", 0, 180)
-                : ObjectAnimator.ofFloat(imgExpand, "rotation", 180, 0);
+                ? ObjectAnimator.ofFloat(imgExpand, "rotation", 180, 0)
+                : ObjectAnimator.ofFloat(imgExpand, "rotation", 0, 180);
         anim.setDuration(500);
         anim.start();
     }
