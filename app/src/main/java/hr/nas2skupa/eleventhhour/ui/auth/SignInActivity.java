@@ -19,7 +19,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
@@ -177,30 +180,48 @@ public class SignInActivity extends FragmentActivity {
     }
 
     @Subscribe(sticky = true)
-    public void onAuthSuccess(AuthSuccessfulEvent event) {
+    public void onAuthSuccess(final AuthSuccessfulEvent event) {
         EventBus.getDefault().removeStickyEvent(event);
-        FirebaseUser firebaseUser = event.getFirebaseUser();
 
-        HashMap<String, Object> userMap = new HashMap<>();
-        userMap.put("username", firebaseUser.getDisplayName());
-        userMap.put("email", firebaseUser.getEmail());
-        if (firebaseUser.getPhotoUrl() != null)
-            userMap.put("pictureUrl", firebaseUser.getPhotoUrl().toString());
-
-        FirebaseDatabase.getInstance().getReference().child("users")
-                .child(firebaseUser.getUid())
-                .updateChildren(userMap)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
+        FirebaseDatabase.getInstance()
+                .getReference(".info/connected")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            // Go to MainActivity
-                            MainActivity_.intent(SignInActivity.this)
-                                    .action(MainActivity.HOME)
-                                    .flags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    .start();
-                        } else showSignInFragment();
+                    public void onDataChange(DataSnapshot snapshot) {
+                        boolean connected = snapshot.getValue(Boolean.class);
+                        if (connected) {
+                            FirebaseUser firebaseUser = event.getFirebaseUser();
+
+                            HashMap<String, Object> userMap = new HashMap<>();
+                            userMap.put("username", firebaseUser.getDisplayName());
+                            userMap.put("email", firebaseUser.getEmail());
+                            if (firebaseUser.getPhotoUrl() != null)
+                                userMap.put("pictureUrl", firebaseUser.getPhotoUrl().toString());
+
+                            FirebaseDatabase.getInstance().getReference().child("users")
+                                    .child(firebaseUser.getUid())
+                                    .updateChildren(userMap)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) goHome();
+                                            else showSignInFragment();
+                                        }
+                                    });
+                        } else goHome();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError error) {
+                        goHome();
                     }
                 });
+    }
+
+    private void goHome() {
+        MainActivity_.intent(SignInActivity.this)
+                .action(MainActivity.HOME)
+                .flags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)
+                .start();
     }
 }
