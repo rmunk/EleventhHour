@@ -2,17 +2,18 @@ package hr.nas2skupa.eleventhhour.model;
 
 import java.util.HashMap;
 
-import hr.nas2skupa.eleventhhour.utils.Utils;
-
 /**
  * Created by nas2skupa on 21/09/16.
  */
 
 public class Provider {
     private String key;
+    private String category;
+    private String subcategory;
 
-    private HashMap<String, String> name = new HashMap<>();
-    private float rating = 0;
+    private String name;
+    private float rating;
+    private int ratingsCnt;
     private Location location;
     private boolean sale;
 
@@ -40,12 +41,24 @@ public class Provider {
         this.key = key;
     }
 
+    public String getCategory() {
+        return category;
+    }
+
+    public String getSubcategory() {
+        return subcategory;
+    }
+
     public String getName() {
-        return Utils.getLocaleString(name);
+        return name;
     }
 
     public float getRating() {
         return rating;
+    }
+
+    public int getRatingsCnt() {
+        return ratingsCnt;
     }
 
     public boolean isSale() {

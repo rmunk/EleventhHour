@@ -23,4 +23,5 @@
     <color name="sale">#1565c0</color>
     <color name="favorite">#c62828</color>
     <color name="divider">#1F000000</color>
+    <color name="item_background">#8AFFFFFF</color>
 </resources>

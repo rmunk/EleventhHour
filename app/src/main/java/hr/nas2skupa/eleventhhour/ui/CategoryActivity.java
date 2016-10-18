@@ -80,7 +80,10 @@ public class CategoryActivity extends AppCompatActivity {
     @UiThread(delay = 500)
     public void setProvidersFragment() {
         if (isFinishing()) return;
-        ProvidersFragment fragment = ProvidersFragment_.builder().subcategoryKey(subcategoryKey).build();
+        ProvidersFragment fragment = ProvidersFragment_.builder()
+                .categoryKey(categoryKey)
+                .subcategoryKey(subcategoryKey)
+                .build();
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.fragment_container, fragment, "ProvidersFragment")
                 .addToBackStack("ProvidersFragment")
@@ -92,7 +95,9 @@ public class CategoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         categoryReference = FirebaseDatabase.getInstance().getReference().child("categories").child(categoryKey);
-        setSubcategoryFragment();
+
+        if (savedInstanceState == null)
+            setSubcategoryFragment();
     }
 
     @Override
@@ -166,23 +171,23 @@ public class CategoryActivity extends AppCompatActivity {
     public void openSubcategory(SubcategorySelectedEvent event) {
         subcategoryKey = event.getSubcategoryKey();
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
+        FirebaseDatabase.getInstance().getReference()
                 .child("subcategories")
                 .child(categoryKey)
-                .child(subcategoryKey);
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Subcategory subcategory = dataSnapshot.getValue(Subcategory.class);
-                if (subcategory == null) return;
-                txtSubcategoryName.setText(subcategory.getName());
-            }
+                .child(subcategoryKey)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Subcategory subcategory = dataSnapshot.getValue(Subcategory.class);
+                        if (subcategory == null) return;
+                        txtSubcategoryName.setText(subcategory.getName());
+                    }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-            }
-        });
+                    }
+                });
 
         getSupportFragmentManager().beginTransaction()
                 .remove(getSupportFragmentManager().findFragmentById(R.id.fragment_container))
@@ -197,6 +202,8 @@ public class CategoryActivity extends AppCompatActivity {
                 Pair.create(event.getView().findViewById(R.id.layout_main), "provider_card")
         );
         ProviderActivity_.intent(this)
+                .categoryKey(categoryKey)
+                .subcategoryKey(subcategoryKey)
                 .providerKey(event.getProviderKey())
                 .withOptions(options.toBundle())
                 .start();

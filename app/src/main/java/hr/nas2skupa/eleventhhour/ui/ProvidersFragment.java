@@ -15,6 +15,7 @@ import android.transition.Transition;
 import android.transition.TransitionManager;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.ChildEventListener;
@@ -35,6 +36,7 @@ import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.events.FavoriteStatusChangedEvent;
 import hr.nas2skupa.eleventhhour.events.UserRatingChangedEvent;
 import hr.nas2skupa.eleventhhour.model.Provider;
+import hr.nas2skupa.eleventhhour.ui.viewholders.ProviderViewHolder;
 import hr.nas2skupa.eleventhhour.utils.Utils;
 
 
@@ -48,6 +50,8 @@ public class ProvidersFragment extends Fragment {
     @FragmentArg
     String subcategoryKey;
 
+    @ViewById(R.id.layout_main)
+    ViewGroup layoutMain;
     @ViewById(R.id.recycler_view)
     RecyclerView recyclerView;
 
@@ -85,13 +89,16 @@ public class ProvidersFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         final LinearLayoutManager manager = new LinearLayoutManager(getActivity());
-        manager.setReverseLayout(true);
-        manager.setStackFromEnd(true);
+//        manager.setReverseLayout(true);
+//        manager.setStackFromEnd(true);
         recyclerView.setLayoutManager(manager);
         recyclerView.setHasFixedSize(true);
 
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        Query query = database.child("providers").child(subcategoryKey).orderByChild("rating");
+        Query query = FirebaseDatabase.getInstance().getReference()
+                .child("providers")
+                .child(categoryKey)
+                .child(subcategoryKey)
+                .orderByPriority();
         FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<Provider, ProviderViewHolder>(
                 Provider.class,
                 R.layout.item_provider,
@@ -116,20 +123,46 @@ public class ProvidersFragment extends Fragment {
 
                 final boolean isExpanded = position == expandedPosition;
                 viewHolder.showDetails(isExpanded);
+                viewHolder.showActionBar(isExpanded);
                 viewHolder.itemView.setActivated(isExpanded);
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                             Transition transition = new AutoTransition();
-                            transition.setDuration(100);
-                            TransitionManager.beginDelayedTransition(recyclerView, transition);
-                        }
+                            transition.addListener(new Transition.TransitionListener() {
+                                @Override
+                                public void onTransitionStart(Transition transition) {
 
-                        notifyItemChanged(expandedPosition);
-                        expandedPosition = isExpanded ? -1 : position;
-                        notifyItemChanged(position);
-                        recyclerView.scrollToPosition(position);
+                                }
+
+                                @Override
+                                public void onTransitionEnd(Transition transition) {
+                                    Transition transition2 = new AutoTransition();
+                                    transition2.setDuration(200);
+                                    TransitionManager.beginDelayedTransition(recyclerView, transition2);
+                                    recyclerView.scrollToPosition(position);
+                                }
+
+                                @Override
+                                public void onTransitionCancel(Transition transition) {
+
+                                }
+
+                                @Override
+                                public void onTransitionPause(Transition transition) {
+
+                                }
+
+                                @Override
+                                public void onTransitionResume(Transition transition) {
+
+                                }
+                            });
+                            TransitionManager.beginDelayedTransition(recyclerView, transition);
+                            expandedPosition = isExpanded ? -1 : position;
+                            notifyDataSetChanged();
+                        }
                     }
                 });
             }

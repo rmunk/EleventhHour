@@ -21,6 +21,7 @@ import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.model.Category;
+import hr.nas2skupa.eleventhhour.ui.viewholders.CategoryViewHolder;
 import hr.nas2skupa.eleventhhour.utils.Utils;
 
 @EFragment(R.layout.fragment_home)
@@ -48,7 +49,7 @@ public class HomeFragment extends Fragment {
                 final DatabaseReference categoryRef = getRef(position);
                 final String categoryKey = categoryRef.getKey();
 
-                viewHolder.bindToSubcategory(model);
+                viewHolder.bindToCategory(model);
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

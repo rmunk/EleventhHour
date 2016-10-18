@@ -1,4 +1,4 @@
-package hr.nas2skupa.eleventhhour.ui;
+package hr.nas2skupa.eleventhhour.ui.viewholders;
 
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
@@ -30,7 +30,7 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder {
         backgroundView = (ImageView) itemView.findViewById(R.id.category_background);
     }
 
-    public void bindToSubcategory(final Category category) {
+    public void bindToCategory(final Category category) {
         titleView.setText(category.getName());
         try {
             backgroundView.setBackgroundColor(Color.parseColor(category.getColor()));

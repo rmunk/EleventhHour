@@ -27,6 +27,7 @@ import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.events.SubcategorySelectedEvent;
 import hr.nas2skupa.eleventhhour.model.Subcategory;
 import hr.nas2skupa.eleventhhour.ui.helpers.SimpleDividerItemDecoration;
+import hr.nas2skupa.eleventhhour.ui.viewholders.SubcategoryViewHolder;
 import hr.nas2skupa.eleventhhour.utils.Utils;
 
 /**
