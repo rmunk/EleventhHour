@@ -12,10 +12,10 @@
                                     android:transitionName="provider_card">
 
     <LinearLayout
+        android:id="@+id/layout_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:id="@+id/layout_list">
+        android:orientation="vertical">
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/provider_summary"
@@ -74,18 +74,21 @@
                 tools:rating="3.3"/>
 
             <TextView
-                android:text="TextView"
+                android:id="@+id/txt_ratings"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/txt_ratings"
-                tools:text="1309"
+                android:drawablePadding="4dp"
+                android:drawableRight="@drawable/ic_person_black_18dp"
+                android:text="TextView"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                app:layout_constraintBottom_toBottomOf="@+id/rating_indicator"
                 app:layout_constraintLeft_toRightOf="@+id/rating_indicator"
                 app:layout_constraintTop_toTopOf="@+id/rating_indicator"
-                app:layout_constraintBottom_toBottomOf="@+id/rating_indicator"
+                app:layout_constraintVertical_bias="0.0"
+                tools:text="1309"
                 android:layout_marginStart="8dp"
                 android:layout_marginLeft="8dp"
-                android:drawableRight="@drawable/ic_person_black_18dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
+                android:textSize="14sp"/>
 
             <TextView
                 android:id="@+id/txt_distance"
