@@ -62,8 +62,10 @@
     <!-- CategoryActivity -->
     <string name="category_pick_a_subcategory">Pick a subcategory</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- BookingDialogFragment -->
+    <string name="book_now">Book now</string>
+    <string name="confirmation_text" formatted="false">Do you want to make a booking on %s from %s to %s?</string>
+    <string name="note_to_provider">Note to provider</string>
 
 
 </resources>

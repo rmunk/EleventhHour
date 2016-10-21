@@ -7,6 +7,7 @@ package hr.nas2skupa.eleventhhour.model;
 public class Service {
     private String name;
     private String price;
+    private int duration;
     private boolean sale;
 
     public Service() {
@@ -18,6 +19,10 @@ public class Service {
 
     public String getPrice() {
         return price;
+    }
+
+    public int getDuration() {
+        return duration;
     }
 
     public boolean isSale() {
