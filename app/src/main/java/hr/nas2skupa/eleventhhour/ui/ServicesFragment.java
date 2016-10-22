@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,15 +25,23 @@ import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.events.MakeNewBookingEvent;
+import hr.nas2skupa.eleventhhour.model.Booking;
 import hr.nas2skupa.eleventhhour.model.Service;
 import hr.nas2skupa.eleventhhour.ui.helpers.SimpleDividerItemDecoration;
 import hr.nas2skupa.eleventhhour.ui.viewholders.ServiceViewHolder;
+import hr.nas2skupa.eleventhhour.utils.Utils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -48,6 +57,7 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
     private String serviceKey;
     private Service selectedService;
     private GregorianCalendar pickedDateTime;
+    private boolean undo = false;
 
     public ServicesFragment() {
         // Required empty public constructor
@@ -58,6 +68,18 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
         super.onCreate(savedInstanceState);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) setTransitions();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -137,17 +159,50 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
         pickedDateTime.set(Calendar.MINUTE, minute);
         pickedDateTime.set(Calendar.SECOND, second);
 
+        Calendar to = (Calendar) pickedDateTime.clone();
+        to.add(Calendar.MINUTE, selectedService.getDuration());
+
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         Fragment last = getFragmentManager().findFragmentByTag("dialog");
         if (last != null) transaction.remove(last);
         transaction.addToBackStack(null);
 
         BookingDialogFragment_.builder()
-                .dateTime(pickedDateTime)
+                .providerKey(providerKey)
+                .serviceKey(serviceKey)
+                .from(pickedDateTime)
+                .to(to)
                 .name(selectedService.getName())
                 .price(selectedService.getPrice())
-                .duration(selectedService.getDuration())
                 .build()
                 .show(getFragmentManager(), "dialog");
+    }
+
+    @Subscribe
+    public void makeNewBooking(MakeNewBookingEvent event) {
+        undo = false;
+        Snackbar.make(getView(), "Your booking has been sent.", 3000)
+                .setAction("Undo", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        undo = true;
+                    }
+                })
+                .show();
+        sendBooking(event.getBooking());
+    }
+
+    @UiThread(delay = 3500)
+    public void sendBooking(Booking booking) {
+        if (undo) return;
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+        String key = reference.child("bookings").child(providerKey).push().getKey();
+        Map<String, Object> bookingValues = booking.toMap();
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/bookings/" + providerKey + "/" + key, bookingValues);
+        childUpdates.put("/users/" + Utils.getMyUid() + "/bookings/" + key, bookingValues);
+        reference.updateChildren(childUpdates);
     }
 }

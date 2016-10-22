@@ -18,11 +18,16 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.Calendar;
 import java.util.Locale;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.events.MakeNewBookingEvent;
+import hr.nas2skupa.eleventhhour.model.Booking;
+import hr.nas2skupa.eleventhhour.model.BookingStatus;
+import hr.nas2skupa.eleventhhour.utils.Utils;
 
 /**
  * Dialog for booking a service.
@@ -30,16 +35,22 @@ import hr.nas2skupa.eleventhhour.R;
 @EFragment(R.layout.fragment_booking_dialog)
 public class BookingDialogFragment extends DialogFragment {
     @FragmentArg
-    Calendar dateTime;
+    String providerKey;
+    @FragmentArg
+    String serviceKey;
+    @FragmentArg
+    Calendar from;
+    @FragmentArg
+    Calendar to;
     @FragmentArg
     String name;
     @FragmentArg
     String price;
-    @FragmentArg
-    int duration;
 
-    @ViewById(R.id.txt_confirmation)
+    @ViewById(R.id.txt_booking_confirmation)
     TextView txtConfirmation;
+    @ViewById(R.id.txt_booking_note)
+    TextView txtNote;
 
     private View view;
 
@@ -60,6 +71,17 @@ public class BookingDialogFragment extends DialogFragment {
                 .setPositiveButton(R.string.book_now, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        Booking booking = new Booking(
+                                Utils.getMyUid(),
+                                providerKey,
+                                serviceKey,
+                                from.getTimeInMillis(),
+                                to.getTimeInMillis(),
+                                txtNote.getText().toString(),
+                                BookingStatus.PENDING
+                        );
+                        EventBus.getDefault().post(new MakeNewBookingEvent(booking));
+
                         BookingDialogFragment.this.dismiss();
                     }
                 })
@@ -81,13 +103,10 @@ public class BookingDialogFragment extends DialogFragment {
 
     @AfterViews
     public void setConfirmationText() {
-        Calendar to = (Calendar) dateTime.clone();
-        to.add(Calendar.MINUTE, duration);
-
         txtConfirmation.setText(String.format(Locale.getDefault(),
                 getString(R.string.confirmation_text),
-                DateUtils.formatDateTime(getContext(), dateTime.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE),
-                DateUtils.formatDateTime(getContext(), dateTime.getTimeInMillis(), DateUtils.FORMAT_SHOW_TIME),
+                DateUtils.formatDateTime(getContext(), from.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE),
+                DateUtils.formatDateTime(getContext(), from.getTimeInMillis(), DateUtils.FORMAT_SHOW_TIME),
                 DateUtils.formatDateTime(getContext(), to.getTimeInMillis(), DateUtils.FORMAT_SHOW_TIME)
         ));
     }
