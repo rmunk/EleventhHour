@@ -1,9 +1,7 @@
 package hr.nas2skupa.eleventhhour.ui;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -14,18 +12,14 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.auth.FirebaseUser;
 
+import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.model.User;
 import hr.nas2skupa.eleventhhour.ui.auth.SignInActivity;
 import hr.nas2skupa.eleventhhour.ui.auth.SignInActivity_;
 
@@ -42,46 +36,8 @@ public class MainActivity extends AppCompatActivity
 
     @ViewById(R.id.drawer)
     DrawerLayout drawer;
-
-    private DatabaseReference database;
-
-    void initToolbar(@ViewById(R.id.toolbar) Toolbar toolbar,
-                     @ViewById(R.id.drawer) DrawerLayout drawer,
-                     @ViewById(R.id.nav_view) NavigationView navView) {
-        toolbar.setTitle(R.string.title_fragment_home);
-        setSupportActionBar(toolbar);
-
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        navView.setNavigationItemSelectedListener(this);
-        final TextView username = (TextView) navView.getHeaderView(0).findViewById(R.id.txt_drawer_username);
-        final TextView email = (TextView) navView.getHeaderView(0).findViewById(R.id.txt_drawer_email);
-        database.child("users")
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        User user = dataSnapshot.getValue(User.class);
-                        username.setText(user.getUsername());
-                        email.setText(user.getEmail());
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-    }
-
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        database = FirebaseDatabase.getInstance().getReference();
-    }
+    @ViewById(R.id.nav_view)
+    NavigationView navView;
 
     @Override
     public void onBackPressed() {
@@ -90,6 +46,34 @@ public class MainActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+    }
+
+    void initToolbar(@ViewById(R.id.toolbar) Toolbar toolbar,
+                     @ViewById(R.id.drawer) DrawerLayout drawer) {
+        toolbar.setTitle(R.string.title_fragment_home);
+        setSupportActionBar(toolbar);
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+    }
+
+    @AfterViews
+    public void afterViews() {
+        navView.setNavigationItemSelectedListener(this);
+        FirebaseAuth.getInstance().addAuthStateListener(new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+                if (currentUser == null) return;
+
+                final TextView username = (TextView) navView.getHeaderView(0).findViewById(R.id.txt_drawer_username);
+                final TextView email = (TextView) navView.getHeaderView(0).findViewById(R.id.txt_drawer_email);
+                username.setText(currentUser.getDisplayName());
+                email.setText(currentUser.getEmail());
+            }
+        });
     }
 
     @SuppressWarnings("StatementWithEmptyBody")

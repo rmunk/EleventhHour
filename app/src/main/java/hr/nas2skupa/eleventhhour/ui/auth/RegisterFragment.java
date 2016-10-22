@@ -1,7 +1,6 @@
 package hr.nas2skupa.eleventhhour.ui.auth;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -22,19 +21,16 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.EditorAction;
 import org.androidannotations.annotations.TextChange;
 import org.androidannotations.annotations.ViewById;
+import org.greenrobot.eventbus.EventBus;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.model.User;
-import hr.nas2skupa.eleventhhour.ui.MainActivity;
-import hr.nas2skupa.eleventhhour.ui.MainActivity_;
+import hr.nas2skupa.eleventhhour.events.AuthSuccessfulEvent;
 import hr.nas2skupa.eleventhhour.utils.NetworkUtils;
 
 /**
@@ -156,7 +152,8 @@ public class RegisterFragment extends Fragment {
                         if (!task.isSuccessful()) {
                             firebaseUser.delete();
                             Snackbar.make(layoutMain, R.string.msg_register_error, Snackbar.LENGTH_LONG).show();
-                        } else onAuthSuccess(firebaseUser);
+                        } else
+                            EventBus.getDefault().postSticky(new AuthSuccessfulEvent(firebaseUser));
                     }
                 });
     }
@@ -176,19 +173,6 @@ public class RegisterFragment extends Fragment {
                                 .commit();
                     }
                 }).show();
-    }
-
-    private void onAuthSuccess(FirebaseUser firebaseUser) {
-        // Write the new user
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        User user = new User(firebaseUser.getDisplayName(), firebaseUser.getEmail(), firebaseUser.getPhotoUrl());
-        database.child("users").child(firebaseUser.getUid()).setValue(user);
-
-        // Go to MainActivity
-        MainActivity_.intent(getContext())
-                .action(MainActivity.HOME)
-                .flags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)
-                .start();
     }
 
     private void hideKeyboard() {

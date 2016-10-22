@@ -114,7 +114,7 @@
         android:layout_marginBottom="24dp"
         android:orientation="horizontal">
 
-        <AppCompatImageView
+        <ImageView
             android:id="@+id/button_google_plus"
             android:layout_width="56dp"
             android:layout_height="56dp"
@@ -122,7 +122,7 @@
             android:tint="#ccffffff"
             app:srcCompat="@drawable/google_plus_box" />
 
-        <android.support.v7.widget.AppCompatImageView
+        <ImageView
             android:id="@+id/button_facebook"
             android:layout_width="56dp"
             android:layout_height="56dp"
@@ -130,7 +130,7 @@
             android:tint="#ccffffff"
             app:srcCompat="@drawable/facebook_box" />
 
-        <AppCompatImageView
+        <ImageView
             android:id="@+id/button_twitter"
             android:layout_width="56dp"
             android:layout_height="56dp"
