@@ -1,7 +1,9 @@
 package hr.nas2skupa.eleventhhour.ui;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -38,6 +40,15 @@ public class MainActivity extends AppCompatActivity
     DrawerLayout drawer;
     @ViewById(R.id.nav_view)
     NavigationView navView;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, HomeFragment_.builder().build()).commit();
+        }
+    }
 
     @Override
     public void onBackPressed() {
@@ -82,13 +93,14 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        if (id == R.id.nav_home) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, HomeFragment_.builder().build()).commit();
+        } else if (id == R.id.nav_calendar) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, CalendarFragment_.builder().build()).commit();
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_notifications) {
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_favorites) {
 
         } else if (id == R.id.nav_share) {
 

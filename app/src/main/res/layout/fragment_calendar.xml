@@ -1,0 +1,59 @@
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:id="@+id/layout_main"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="match_parent"
+                                             android:background="@drawable/background"
+                                             tools:context="hr.nas2skupa.eleventhhour.ui.CalendarFragment">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/card_calendar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="8dp">
+
+            <TextView
+                android:id="@+id/txt_month"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorAccent"
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title.Inverse"
+                tools:text="January"/>
+
+            <com.github.sundeepk.compactcalendarview.CompactCalendarView
+                android:id="@+id/calendar"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:layout_marginTop="8dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                app:compactCalendarBackgroundColor="@android:color/transparent"
+                app:compactCalendarCurrentDayBackgroundColor="@color/colorAccent"
+                app:compactCalendarCurrentDayIndicatorStyle="no_fill_large_indicator"
+                app:compactCalendarCurrentSelectedDayBackgroundColor="#61adbb00"
+                app:compactCalendarCurrentSelectedDayIndicatorStyle="fill_large_indicator"
+                app:compactCalendarEventIndicatorStyle="small_indicator"
+                app:compactCalendarMultiEventIndicatorColor="@color/colorAccent"
+                app:compactCalendarTextSize="14sp"/>
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+</android.support.constraint.ConstraintLayout>

@@ -3,42 +3,40 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
+            android:id="@+id/nav_home"
             android:icon="@drawable/ic_home_black_24dp"
-            android:title="Početna"/>
+            android:title="@string/menu_home"/>
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/nav_calendar"
             android:icon="@drawable/ic_event_black_24dp"
-            android:title="Organizator"/>
+            android:title="@string/menu_calendar"/>
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/nav_notifications"
             android:icon="@drawable/ic_notifications_active_black_24dp"
-            android:title="Poruke"/>
+            android:title="@string/menu_notifications"/>
         <item
-            android:id="@+id/nav_manage"
+            android:id="@+id/nav_favorites"
             android:icon="@drawable/ic_favorite_black_24dp"
-            android:title="Favoriti"/>
+            android:title="@string/menu_favorites"/>
         <item
-            android:id="@+id/nav_actions"
+            android:id="@+id/nav_sale"
             android:icon="@drawable/ic_redeem_black_24dp"
-            android:title="Akcije"/>
+            android:title="@string/menu_sale"/>
     </group>
 
-    <item android:title="Komunikacija">
-        <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Podijeli"/>
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Pošalji"/>
-            <item
-                android:id="@+id/nav_sign_out"
-                android:icon="@drawable/ic_exit_to_app_black_24dp"
-                android:title="Odjavi se"/>
-        </menu>
-    </item>
+    <group>
+        <item
+            android:id="@+id/nav_share"
+            android:icon="@drawable/ic_menu_share"
+            android:title="@string/menu_share"/>
+        <item
+            android:id="@+id/nav_send"
+            android:icon="@drawable/ic_menu_send"
+            android:title="@string/menu_send"/>
+        <item
+            android:id="@+id/nav_sign_out"
+            android:icon="@drawable/ic_exit_to_app_black_24dp"
+            android:title="@string/menu_sign_out"/>
+    </group>
 
 </menu>

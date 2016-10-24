@@ -10,6 +10,8 @@ import java.util.Map;
  */
 
 public class Booking {
+    private String key;
+
     private String userId;
     private String providerId;
     private String serviceId;
@@ -32,6 +34,14 @@ public class Booking {
         this.to = to;
         this.note = note;
         this.status = status;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public String getUserId() {
@@ -75,5 +85,11 @@ public class Booking {
         result.put("status", status);
 
         return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Booking) return ((Booking) obj).getKey().equals(key);
+        return false;
     }
 }
