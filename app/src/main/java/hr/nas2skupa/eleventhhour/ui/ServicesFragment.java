@@ -16,9 +16,12 @@ import android.view.Gravity;
 import android.view.View;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
@@ -38,6 +41,7 @@ import java.util.Map;
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.events.MakeNewBookingEvent;
 import hr.nas2skupa.eleventhhour.model.Booking;
+import hr.nas2skupa.eleventhhour.model.Provider;
 import hr.nas2skupa.eleventhhour.model.Service;
 import hr.nas2skupa.eleventhhour.ui.helpers.SimpleDividerItemDecoration;
 import hr.nas2skupa.eleventhhour.ui.viewholders.ServiceViewHolder;
@@ -49,6 +53,10 @@ import hr.nas2skupa.eleventhhour.utils.Utils;
 @EFragment(R.layout.fragment_recycler_view)
 public class ServicesFragment extends Fragment implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
     @FragmentArg
+    String categoryKey;
+    @FragmentArg
+    String subcategoryKey;
+    @FragmentArg
     String providerKey;
 
     @ViewById(R.id.recycler_view)
@@ -58,6 +66,7 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
     private Service selectedService;
     private GregorianCalendar pickedDateTime;
     private boolean undo = false;
+    private FirebaseRecyclerAdapter<Service, ServiceViewHolder> adapter;
 
     public ServicesFragment() {
         // Required empty public constructor
@@ -83,6 +92,13 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (adapter != null) adapter.cleanup();
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
@@ -93,7 +109,7 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         Query query = database.child("services").child(providerKey).orderByChild("name");
-        FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<Service, ServiceViewHolder>(
+        adapter = new FirebaseRecyclerAdapter<Service, ServiceViewHolder>(
                 Service.class,
                 R.layout.item_service,
                 ServiceViewHolder.class,
@@ -108,16 +124,7 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
                         serviceKey = categoryRef.getKey();
                         selectedService = model;
 
-                        Calendar now = Calendar.getInstance();
-                        DatePickerDialog dpd = DatePickerDialog.newInstance(
-                                ServicesFragment.this,
-                                now.get(Calendar.YEAR),
-                                now.get(Calendar.MONTH),
-                                now.get(Calendar.DAY_OF_MONTH)
-                        );
-                        dpd.setTitle(model.getName());
-                        dpd.setMinDate(now);
-                        dpd.show(getActivity().getFragmentManager(), "Datepickerdialog");
+                        showDatePicker(model);
                     }
                 });
             }
@@ -125,15 +132,17 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
         recyclerView.setAdapter(adapter);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void setTransitions() {
-        setAllowEnterTransitionOverlap(false);
-        setAllowReturnTransitionOverlap(false);
-
-        setEnterTransition(new Fade());
-        setReenterTransition(new Fade());
-        setExitTransition(new Slide(Gravity.TOP));
-        setReturnTransition(new Slide(Gravity.TOP));
+    private void showDatePicker(Service model) {
+        Calendar now = Calendar.getInstance();
+        DatePickerDialog dpd = DatePickerDialog.newInstance(
+                ServicesFragment.this,
+                now.get(Calendar.YEAR),
+                now.get(Calendar.MONTH),
+                now.get(Calendar.DAY_OF_MONTH)
+        );
+        dpd.setTitle(model.getName());
+        dpd.setMinDate(now);
+        dpd.show(getActivity().getFragmentManager(), "Datepickerdialog");
     }
 
     @Override
@@ -159,7 +168,7 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
         pickedDateTime.set(Calendar.MINUTE, minute);
         pickedDateTime.set(Calendar.SECOND, second);
 
-        Calendar to = (Calendar) pickedDateTime.clone();
+        final Calendar to = (Calendar) pickedDateTime.clone();
         to.add(Calendar.MINUTE, selectedService.getDuration());
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
@@ -167,22 +176,42 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
         if (last != null) transaction.remove(last);
         transaction.addToBackStack(null);
 
-        BookingDialogFragment_.builder()
-                .providerKey(providerKey)
-                .serviceKey(serviceKey)
-                .from(pickedDateTime)
-                .to(to)
-                .providerName("") // TODO: Add provider name
-                .serviceName(selectedService.getName())
-                .price(selectedService.getPrice())
-                .build()
-                .show(getFragmentManager(), "dialog");
+        FirebaseDatabase.getInstance().getReference()
+                .child("providers")
+                .child(categoryKey)
+                .child(subcategoryKey)
+                .child(providerKey)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Provider provider = dataSnapshot.getValue(Provider.class);
+                        if (provider == null) onCancelled(null);
+
+                        BookingDialogFragment_.builder()
+                                .providerKey(providerKey)
+                                .serviceKey(serviceKey)
+                                .from(pickedDateTime)
+                                .to(to)
+                                .providerName(provider.getName())
+                                .serviceName(selectedService.getName())
+                                .price(selectedService.getPrice())
+                                .build()
+                                .show(getFragmentManager(), "dialog");
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        if (getView() != null)
+                            Snackbar.make(getView(), R.string.msg_booking_failed, Snackbar.LENGTH_LONG).show();
+                    }
+                });
+
     }
 
     @Subscribe
     public void makeNewBooking(MakeNewBookingEvent event) {
         undo = false;
-        Snackbar.make(getView(), "Your booking has been sent.", 3000)
+        Snackbar.make(getView(), "Your booking has been sent.", 5000)
                 .setAction("Undo", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -193,7 +222,7 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
         sendBooking(event.getBooking());
     }
 
-    @UiThread(delay = 3500)
+    @UiThread(delay = 5500)
     public void sendBooking(Booking booking) {
         if (undo) return;
 
@@ -204,6 +233,23 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/bookings/" + providerKey + "/" + key, bookingValues);
         childUpdates.put("/users/" + Utils.getMyUid() + "/bookings/" + key, bookingValues);
-        reference.updateChildren(childUpdates);
+        reference.updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if (databaseError != null)
+                    Snackbar.make(getView(), R.string.msg_booking_failed, Snackbar.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void setTransitions() {
+        setAllowEnterTransitionOverlap(false);
+        setAllowReturnTransitionOverlap(false);
+
+        setEnterTransition(new Fade());
+        setReenterTransition(new Fade());
+        setExitTransition(new Slide(Gravity.TOP));
+        setReturnTransition(new Slide(Gravity.TOP));
     }
 }

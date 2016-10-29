@@ -78,6 +78,16 @@ public class CalendarFragment extends Fragment {
         bookingsChangedListener = new BookingsChangedListener();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (bookingsChangedListener != null) {
+            bookingsQuery.removeEventListener(bookingsChangedListener);
+            bookingsChangedListener = null;
+        }
+        if (adapter != null) adapter.cleanup();
+    }
+
     @AfterViews
     public void afterViews() {
         Date now = new Date();

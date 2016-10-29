@@ -29,6 +29,8 @@ public class HomeFragment extends Fragment {
     @ViewById(R.id.categories_list)
     RecyclerView recyclerView;
 
+    private FirebaseRecyclerAdapter<Category, CategoryViewHolder> adapter;
+
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -42,7 +44,7 @@ public class HomeFragment extends Fragment {
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         Query query = database.child("categories").orderByChild("name/" + Utils.getLanguageIso());
-        FirebaseRecyclerAdapter<Category, CategoryViewHolder> adapter = new FirebaseRecyclerAdapter<Category, CategoryViewHolder>(Category.class, R.layout.item_category
+        adapter = new FirebaseRecyclerAdapter<Category, CategoryViewHolder>(Category.class, R.layout.item_category
                 , CategoryViewHolder.class, query) {
             @Override
             protected void populateViewHolder(final CategoryViewHolder viewHolder, final Category model, int position) {
@@ -59,6 +61,13 @@ public class HomeFragment extends Fragment {
             }
         };
         recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (adapter != null) adapter.cleanup();
     }
 
     private void startCategoryActivity(View card, String categoryKey) {

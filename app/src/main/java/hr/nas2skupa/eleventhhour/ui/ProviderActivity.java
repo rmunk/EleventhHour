@@ -75,7 +75,11 @@ public class ProviderActivity extends AppCompatActivity {
                 .child(providerKey);
 
         if (savedInstanceState == null) {
-            ServicesFragment fragment = ServicesFragment_.builder().providerKey(providerKey).build();
+            ServicesFragment fragment = ServicesFragment_.builder()
+                    .categoryKey(categoryKey)
+                    .subcategoryKey(subcategoryKey)
+                    .providerKey(providerKey)
+                    .build();
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container, fragment, "ServicesFragment")

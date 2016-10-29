@@ -41,6 +41,8 @@ public class SubcategoriesFragment extends Fragment {
     @ViewById(R.id.recycler_view)
     RecyclerView recyclerView;
 
+    private FirebaseRecyclerAdapter<Subcategory, SubcategoryViewHolder> adapter;
+
     public SubcategoriesFragment() {
         // Required empty public constructor
     }
@@ -63,7 +65,7 @@ public class SubcategoriesFragment extends Fragment {
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         Query query = database.child("subcategories").child(categoryKey).orderByChild("name/" + Utils.getLanguageIso());
-        FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<Subcategory, SubcategoryViewHolder>(
+        adapter = new FirebaseRecyclerAdapter<Subcategory, SubcategoryViewHolder>(
                 Subcategory.class,
                 R.layout.item_subcategory,
                 SubcategoryViewHolder.class,
@@ -83,6 +85,13 @@ public class SubcategoriesFragment extends Fragment {
             }
         };
         recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (adapter != null) adapter.cleanup();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)

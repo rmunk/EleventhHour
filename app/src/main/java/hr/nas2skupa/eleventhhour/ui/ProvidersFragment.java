@@ -62,6 +62,7 @@ public class ProvidersFragment extends Fragment {
     private DatabaseReference ratingReference;
     private ChildEventListener ratingChangedListener;
     private HashMap<String, Float> ratings = new HashMap<>();
+    private FirebaseRecyclerAdapter<Provider, ProviderViewHolder> adapter;
 
     public ProvidersFragment() {
         // Required empty public constructor
@@ -89,8 +90,6 @@ public class ProvidersFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         final LinearLayoutManager manager = new LinearLayoutManager(getActivity());
-//        manager.setReverseLayout(true);
-//        manager.setStackFromEnd(true);
         recyclerView.setLayoutManager(manager);
         recyclerView.setHasFixedSize(true);
 
@@ -99,7 +98,7 @@ public class ProvidersFragment extends Fragment {
                 .child(categoryKey)
                 .child(subcategoryKey)
                 .orderByPriority();
-        FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<Provider, ProviderViewHolder>(
+        adapter = new FirebaseRecyclerAdapter<Provider, ProviderViewHolder>(
                 Provider.class,
                 R.layout.item_provider,
                 ProviderViewHolder.class,
@@ -138,9 +137,11 @@ public class ProvidersFragment extends Fragment {
 
                                 @Override
                                 public void onTransitionEnd(Transition transition) {
-                                    Transition transition2 = new AutoTransition();
-                                    transition2.setDuration(200);
-                                    TransitionManager.beginDelayedTransition(recyclerView, transition2);
+                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                                        Transition transition2 = new AutoTransition();
+                                        transition2.setDuration(200);
+                                        TransitionManager.beginDelayedTransition(recyclerView, transition2);
+                                    }
                                     recyclerView.scrollToPosition(position);
                                 }
 
@@ -258,6 +259,13 @@ public class ProvidersFragment extends Fragment {
             favoriteReference.removeEventListener(favoriteChangedListener);
         if (ratingChangedListener != null)
             ratingReference.removeEventListener(ratingChangedListener);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (adapter != null) adapter.cleanup();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)

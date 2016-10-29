@@ -79,7 +79,7 @@ public class BookingDialogFragment extends DialogFragment {
                                 providerKey,
                                 serviceKey,
                                 FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
-                                "", // TODO: Add provider name
+                                providerName,
                                 serviceName,
                                 price,
                                 from.getTimeInMillis(),
