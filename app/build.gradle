@@ -2,8 +2,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'android-apt'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.3"
     defaultConfig {
         applicationId "hr.nas2skupa.eleventhhour"
         minSdkVersion 16
@@ -32,11 +32,11 @@ dependencies {
     })
 
     // Testing
-    compile 'com.android.support:appcompat-v7:25.0.0'
-    compile 'com.android.support:design:25.0.0'
-    compile 'com.android.support:cardview-v7:25.0.0'
-    compile 'com.android.support:support-v4:25.0.0'
-    compile 'com.android.support:recyclerview-v7:25.0.0'
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:design:24.2.1'
+    compile 'com.android.support:cardview-v7:24.2.1'
+    compile 'com.android.support:support-v4:24.2.1'
+    compile 'com.android.support:recyclerview-v7:24.2.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-beta1'
 
     compile 'com.google.android.gms:play-services-auth:9.6.1'
@@ -57,7 +57,8 @@ dependencies {
 
     compile 'com.wdullaer:materialdatetimepicker:2.5.0'
     compile 'com.github.sundeepk:compact-calendar-view:1.9.2'
-    compile 'eu.davidea:flexible-adapter:5.0.0-b8'
+
+    compile 'jp.wasabeef:recyclerview-animators:2.2.4'
 
     // Testing
     testCompile 'org.testng:testng:6.9.6'

@@ -24,6 +24,7 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.R;
@@ -31,6 +32,7 @@ import hr.nas2skupa.eleventhhour.model.Provider;
 import hr.nas2skupa.eleventhhour.ui.viewholders.ProviderViewHolder;
 
 @EActivity(R.layout.activity_provider)
+@OptionsMenu(R.menu.main)
 public class ProviderActivity extends AppCompatActivity {
     @Extra
     String categoryKey;
@@ -115,7 +117,7 @@ public class ProviderActivity extends AppCompatActivity {
             providerReference.removeEventListener(providerListener);
     }
 
-    @OptionsItem
+    @OptionsItem(android.R.id.home)
     void homeSelected() {
         onBackPressed();
     }

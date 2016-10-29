@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
@@ -26,7 +28,6 @@ import java.util.Locale;
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.events.MakeNewBookingEvent;
 import hr.nas2skupa.eleventhhour.model.Booking;
-import hr.nas2skupa.eleventhhour.model.BookingStatus;
 import hr.nas2skupa.eleventhhour.utils.Utils;
 
 /**
@@ -43,7 +44,9 @@ public class BookingDialogFragment extends DialogFragment {
     @FragmentArg
     Calendar to;
     @FragmentArg
-    String name;
+    String providerName;
+    @FragmentArg
+    String serviceName;
     @FragmentArg
     String price;
 
@@ -67,7 +70,7 @@ public class BookingDialogFragment extends DialogFragment {
         view = inflater.inflate(R.layout.fragment_booking_dialog, null);
 
         builder.setView(view)
-                .setTitle(name + " (" + price + ")")
+                .setTitle(serviceName + " (" + price + ")")
                 .setPositiveButton(R.string.book_now, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -75,10 +78,13 @@ public class BookingDialogFragment extends DialogFragment {
                                 Utils.getMyUid(),
                                 providerKey,
                                 serviceKey,
+                                FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
+                                "", // TODO: Add provider name
+                                serviceName,
+                                price,
                                 from.getTimeInMillis(),
                                 to.getTimeInMillis(),
-                                txtNote.getText().toString(),
-                                BookingStatus.PENDING
+                                txtNote.getText().toString()
                         );
                         EventBus.getDefault().post(new MakeNewBookingEvent(booking));
 

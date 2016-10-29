@@ -16,24 +16,31 @@ public class Booking {
     private String providerId;
     private String serviceId;
 
+    private String userName;
+    private String providerName;
+    private String serviceName;
+    private String price;
     private long from;
     private long to;
     private String note;
 
     @BookingStatus
-    private int status;
+    private int status = BookingStatus.PENDING;
 
     public Booking() {
     }
 
-    public Booking(String userId, String providerId, String serviceId, long from, long to, String note, int status) {
+    public Booking(String userId, String providerId, String serviceId, String userName, String providerName, String serviceName, String price, long from, long to, String note) {
         this.userId = userId;
         this.providerId = providerId;
         this.serviceId = serviceId;
+        this.userName = userName;
+        this.providerName = providerName;
+        this.serviceName = serviceName;
+        this.price = price;
         this.from = from;
         this.to = to;
         this.note = note;
-        this.status = status;
     }
 
     public String getKey() {
@@ -50,6 +57,22 @@ public class Booking {
 
     public String getProviderId() {
         return providerId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getProviderName() {
+        return providerName;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public String getPrice() {
+        return price;
     }
 
     public String getServiceId() {
@@ -80,6 +103,10 @@ public class Booking {
         result.put("providerId", providerId);
         result.put("serviceId", serviceId);
         result.put("from", from);
+        result.put("userName", userName);
+        result.put("providerName", providerName);
+        result.put("serviceName", serviceName);
+        result.put("price", price);
         result.put("to", to);
         result.put("note", note);
         result.put("status", status);

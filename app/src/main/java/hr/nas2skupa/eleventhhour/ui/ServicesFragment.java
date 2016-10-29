@@ -99,15 +99,15 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
                 ServiceViewHolder.class,
                 query) {
             @Override
-            protected void populateViewHolder(final ServiceViewHolder viewHolder, final Service model, int position) {
-                final DatabaseReference categoryRef = getRef(position);
-                serviceKey = categoryRef.getKey();
-                selectedService = model;
-
+            protected void populateViewHolder(final ServiceViewHolder viewHolder, final Service model, final int position) {
                 viewHolder.bindToService(model);
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        final DatabaseReference categoryRef = getRef(position);
+                        serviceKey = categoryRef.getKey();
+                        selectedService = model;
+
                         Calendar now = Calendar.getInstance();
                         DatePickerDialog dpd = DatePickerDialog.newInstance(
                                 ServicesFragment.this,
@@ -172,7 +172,8 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
                 .serviceKey(serviceKey)
                 .from(pickedDateTime)
                 .to(to)
-                .name(selectedService.getName())
+                .providerName("") // TODO: Add provider name
+                .serviceName(selectedService.getName())
                 .price(selectedService.getPrice())
                 .build()
                 .show(getFragmentManager(), "dialog");
