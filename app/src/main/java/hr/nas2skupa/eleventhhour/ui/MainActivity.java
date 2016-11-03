@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity
     DrawerLayout drawer;
     @ViewById(R.id.nav_view)
     NavigationView navView;
+    @ViewById(R.id.toolbar)
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -94,8 +96,10 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
+            toolbar.setTitle(R.string.title_fragment_home);
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, HomeFragment_.builder().build()).commit();
         } else if (id == R.id.nav_calendar) {
+            toolbar.setTitle(R.string.title_fragment_calendar);
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, CalendarFragment_.builder().build()).commit();
 
         } else if (id == R.id.nav_notifications) {
