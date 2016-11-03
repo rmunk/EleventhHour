@@ -10,6 +10,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.animation.OvershootInterpolator;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
@@ -23,6 +24,7 @@ import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.model.Category;
 import hr.nas2skupa.eleventhhour.ui.viewholders.CategoryViewHolder;
 import hr.nas2skupa.eleventhhour.utils.Utils;
+import jp.wasabeef.recyclerview.animators.LandingAnimator;
 
 @EFragment(R.layout.fragment_home)
 public class HomeFragment extends Fragment {
@@ -41,6 +43,9 @@ public class HomeFragment extends Fragment {
 
         LinearLayoutManager manager = new GridLayoutManager(getContext(), 3);
         recyclerView.setLayoutManager(manager);
+        recyclerView.setItemAnimator(new LandingAnimator(new OvershootInterpolator(0.1f)));
+        recyclerView.getItemAnimator().setAddDuration(300);
+        recyclerView.getItemAnimator().setRemoveDuration(300);
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         Query query = database.child("categories").orderByChild("name/" + Utils.getLanguageIso());
