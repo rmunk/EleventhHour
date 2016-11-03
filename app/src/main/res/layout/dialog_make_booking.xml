@@ -3,7 +3,7 @@
                                              xmlns:tools="http://schemas.android.com/tools"
                                              android:layout_width="match_parent"
                                              android:layout_height="wrap_content"
-                                             tools:context="hr.nas2skupa.eleventhhour.ui.BookingDialogFragment">
+                                             tools:context="hr.nas2skupa.eleventhhour.ui.MakeBookingDialog">
 
     <TextView
         android:id="@+id/txt_booking_confirmation"
@@ -28,7 +28,7 @@
         android:layout_marginTop="16dp"
         android:ems="10"
         android:hint="@string/note_to_provider"
-        android:inputType="textMultiLine"
+        android:inputType="textCapSentences|textMultiLine"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="@+id/txt_booking_confirmation"
         app:layout_constraintRight_toRightOf="@+id/txt_booking_confirmation"

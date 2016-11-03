@@ -187,7 +187,7 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
                         Provider provider = dataSnapshot.getValue(Provider.class);
                         if (provider == null) onCancelled(null);
 
-                        BookingDialogFragment_.builder()
+                        MakeBookingDialog_.builder()
                                 .providerKey(providerKey)
                                 .serviceKey(serviceKey)
                                 .from(pickedDateTime)

@@ -33,8 +33,8 @@ import hr.nas2skupa.eleventhhour.utils.Utils;
 /**
  * Dialog for booking a service.
  */
-@EFragment(R.layout.fragment_booking_dialog)
-public class BookingDialogFragment extends DialogFragment {
+@EFragment(R.layout.dialog_make_booking)
+public class MakeBookingDialog extends DialogFragment {
     @FragmentArg
     String providerKey;
     @FragmentArg
@@ -58,7 +58,7 @@ public class BookingDialogFragment extends DialogFragment {
     private View view;
 
 
-    public BookingDialogFragment() {
+    public MakeBookingDialog() {
         // Required empty public constructor
     }
 
@@ -67,7 +67,7 @@ public class BookingDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         final LayoutInflater inflater = getActivity().getLayoutInflater();
-        view = inflater.inflate(R.layout.fragment_booking_dialog, null);
+        view = inflater.inflate(R.layout.dialog_make_booking, null);
 
         builder.setView(view)
                 .setTitle(serviceName + " (" + price + ")")
@@ -88,13 +88,13 @@ public class BookingDialogFragment extends DialogFragment {
                         );
                         EventBus.getDefault().post(new MakeNewBookingEvent(booking));
 
-                        BookingDialogFragment.this.dismiss();
+                        MakeBookingDialog.this.dismiss();
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        BookingDialogFragment.this.dismiss();
+                        MakeBookingDialog.this.dismiss();
                     }
                 });
 
