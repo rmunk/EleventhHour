@@ -157,7 +157,7 @@ public class CalendarFragment extends Fragment {
                 query) {
             @Override
             protected void populateViewHolder(final BookingViewHolder viewHolder, final Booking model, final int position) {
-                viewHolder.bind(model);
+                viewHolder.bind(getContext(), model);
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
