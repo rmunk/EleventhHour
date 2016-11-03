@@ -127,43 +127,12 @@ public class ProvidersFragment extends Fragment {
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                            Transition transition = new AutoTransition();
-                            transition.addListener(new Transition.TransitionListener() {
-                                @Override
-                                public void onTransitionStart(Transition transition) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                            animateCardExpansion(position);
+                        else recyclerView.scrollToPosition(position);
 
-                                }
-
-                                @Override
-                                public void onTransitionEnd(Transition transition) {
-                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-                                        Transition transition2 = new AutoTransition();
-                                        transition2.setDuration(200);
-                                        TransitionManager.beginDelayedTransition(recyclerView, transition2);
-                                    }
-                                    recyclerView.scrollToPosition(position);
-                                }
-
-                                @Override
-                                public void onTransitionCancel(Transition transition) {
-
-                                }
-
-                                @Override
-                                public void onTransitionPause(Transition transition) {
-
-                                }
-
-                                @Override
-                                public void onTransitionResume(Transition transition) {
-
-                                }
-                            });
-                            TransitionManager.beginDelayedTransition(recyclerView, transition);
-                            expandedPosition = isExpanded ? -1 : position;
-                            notifyDataSetChanged();
-                        }
+                        expandedPosition = isExpanded ? -1 : position;
+                        notifyDataSetChanged();
                     }
                 });
             }
@@ -183,6 +152,43 @@ public class ProvidersFragment extends Fragment {
             }
         };
         recyclerView.setAdapter(adapter);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private void animateCardExpansion(final int position) {
+        Transition transition = new AutoTransition();
+        transition.addListener(new Transition.TransitionListener() {
+            @Override
+            public void onTransitionStart(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionEnd(Transition transition) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    Transition transition2 = new AutoTransition();
+                    transition2.setDuration(200);
+                    TransitionManager.beginDelayedTransition(recyclerView, transition2);
+                }
+                recyclerView.scrollToPosition(position);
+            }
+
+            @Override
+            public void onTransitionCancel(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionPause(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionResume(Transition transition) {
+
+            }
+        });
+        TransitionManager.beginDelayedTransition(recyclerView, transition);
     }
 
     @Override
