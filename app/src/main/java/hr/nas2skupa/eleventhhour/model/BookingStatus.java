@@ -12,7 +12,6 @@ import java.lang.annotation.RetentionPolicy;
 @IntDef({
         BookingStatus.PENDING,
         BookingStatus.PROVIDER_ACCEPTED,
-        BookingStatus.USER_ACCEPTED,
         BookingStatus.PROVIDER_REJECTED,
         BookingStatus.USER_REJECTED
 })
@@ -23,14 +22,9 @@ public @interface BookingStatus {
     int PENDING = 0;
 
     /***
-     * Booking has been accepted by the provider, waiting for user confirmation.
+     * Booking has been accepted by the provider.
      */
     int PROVIDER_ACCEPTED = 1;
-
-    /***
-     * Booking has been accepted by both provider and user and it is now confirmed.
-     */
-    int USER_ACCEPTED = 2;
 
     /***
      * Provider has rejected booking.
