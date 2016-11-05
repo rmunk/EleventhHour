@@ -2,7 +2,9 @@ package hr.nas2skupa.eleventhhour.model;
 
 import com.google.firebase.database.Exclude;
 
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -87,6 +89,11 @@ public class Booking {
         return to;
     }
 
+    public String getTime() {
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        return String.format(Locale.getDefault(), "%s - %s", format.format(from), format.format(to));
+    }
+
     public String getNote() {
         return note;
     }
@@ -94,6 +101,10 @@ public class Booking {
     @BookingStatus
     public int getStatus() {
         return status;
+    }
+
+    public void setStatus(@BookingStatus int status) {
+        this.status = status;
     }
 
     @Exclude

@@ -4,11 +4,11 @@ package hr.nas2skupa.eleventhhour.ui;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 import android.widget.TextView;
@@ -27,14 +27,21 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.ColorRes;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.events.CancelBookingEvent;
+import hr.nas2skupa.eleventhhour.events.ShowBookingDetailsEvent;
 import hr.nas2skupa.eleventhhour.model.Booking;
+import hr.nas2skupa.eleventhhour.model.BookingStatus;
 import hr.nas2skupa.eleventhhour.ui.viewholders.BookingViewHolder;
 import hr.nas2skupa.eleventhhour.utils.Utils;
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
@@ -45,8 +52,10 @@ import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 @EFragment(R.layout.fragment_calendar)
 public class CalendarFragment extends Fragment {
 
-    @ColorRes(R.color.colorAccent)
-    int colorAccent;
+    @ColorRes(R.color.event_active)
+    int eventActive;
+    @ColorRes(R.color.event_inactive)
+    int eventInactive;
 
     @ViewById(R.id.main_layout)
     ViewGroup mainLayout;
@@ -86,6 +95,58 @@ public class CalendarFragment extends Fragment {
             bookingsChangedListener = null;
         }
         if (adapter != null) adapter.cleanup();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe
+    public void showBooking(ShowBookingDetailsEvent event) {
+        BookingDetailsDialog_.builder()
+                .bookingKey(event.getBooking().getKey())
+                .build()
+                .show(getFragmentManager(), "BookingDetailsDialog");
+    }
+
+    @Subscribe
+    public void cancelBooking(CancelBookingEvent event) {
+        Booking booking = event.getBooking();
+        if (booking == null) {
+            Snackbar.make(getView(), R.string.msg_booking_failed, Snackbar.LENGTH_LONG).show();
+            return;
+        }
+
+        // Shouldn't cancel
+        if (booking.getStatus() < 0 || booking.getTo() <= new Date().getTime())
+            return;
+
+        booking.setStatus(BookingStatus.USER_CANCELED);
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+        String key = booking.getKey();
+        Map<String, Object> bookingValues = booking.toMap();
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/bookings/" + booking.getProviderId() + "/" + key, bookingValues);
+        childUpdates.put("/users/" + Utils.getMyUid() + "/bookings/" + key, bookingValues);
+        reference.updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if (databaseError != null)
+                    Snackbar.make(getView(), R.string.msg_booking_failed, Snackbar.LENGTH_LONG).show();
+            }
+        });
     }
 
     @AfterViews
@@ -157,12 +218,8 @@ public class CalendarFragment extends Fragment {
                 query) {
             @Override
             protected void populateViewHolder(final BookingViewHolder viewHolder, final Booking model, final int position) {
+                model.setKey(getRef(position).getKey());
                 viewHolder.bind(getContext(), model);
-                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                    }
-                });
             }
         };
         recyclerView.setAdapter(adapter);
@@ -201,7 +258,8 @@ public class CalendarFragment extends Fragment {
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
             Booking booking = dataSnapshot.getValue(Booking.class);
             booking.setKey(dataSnapshot.getKey());
-            calendarView.addEvent(new Event(colorAccent, booking.getFrom(), booking), true);
+            int color = booking.getStatus() >= 0 && booking.getTo() > new Date().getTime() ? eventActive : eventInactive;
+            calendarView.addEvent(new Event(color, booking.getFrom(), booking), true);
         }
 
         @Override
@@ -209,7 +267,8 @@ public class CalendarFragment extends Fragment {
             Booking booking = dataSnapshot.getValue(Booking.class);
             booking.setKey(dataSnapshot.getKey());
             removeBookingFromCalendar(booking);
-            calendarView.addEvent(new Event(colorAccent, booking.getFrom(), booking), true);
+            int color = booking.getStatus() > 0 && booking.getTo() > new Date().getTime() ? eventActive : eventInactive;
+            calendarView.addEvent(new Event(color, booking.getFrom(), booking), true);
         }
 
         @Override

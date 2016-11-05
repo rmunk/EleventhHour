@@ -71,7 +71,7 @@ public class MakeBookingDialog extends DialogFragment {
 
         builder.setView(view)
                 .setTitle(serviceName + " (" + price + ")")
-                .setPositiveButton(R.string.book_now, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.make_booking_action, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Booking booking = new Booking(
