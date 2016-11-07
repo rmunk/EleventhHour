@@ -35,7 +35,7 @@ public class App extends Application {
 
         okHttpClient.setCache(new Cache(getCacheDir(), Integer.MAX_VALUE));
         OkHttpDownloader okHttpDownloader = new OkHttpDownloader(okHttpClient);
-        Picasso picasso = new Picasso.Builder(this).downloader(okHttpDownloader).indicatorsEnabled(true).build();
+        Picasso picasso = new Picasso.Builder(this).downloader(okHttpDownloader).indicatorsEnabled(false).build();
         Picasso.setSingletonInstance(picasso);
     }
 }
