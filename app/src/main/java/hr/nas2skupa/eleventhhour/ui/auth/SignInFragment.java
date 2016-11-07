@@ -180,12 +180,14 @@ public class SignInFragment extends Fragment implements GoogleApiClient.OnConnec
 
     @Click(R.id.button_facebook)
     public void signInFacebook() {
-        progressBar.setVisibility(View.VISIBLE);
+//        progressBar.setVisibility(View.VISIBLE);
+        Snackbar.make(getView(), "Coming soon...", Snackbar.LENGTH_SHORT).show();
     }
 
     @Click(R.id.button_twitter)
     public void signInTwitter() {
-        progressBar.setVisibility(View.VISIBLE);
+//        progressBar.setVisibility(View.VISIBLE);
+        Snackbar.make(getView(), "Coming soon...", Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
