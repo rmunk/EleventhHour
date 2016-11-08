@@ -172,6 +172,8 @@ public class BookingDetailsDialog extends DialogFragment implements OnMapReadyCa
                 geoFire.getLocation(booking.getProviderId(), new LocationCallback() {
                     @Override
                     public void onLocationResult(String key, GeoLocation location) {
+                        if (getActivity() == null) return;
+
                         if (location != null) {
                             LatLng target = new LatLng(location.latitude, location.longitude);
                             marker = map.addMarker(new MarkerOptions()
