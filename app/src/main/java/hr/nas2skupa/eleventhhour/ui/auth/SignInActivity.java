@@ -175,7 +175,7 @@ public class SignInActivity extends FragmentActivity {
     public void onAuthSuccess(final AuthSuccessfulEvent event) {
         EventBus.getDefault().removeStickyEvent(event);
         MainActivity_.intent(SignInActivity.this)
-                .action(MainActivity.HOME)
+                .action(MainActivity.ACTION_HOME)
                 .flags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)
                 .start();
     }

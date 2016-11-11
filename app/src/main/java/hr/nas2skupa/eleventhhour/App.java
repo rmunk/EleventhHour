@@ -1,7 +1,10 @@
 package hr.nas2skupa.eleventhhour;
 
 import android.app.Application;
+import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.core.CrashlyticsCore;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.Interceptor;
@@ -12,6 +15,8 @@ import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 
+import io.fabric.sdk.android.Fabric;
+
 
 /**
  * Created by nas2skupa on 25/08/16.
@@ -21,6 +26,19 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        CrashlyticsCore core = new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build();
+        Fabric.with(this, new Crashlytics.Builder().core(core).build());
+
+        if (BuildConfig.DEBUG) {
+            Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                @Override
+                public void uncaughtException(Thread thread, Throwable e) {
+                    Log.wtf("Alert", e.getMessage(), e);
+                    System.exit(2); //Prevents the service/app from freezing
+                }
+            });
+        }
 
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 

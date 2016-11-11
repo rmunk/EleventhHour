@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="hr.nas2skupa.eleventhhour">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <application
@@ -31,15 +32,22 @@
             android:name=".ui.MainActivity_"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/MaterialTheme.Light.DarkToolbar.TranslucentStatus">
+            <intent-filter>
+                <action android:name="ch.photrack.discharge.ACTION_HOME"/>
+                <action android:name="ch.photrack.discharge.ACTION_CALENDAR"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ui.CategoryActivity_"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/MaterialTheme.Light.DarkToolbar.TranslucentStatus"/>
         <activity
             android:name=".ui.ProviderActivity_"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/MaterialTheme.Light.TranslucentStatus"/>
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -52,6 +60,9 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key"/>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="cd3d2c728913a7a16aea78e2d76ccc5fa27f9892"/>
     </application>
 
 </manifest>

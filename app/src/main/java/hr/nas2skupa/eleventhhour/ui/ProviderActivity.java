@@ -1,11 +1,11 @@
 package hr.nas2skupa.eleventhhour.ui;
 
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.transition.AutoTransition;
@@ -28,12 +28,14 @@ import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.model.Category;
 import hr.nas2skupa.eleventhhour.model.Provider;
+import hr.nas2skupa.eleventhhour.ui.helpers.DrawerActivity;
 import hr.nas2skupa.eleventhhour.ui.viewholders.ProviderViewHolder;
 
 @EActivity(R.layout.activity_provider)
 @OptionsMenu(R.menu.main)
-public class ProviderActivity extends AppCompatActivity {
+public class ProviderActivity extends DrawerActivity {
     @Extra
     String categoryKey;
     @Extra
@@ -46,6 +48,8 @@ public class ProviderActivity extends AppCompatActivity {
     @ViewById(R.id.app_bar)
     AppBarLayout appBar;
 
+    private DatabaseReference categoryReference;
+    private ValueEventListener categoryListener;
     private ProviderViewHolder providerViewHolder;
     private DatabaseReference providerReference;
     private ValueEventListener providerListener;
@@ -57,6 +61,8 @@ public class ProviderActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        getDrawer().setStatusBarBackgroundColor(Color.LTGRAY);
     }
 
     void setProviderView(@ViewById(R.id.item_provider) View providerInfo) {
@@ -68,6 +74,7 @@ public class ProviderActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        categoryReference = FirebaseDatabase.getInstance().getReference().child("categories").child(categoryKey);
         providerReference = FirebaseDatabase.getInstance().getReference()
                 .child("providers")
                 .child(categoryKey)
@@ -93,6 +100,27 @@ public class ProviderActivity extends AppCompatActivity {
 
 //        EventBus.getDefault().register(this);
 
+        categoryListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Category category = dataSnapshot.getValue(Category.class);
+                if (category == null) return;
+
+                int color;
+                try {
+                    color = Color.parseColor(category.getColor());
+                } catch (Exception e) {
+                    color = Color.LTGRAY;
+                }
+                getDrawer().setStatusBarBackgroundColor(color);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        };
+        categoryReference.addValueEventListener(categoryListener);
+
         providerListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -117,8 +145,8 @@ public class ProviderActivity extends AppCompatActivity {
 
 //        EventBus.getDefault().unregister(this);
 
-        if (providerListener != null)
-            providerReference.removeEventListener(providerListener);
+        if (categoryListener != null) categoryReference.removeEventListener(categoryListener);
+        if (providerListener != null) providerReference.removeEventListener(providerListener);
     }
 
     @OptionsItem(android.R.id.home)

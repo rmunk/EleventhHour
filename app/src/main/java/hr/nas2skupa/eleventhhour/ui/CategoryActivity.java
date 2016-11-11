@@ -1,7 +1,6 @@
 package hr.nas2skupa.eleventhhour.ui;
 
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -9,7 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.util.Pair;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.view.GravityCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.ViewGroup;
@@ -36,11 +35,12 @@ import hr.nas2skupa.eleventhhour.events.ProviderSelectedEvent;
 import hr.nas2skupa.eleventhhour.events.SubcategorySelectedEvent;
 import hr.nas2skupa.eleventhhour.model.Category;
 import hr.nas2skupa.eleventhhour.model.Subcategory;
+import hr.nas2skupa.eleventhhour.ui.helpers.DrawerActivity;
 
 
 @EActivity(R.layout.activity_category)
 @OptionsMenu(R.menu.main)
-public class CategoryActivity extends AppCompatActivity {
+public class CategoryActivity extends DrawerActivity {
     @Extra
     String categoryKey;
     @Extra
@@ -118,11 +118,10 @@ public class CategoryActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     color = ContextCompat.getColor(CategoryActivity.this, R.color.colorPrimary);
                 }
+
                 txtCategoryName.setText(category.getName());
                 appBar.setBackgroundColor(color);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    getWindow().setStatusBarColor(color);
-                }
+                getDrawer().setStatusBarBackgroundColor(color);
                 Picasso.with(CategoryActivity.this).load(category.getIcon()).fit().into(imgCategoryIcon);
                 categoryBackground.setBackgroundColor(color);
             }
@@ -159,12 +158,13 @@ public class CategoryActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-
-        if (getFragmentManager().findFragmentById(R.id.fragment_container) == null) {
+        if (getDrawer().isDrawerOpen(GravityCompat.START))
+            getDrawer().closeDrawer(GravityCompat.START);
+        else if (getFragmentManager().findFragmentById(R.id.fragment_container) == null) {
+            super.onBackPressed();
             setSubcategoryFragment();
             txtSubcategoryName.setText(R.string.category_pick_a_subcategory);
-        }
+        } else super.onBackPressed();
     }
 
     @Subscribe
