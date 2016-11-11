@@ -212,7 +212,6 @@ public class ProviderViewHolder extends RecyclerView.ViewHolder {
                     .child(provider.getSubcategory())
                     .child(provider.getKey());
             providers.updateChildren(ratingUpdate);
-            providers.setPriority(5 - newRating);
 
             FirebaseDatabase.getInstance().getReference()
                     .child("users")

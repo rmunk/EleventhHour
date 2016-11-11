@@ -96,8 +96,7 @@ public class ProvidersFragment extends Fragment {
         Query query = FirebaseDatabase.getInstance().getReference()
                 .child("providers")
                 .child(categoryKey)
-                .child(subcategoryKey)
-                .orderByPriority();
+                .child(subcategoryKey);
         adapter = new FirebaseRecyclerAdapter<Provider, ProviderViewHolder>(
                 Provider.class,
                 R.layout.item_provider,
