@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -174,6 +175,12 @@ public class SignInActivity extends FragmentActivity {
     @Subscribe(sticky = true)
     public void onAuthSuccess(final AuthSuccessfulEvent event) {
         EventBus.getDefault().removeStickyEvent(event);
+
+        FirebaseUser user = event.getFirebaseUser();
+        Crashlytics.setUserIdentifier(user.getUid());
+        Crashlytics.setUserEmail(user.getEmail());
+        Crashlytics.setUserName(user.getDisplayName());
+
         MainActivity_.intent(SignInActivity.this)
                 .action(MainActivity.ACTION_HOME)
                 .flags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)

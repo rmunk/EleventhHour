@@ -70,3 +70,11 @@
 -keep class hr.nas2skupa.eleventhhour.ui.viewholders.**  { *; }
 
 
+# Crashlytics
+-keep class com.crashlytics.** { *; }
+-keep class com.crashlytics.android.**
+-keepattributes SourceFile, LineNumberTable, *Annotation*
+
+# If you are using custom exceptions, add this line so that custom exception types are skipped during obfuscation:
+-keep public class * extends java.lang.Exception
+
