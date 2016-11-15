@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
@@ -59,6 +60,8 @@ public class CategoryActivity extends DrawerActivity {
     ImageView categoryBackground;
     @ViewById(R.id.img_category_icon)
     ImageView imgCategoryIcon;
+    @ViewById(R.id.fab_map)
+    FloatingActionButton fabMap;
 
     void setToolbar(@ViewById(R.id.toolbar) Toolbar toolbar) {
         setSupportActionBar(toolbar);
@@ -75,6 +78,7 @@ public class CategoryActivity extends DrawerActivity {
         if (isFinishing()) return;
         SubcategoriesFragment fragment = SubcategoriesFragment_.builder().categoryKey(categoryKey).build();
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, fragment, "SubcategoriesFragment").commit();
+        fabMap.hide();
     }
 
     @UiThread(delay = 500)
@@ -88,6 +92,7 @@ public class CategoryActivity extends DrawerActivity {
                 .add(R.id.fragment_container, fragment, "ProvidersFragment")
                 .addToBackStack("ProvidersFragment")
                 .commit();
+        fabMap.show();
     }
 
     @Override

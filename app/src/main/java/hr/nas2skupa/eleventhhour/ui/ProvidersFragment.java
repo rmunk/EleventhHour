@@ -14,6 +14,8 @@ import android.transition.Slide;
 import android.transition.Transition;
 import android.transition.TransitionManager;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -27,6 +29,8 @@ import com.google.firebase.database.Query;
 
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 import org.greenrobot.eventbus.EventBus;
 
@@ -43,7 +47,8 @@ import hr.nas2skupa.eleventhhour.utils.Utils;
 /**
  * A simple {@link Fragment} subclass.
  */
-@EFragment(R.layout.fragment_recycler_view)
+@EFragment(R.layout.fragment_providers)
+@OptionsMenu(R.menu.providers)
 public class ProvidersFragment extends Fragment {
     @FragmentArg
     String categoryKey;
@@ -56,11 +61,11 @@ public class ProvidersFragment extends Fragment {
     RecyclerView recyclerView;
 
     private DatabaseReference favoriteReference;
-    private ChildEventListener favoriteChangedListener;
+    private ChildEventListener myFavoriteChangedListener;
     private HashMap<String, Boolean> favorites = new HashMap<>();
 
     private DatabaseReference ratingReference;
-    private ChildEventListener ratingChangedListener;
+    private ChildEventListener myRatingChangedListener;
     private HashMap<String, Float> ratings = new HashMap<>();
     private FirebaseRecyclerAdapter<Provider, ProviderViewHolder> adapter;
 
@@ -97,173 +102,63 @@ public class ProvidersFragment extends Fragment {
                 .child("providers")
                 .child(categoryKey)
                 .child(subcategoryKey);
-        adapter = new FirebaseRecyclerAdapter<Provider, ProviderViewHolder>(
+        adapter = new ProvidersAdapter(
                 Provider.class,
                 R.layout.item_provider,
                 ProviderViewHolder.class,
-                query) {
-
-            public int expandedPosition = -1;
-
-            @Override
-            protected void populateViewHolder(final ProviderViewHolder viewHolder, final Provider provider, final int position) {
-                provider.setKey(getRef(position).getKey());
-
-                provider.setFavorite(favorites.containsKey(provider.getKey())
-                        ? favorites.get(provider.getKey())
-                        : false);
-
-                provider.setUserRating(ratings.containsKey(provider.getKey())
-                        ? ratings.get(provider.getKey())
-                        : 0f);
-
-                viewHolder.bindToProvider(provider);
-
-                final boolean isExpanded = position == expandedPosition;
-                viewHolder.showDetails(isExpanded);
-                viewHolder.showActionBar(isExpanded);
-                viewHolder.itemView.setActivated(isExpanded);
-                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-                            animateCardExpansion(position);
-                        else recyclerView.scrollToPosition(position);
-
-                        expandedPosition = isExpanded ? -1 : position;
-                        notifyDataSetChanged();
-                    }
-                });
-            }
-
-            @Override
-            public void onViewAttachedToWindow(ProviderViewHolder holder) {
-                super.onViewAttachedToWindow(holder);
-
-                EventBus.getDefault().register(holder);
-            }
-
-            @Override
-            public void onViewDetachedFromWindow(ProviderViewHolder holder) {
-                super.onViewDetachedFromWindow(holder);
-
-                EventBus.getDefault().unregister(holder);
-            }
-        };
+                query);
         recyclerView.setAdapter(adapter);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private void animateCardExpansion(final int position) {
-        Transition transition = new AutoTransition();
-        transition.addListener(new Transition.TransitionListener() {
-            @Override
-            public void onTransitionStart(Transition transition) {
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
 
-            }
+        MenuItem item = menu.findItem(R.id.action_sale);
+        if (item != null) item.getIcon().setAlpha(138);
+    }
 
-            @Override
-            public void onTransitionEnd(Transition transition) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    Transition transition2 = new AutoTransition();
-                    transition2.setDuration(200);
-                    TransitionManager.beginDelayedTransition(recyclerView, transition2);
-                }
-                recyclerView.scrollToPosition(position);
-            }
+    @OptionsItem(R.id.action_sale)
+    void multipleMenuItems(MenuItem item) {
+        item.setChecked(!item.isChecked());
+        item.getIcon().setAlpha(item.isChecked() ? 255 : 138);
 
-            @Override
-            public void onTransitionCancel(Transition transition) {
+        Query query;
+        if (item.isChecked()) query = FirebaseDatabase.getInstance().getReference()
+                .child("providers")
+                .child(categoryKey)
+                .child(subcategoryKey)
+                .orderByChild("sale")
+                .equalTo(true);
+        else query = FirebaseDatabase.getInstance().getReference()
+                .child("providers")
+                .child(categoryKey)
+                .child(subcategoryKey);
 
-            }
-
-            @Override
-            public void onTransitionPause(Transition transition) {
-
-            }
-
-            @Override
-            public void onTransitionResume(Transition transition) {
-
-            }
-        });
-        TransitionManager.beginDelayedTransition(recyclerView, transition);
+        adapter = new ProvidersAdapter(Provider.class, R.layout.item_provider, ProviderViewHolder.class, query);
+        recyclerView.setAdapter(adapter);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        favoriteChangedListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                favorites.put(dataSnapshot.getKey(), dataSnapshot.getValue(boolean.class));
-                EventBus.getDefault().post(new FavoriteStatusChangedEvent(dataSnapshot.getKey(), dataSnapshot.getValue(boolean.class)));
-            }
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                favorites.put(dataSnapshot.getKey(), dataSnapshot.getValue(boolean.class));
-                EventBus.getDefault().post(new FavoriteStatusChangedEvent(dataSnapshot.getKey(), dataSnapshot.getValue(boolean.class)));
-            }
+        myFavoriteChangedListener = new MyFavoriteChangedListener();
+        favoriteReference.addChildEventListener(myFavoriteChangedListener);
 
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                favorites.remove(dataSnapshot.getKey());
-                EventBus.getDefault().post(new FavoriteStatusChangedEvent(dataSnapshot.getKey(), false));
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-        favoriteReference.addChildEventListener(favoriteChangedListener);
-
-        ratingChangedListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                ratings.put(dataSnapshot.getKey(), dataSnapshot.getValue(float.class));
-                EventBus.getDefault().post(new UserRatingChangedEvent(dataSnapshot.getKey(), dataSnapshot.getValue(float.class)));
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                ratings.put(dataSnapshot.getKey(), dataSnapshot.getValue(float.class));
-                EventBus.getDefault().post(new UserRatingChangedEvent(dataSnapshot.getKey(), dataSnapshot.getValue(float.class)));
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                ratings.remove(dataSnapshot.getKey());
-                EventBus.getDefault().post(new UserRatingChangedEvent(dataSnapshot.getKey(), 0f));
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-        ratingReference.addChildEventListener(ratingChangedListener);
+        myRatingChangedListener = new MyRatingChangedListener();
+        ratingReference.addChildEventListener(myRatingChangedListener);
     }
 
     @Override
     public void onStop() {
         super.onStop();
 
-        if (favoriteChangedListener != null)
-            favoriteReference.removeEventListener(favoriteChangedListener);
-        if (ratingChangedListener != null)
-            ratingReference.removeEventListener(ratingChangedListener);
+        if (myFavoriteChangedListener != null)
+            favoriteReference.removeEventListener(myFavoriteChangedListener);
+
+        if (myRatingChangedListener != null)
+            ratingReference.removeEventListener(myRatingChangedListener);
     }
 
     @Override
@@ -282,5 +177,157 @@ public class ProvidersFragment extends Fragment {
         setReenterTransition(new Fade());
         setExitTransition(new Slide(Gravity.TOP));
         setReturnTransition(new Slide(Gravity.TOP));
+    }
+
+    public class ProvidersAdapter extends FirebaseRecyclerAdapter<Provider, ProviderViewHolder> {
+        public int expandedPosition = -1;
+
+        public ProvidersAdapter(Class<Provider> modelClass, int modelLayout, Class<ProviderViewHolder> viewHolderClass, Query ref) {
+            super(modelClass, modelLayout, viewHolderClass, ref);
+        }
+
+        public ProvidersAdapter(Class<Provider> modelClass, int modelLayout, Class<ProviderViewHolder> viewHolderClass, DatabaseReference ref) {
+            super(modelClass, modelLayout, viewHolderClass, ref);
+        }
+
+        @Override
+        protected void populateViewHolder(final ProviderViewHolder viewHolder, final Provider provider, final int position) {
+            provider.setKey(getRef(position).getKey());
+
+            provider.setFavorite(favorites.containsKey(provider.getKey())
+                    ? favorites.get(provider.getKey())
+                    : false);
+
+            provider.setUserRating(ratings.containsKey(provider.getKey())
+                    ? ratings.get(provider.getKey())
+                    : 0f);
+
+            viewHolder.bindToProvider(provider);
+
+            final boolean isExpanded = position == expandedPosition;
+            viewHolder.showDetails(isExpanded);
+            viewHolder.showActionBar(isExpanded);
+            viewHolder.itemView.setActivated(isExpanded);
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                        animateCardExpansion(position);
+                    else recyclerView.scrollToPosition(position);
+
+                    expandedPosition = isExpanded ? -1 : position;
+                    notifyDataSetChanged();
+                }
+            });
+        }
+
+        @Override
+        public void onViewAttachedToWindow(ProviderViewHolder holder) {
+            super.onViewAttachedToWindow(holder);
+
+            EventBus.getDefault().register(holder);
+        }
+
+        @Override
+        public void onViewDetachedFromWindow(ProviderViewHolder holder) {
+            super.onViewDetachedFromWindow(holder);
+
+            EventBus.getDefault().unregister(holder);
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+        private void animateCardExpansion(final int position) {
+            Transition transition = new AutoTransition();
+            transition.addListener(new Transition.TransitionListener() {
+                @Override
+                public void onTransitionStart(Transition transition) {
+
+                }
+
+                @Override
+                public void onTransitionEnd(Transition transition) {
+                    Transition transition2 = new AutoTransition();
+                    transition2.setDuration(200);
+                    TransitionManager.beginDelayedTransition(recyclerView, transition2);
+                    recyclerView.scrollToPosition(position);
+                }
+
+                @Override
+                public void onTransitionCancel(Transition transition) {
+
+                }
+
+                @Override
+                public void onTransitionPause(Transition transition) {
+
+                }
+
+                @Override
+                public void onTransitionResume(Transition transition) {
+
+                }
+            });
+            TransitionManager.beginDelayedTransition(recyclerView, transition);
+        }
+    }
+
+    private class MyFavoriteChangedListener implements ChildEventListener {
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            favorites.put(dataSnapshot.getKey(), dataSnapshot.getValue(boolean.class));
+            EventBus.getDefault().post(new FavoriteStatusChangedEvent(dataSnapshot.getKey(), dataSnapshot.getValue(boolean.class)));
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            favorites.put(dataSnapshot.getKey(), dataSnapshot.getValue(boolean.class));
+            EventBus.getDefault().post(new FavoriteStatusChangedEvent(dataSnapshot.getKey(), dataSnapshot.getValue(boolean.class)));
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+            favorites.remove(dataSnapshot.getKey());
+            EventBus.getDefault().post(new FavoriteStatusChangedEvent(dataSnapshot.getKey(), false));
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    }
+
+    private class MyRatingChangedListener implements ChildEventListener {
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            ratings.put(dataSnapshot.getKey(), dataSnapshot.getValue(float.class));
+            EventBus.getDefault().post(new UserRatingChangedEvent(dataSnapshot.getKey(), dataSnapshot.getValue(float.class)));
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            ratings.put(dataSnapshot.getKey(), dataSnapshot.getValue(float.class));
+            EventBus.getDefault().post(new UserRatingChangedEvent(dataSnapshot.getKey(), dataSnapshot.getValue(float.class)));
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+            ratings.remove(dataSnapshot.getKey());
+            EventBus.getDefault().post(new UserRatingChangedEvent(dataSnapshot.getKey(), 0f));
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
     }
 }
