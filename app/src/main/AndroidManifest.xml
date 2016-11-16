@@ -48,6 +48,11 @@
             android:name=".ui.ProviderActivity_"
             android:screenOrientation="portrait"
             android:theme="@style/MaterialTheme.Light.TranslucentStatus"/>
+        <activity
+            android:name=".ui.MapActivity"
+            android:label="@string/title_activity_map"
+            android:screenOrientation="portrait"
+            android:theme="@style/MaterialTheme.Light.TranslucentStatus"/>
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.

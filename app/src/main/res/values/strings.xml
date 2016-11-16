@@ -22,6 +22,7 @@
     <!-- Activity and fragment titles -->
     <string name="title_fragment_home">Home</string>
     <string name="title_fragment_calendar">My bookings</string>
+    <string name="title_activity_map">Map</string>
 
     <!-- Categories -->
     <string name="category_health">Health</string>

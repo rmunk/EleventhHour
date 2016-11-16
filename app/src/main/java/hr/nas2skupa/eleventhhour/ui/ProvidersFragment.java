@@ -65,6 +65,7 @@ public class ProvidersFragment extends Fragment {
     private HashMap<String, Boolean> favorites = new HashMap<>();
 
     private DatabaseReference ratingReference;
+    private Query query;
     private ChildEventListener myRatingChangedListener;
     private HashMap<String, Float> ratings = new HashMap<>();
     private FirebaseRecyclerAdapter<Provider, ProviderViewHolder> adapter;
@@ -98,7 +99,7 @@ public class ProvidersFragment extends Fragment {
         recyclerView.setLayoutManager(manager);
         recyclerView.setHasFixedSize(true);
 
-        Query query = FirebaseDatabase.getInstance().getReference()
+        query = FirebaseDatabase.getInstance().getReference()
                 .child("providers")
                 .child(categoryKey)
                 .child(subcategoryKey);
@@ -123,7 +124,6 @@ public class ProvidersFragment extends Fragment {
         item.setChecked(!item.isChecked());
         item.getIcon().setAlpha(item.isChecked() ? 255 : 138);
 
-        Query query;
         if (item.isChecked()) query = FirebaseDatabase.getInstance().getReference()
                 .child("providers")
                 .child(categoryKey)
