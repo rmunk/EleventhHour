@@ -45,8 +45,6 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/app_bar"
-        android:id="@+id/fragment_container">
-
-    </FrameLayout>
+        android:id="@+id/fragment_container"/>
 
 </android.support.constraint.ConstraintLayout>

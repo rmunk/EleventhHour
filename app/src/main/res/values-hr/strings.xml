@@ -69,4 +69,6 @@
     <string name="title_fragment_home">Početna</string>
     <string name="menu_profile">Moj profil</string>
     <string name="menu_help">Pomoć</string>
+    <string name="menu_sale">Akcija</string>
+    <string name="title_activity_map">Karta</string>
 </resources>

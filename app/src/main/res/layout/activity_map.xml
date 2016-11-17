@@ -1,7 +1,50 @@
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          android:id="@+id/map"
-          android:name="com.google.android.gms.maps.SupportMapFragment"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          tools:context="hr.nas2skupa.eleventhhour.ui.MapActivity"/>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="hr.nas2skupa.eleventhhour.ui.MapActivity"
+        tools:layout="@layout/item_subcategory"/>
+
+    <LinearLayout
+        android:id="@+id/bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/background_light"
+        android:elevation="16dp"
+        android:orientation="vertical"
+        android:outlineProvider="bounds"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="116dp"
+        app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+
+        <FrameLayout
+            android:id="@+id/fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_marginRight="@dimen/fab_margin"
+        android:clickable="true"
+        android:visibility="gone"
+        app:elevation="16dp"
+        app:fabSize="normal"
+        app:layout_anchor="@id/bottom_sheet"
+        app:layout_anchorGravity="top|right"
+        app:srcCompat="@drawable/ic_watch_later_white_24dp"/>
+
+</android.support.design.widget.CoordinatorLayout>
+

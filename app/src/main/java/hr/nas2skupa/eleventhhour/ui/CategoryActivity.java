@@ -1,6 +1,5 @@
 package hr.nas2skupa.eleventhhour.ui;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -218,6 +217,6 @@ public class CategoryActivity extends DrawerActivity {
 
     @Click(R.id.fab_map)
     public void showMap(FloatingActionButton fabMap) {
-        startActivity(new Intent(this, MapActivity.class));
+        MapActivity_.intent(this).categoryKey(categoryKey).subcategoryKey(subcategoryKey).start();
     }
 }

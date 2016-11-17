@@ -49,7 +49,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/MaterialTheme.Light.TranslucentStatus"/>
         <activity
-            android:name=".ui.MapActivity"
+            android:name=".ui.MapActivity_"
             android:label="@string/title_activity_map"
             android:screenOrientation="portrait"
             android:theme="@style/MaterialTheme.Light.TranslucentStatus"/>
