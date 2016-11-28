@@ -2,8 +2,10 @@ package hr.nas2skupa.eleventhhour.ui.helpers;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -29,6 +31,8 @@ public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private DrawerLayout drawer;
+    private NavigationView navView;
+    private FirebaseAuth.AuthStateListener authStateListener;
 
     public DrawerLayout getDrawer() {
         return drawer;
@@ -39,9 +43,18 @@ public class DrawerActivity extends AppCompatActivity
     public void setContentView(@LayoutRes int layoutResID) {
         drawer = (DrawerLayout) getLayoutInflater().inflate(R.layout.activity_drawer, null);
 
-        final NavigationView navView = (NavigationView) drawer.findViewById(R.id.nav_view);
+        navView = (NavigationView) drawer.findViewById(R.id.nav_view);
         navView.setNavigationItemSelectedListener(this);
-        FirebaseAuth.getInstance().addAuthStateListener(new FirebaseAuth.AuthStateListener() {
+        FrameLayout content = (FrameLayout) drawer.findViewById(R.id.content_main);
+        getLayoutInflater().inflate(layoutResID, content, true);
+        super.setContentView(drawer);
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser currentUser = firebaseAuth.getCurrentUser();
@@ -52,11 +65,19 @@ public class DrawerActivity extends AppCompatActivity
                 username.setText(currentUser.getDisplayName());
                 email.setText(currentUser.getEmail());
             }
-        });
+        };
+    }
 
-        FrameLayout content = (FrameLayout) drawer.findViewById(R.id.content_main);
-        getLayoutInflater().inflate(layoutResID, content, true);
-        super.setContentView(drawer);
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        FirebaseAuth.getInstance().removeAuthStateListener(authStateListener);
     }
 
     @Override
