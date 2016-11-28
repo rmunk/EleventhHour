@@ -31,6 +31,10 @@ android {
     }
     compileSdkVersion 25
     buildToolsVersion "25.0.0"
+    dexOptions {
+        maxProcessCount 2
+        javaMaxHeapSize "2g"
+    }
     defaultConfig {
         applicationId "hr.nas2skupa.eleventhhour"
         minSdkVersion 16
@@ -66,7 +70,7 @@ dependencies {
     compile 'com.android.support:cardview-v7:25.0.1'
     compile 'com.android.support:support-v4:25.0.1'
     compile 'com.android.support:recyclerview-v7:25.0.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta3'
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
 
     compile 'com.google.android.gms:play-services-auth:9.8.0'
     compile 'com.google.android.gms:play-services-maps:9.8.0'
@@ -98,6 +102,12 @@ dependencies {
     compile 'com.github.sundeepk:compact-calendar-view:1.9.2'
 
     compile 'jp.wasabeef:recyclerview-animators:2.2.4'
+    compile 'eu.davidea:flexible-adapter:5.0.0-b8'
+
+    // LeakCanary
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
+    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
 
     // Testing
     testCompile 'org.testng:testng:6.9.6'

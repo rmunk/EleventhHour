@@ -79,7 +79,6 @@
                 android:layout_height="wrap_content"
                 android:drawablePadding="4dp"
                 android:drawableRight="@drawable/ic_person_black_18dp"
-                android:text="TextView"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 app:layout_constraintBottom_toBottomOf="@+id/rating_indicator"
                 app:layout_constraintLeft_toRightOf="@+id/rating_indicator"

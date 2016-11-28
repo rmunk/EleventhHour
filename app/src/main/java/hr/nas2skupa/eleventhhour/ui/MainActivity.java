@@ -22,6 +22,7 @@ public class MainActivity extends DrawerActivity
 
     public static final String ACTION_HOME = "ch.photrack.discharge.ACTION_HOME";
     public static final String ACTION_CALENDAR = "ch.photrack.discharge.ACTION_CALENDAR";
+    public static final String ACTION_FAVORITES = "ch.photrack.discharge.ACTION_FAVORITES";
 
     @ViewById(R.id.toolbar)
     Toolbar toolbar;
@@ -61,12 +62,23 @@ public class MainActivity extends DrawerActivity
             case ACTION_HOME:
                 toolbar.setTitle(R.string.title_fragment_home);
                 if (getSupportFragmentManager().findFragmentByTag("HomeFragment") == null)
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, HomeFragment_.builder().build(), "HomeFragment").commit();
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, HomeFragment_.builder().build(), "HomeFragment")
+                            .commit();
                 break;
             case ACTION_CALENDAR:
                 toolbar.setTitle(R.string.title_fragment_calendar);
                 if (getSupportFragmentManager().findFragmentByTag("CalendarFragment") == null)
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, CalendarFragment_.builder().build(), "CalendarFragment").commit();
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, CalendarFragment_.builder().build(), "CalendarFragment")
+                            .commit();
+                break;
+            case ACTION_FAVORITES:
+                toolbar.setTitle(R.string.title_fragment_favorites);
+                if (getSupportFragmentManager().findFragmentByTag("FavoritesFragment") == null)
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, FavoritesFragment_.builder().build(), "FavoritesFragment")
+                            .commit();
                 break;
             default:
                 setPage(ACTION_HOME);

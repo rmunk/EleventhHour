@@ -18,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.ChildEventListener;
@@ -42,6 +43,7 @@ import hr.nas2skupa.eleventhhour.events.UserRatingChangedEvent;
 import hr.nas2skupa.eleventhhour.model.Provider;
 import hr.nas2skupa.eleventhhour.ui.viewholders.ProviderViewHolder;
 import hr.nas2skupa.eleventhhour.utils.Utils;
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 
 /**
@@ -98,6 +100,9 @@ public class ProvidersFragment extends Fragment {
         final LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(manager);
         recyclerView.setHasFixedSize(true);
+        recyclerView.setItemAnimator(new SlideInUpAnimator(new OvershootInterpolator(0.1f)));
+        recyclerView.getItemAnimator().setAddDuration(500);
+        recyclerView.getItemAnimator().setRemoveDuration(500);
 
         query = FirebaseDatabase.getInstance().getReference()
                 .child("providers")
@@ -136,7 +141,7 @@ public class ProvidersFragment extends Fragment {
                 .child(subcategoryKey);
 
         adapter = new ProvidersAdapter(Provider.class, R.layout.item_provider, ProviderViewHolder.class, query);
-        recyclerView.setAdapter(adapter);
+        recyclerView.swapAdapter(adapter, false);
     }
 
     @Override
