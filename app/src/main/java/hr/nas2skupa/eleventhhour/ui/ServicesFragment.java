@@ -53,10 +53,6 @@ import hr.nas2skupa.eleventhhour.utils.Utils;
 @EFragment(R.layout.fragment_recycler_view)
 public class ServicesFragment extends Fragment implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
     @FragmentArg
-    String categoryKey;
-    @FragmentArg
-    String subcategoryKey;
-    @FragmentArg
     String providerKey;
 
     @ViewById(R.id.recycler_view)
@@ -178,8 +174,6 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
 
         FirebaseDatabase.getInstance().getReference()
                 .child("providers")
-                .child(categoryKey)
-                .child(subcategoryKey)
                 .child(providerKey)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override

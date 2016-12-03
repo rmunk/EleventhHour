@@ -4,8 +4,6 @@ import android.animation.ObjectAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -154,23 +152,6 @@ public class ProviderViewHolder extends RecyclerView.ViewHolder {
         viewAction.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
-    protected void animateView(final View v, final int animResId, final int endVisibility) {
-        Animation anim = AnimationUtils.loadAnimation(itemView.getContext(), animResId);
-        anim.setAnimationListener(new Animation.AnimationListener() {
-            public void onAnimationStart(Animation animation) {
-                v.setVisibility(View.VISIBLE);
-            }
-
-            public void onAnimationEnd(Animation animation) {
-                v.setVisibility(endVisibility);
-            }
-
-            public void onAnimationRepeat(Animation animation) {
-            }
-        });
-        v.startAnimation(anim);
-    }
-
     @Subscribe
     public void updateFavorite(FavoriteStatusChangedEvent event) {
         if (!event.getProviderKey().equals(provider.getKey())) return;
@@ -208,8 +189,6 @@ public class ProviderViewHolder extends RecyclerView.ViewHolder {
             ratingUpdate.put(".priority", 5 - newRating);
             DatabaseReference providers = FirebaseDatabase.getInstance().getReference()
                     .child("providers")
-                    .child(provider.getCategory())
-                    .child(provider.getSubcategory())
                     .child(provider.getKey());
             providers.updateChildren(ratingUpdate);
 

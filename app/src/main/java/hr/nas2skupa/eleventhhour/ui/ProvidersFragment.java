@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 
+import com.firebase.ui.database.FirebaseIndexRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -51,7 +52,7 @@ import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
  */
 @EFragment(R.layout.fragment_providers)
 @OptionsMenu(R.menu.providers)
-public class ProvidersFragment extends Fragment {
+public abstract class ProvidersFragment extends Fragment {
     @FragmentArg
     String categoryKey;
     @FragmentArg
@@ -67,10 +68,13 @@ public class ProvidersFragment extends Fragment {
     private HashMap<String, Boolean> favorites = new HashMap<>();
 
     private DatabaseReference ratingReference;
-    private Query query;
+    private Query dataRef;
     private ChildEventListener myRatingChangedListener;
     private HashMap<String, Float> ratings = new HashMap<>();
     private FirebaseRecyclerAdapter<Provider, ProviderViewHolder> adapter;
+
+
+    public abstract Query getKeyRef();
 
     public ProvidersFragment() {
         // Required empty public constructor
@@ -104,15 +108,14 @@ public class ProvidersFragment extends Fragment {
         recyclerView.getItemAnimator().setAddDuration(500);
         recyclerView.getItemAnimator().setRemoveDuration(500);
 
-        query = FirebaseDatabase.getInstance().getReference()
-                .child("providers")
-                .child(categoryKey)
-                .child(subcategoryKey);
+        dataRef = FirebaseDatabase.getInstance().getReference()
+                .child("providers");
         adapter = new ProvidersAdapter(
                 Provider.class,
                 R.layout.item_provider,
                 ProviderViewHolder.class,
-                query);
+                getKeyRef(),
+                dataRef);
         recyclerView.setAdapter(adapter);
     }
 
@@ -129,18 +132,18 @@ public class ProvidersFragment extends Fragment {
         item.setChecked(!item.isChecked());
         item.getIcon().setAlpha(item.isChecked() ? 255 : 138);
 
-        if (item.isChecked()) query = FirebaseDatabase.getInstance().getReference()
+        if (item.isChecked()) dataRef = FirebaseDatabase.getInstance().getReference()
                 .child("providers")
-                .child(categoryKey)
-                .child(subcategoryKey)
                 .orderByChild("sale")
                 .equalTo(true);
-        else query = FirebaseDatabase.getInstance().getReference()
-                .child("providers")
-                .child(categoryKey)
-                .child(subcategoryKey);
+        else dataRef = FirebaseDatabase.getInstance().getReference()
+                .child("providers");
 
-        adapter = new ProvidersAdapter(Provider.class, R.layout.item_provider, ProviderViewHolder.class, query);
+        adapter = new ProvidersAdapter(Provider.class,
+                R.layout.item_provider,
+                ProviderViewHolder.class,
+                getKeyRef(),
+                dataRef);
         recyclerView.swapAdapter(adapter, false);
     }
 
@@ -184,15 +187,11 @@ public class ProvidersFragment extends Fragment {
         setReturnTransition(new Slide(Gravity.TOP));
     }
 
-    public class ProvidersAdapter extends FirebaseRecyclerAdapter<Provider, ProviderViewHolder> {
+    public class ProvidersAdapter extends FirebaseIndexRecyclerAdapter<Provider, ProviderViewHolder> {
         public int expandedPosition = -1;
 
-        public ProvidersAdapter(Class<Provider> modelClass, int modelLayout, Class<ProviderViewHolder> viewHolderClass, Query ref) {
-            super(modelClass, modelLayout, viewHolderClass, ref);
-        }
-
-        public ProvidersAdapter(Class<Provider> modelClass, int modelLayout, Class<ProviderViewHolder> viewHolderClass, DatabaseReference ref) {
-            super(modelClass, modelLayout, viewHolderClass, ref);
+        public ProvidersAdapter(Class<Provider> modelClass, int modelLayout, Class<ProviderViewHolder> viewHolderClass, Query keyRef, Query dataRef) {
+            super(modelClass, modelLayout, viewHolderClass, keyRef, dataRef);
         }
 
         @Override
@@ -211,9 +210,10 @@ public class ProvidersFragment extends Fragment {
 
             final boolean isExpanded = position == expandedPosition;
             viewHolder.showDetails(isExpanded);
-            viewHolder.showActionBar(isExpanded);
+//            viewHolder.showActionBar(isExpanded);
             viewHolder.itemView.setActivated(isExpanded);
-            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            View imgExpand = viewHolder.itemView.findViewById(R.id.img_expand);
+            imgExpand.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
@@ -222,6 +222,13 @@ public class ProvidersFragment extends Fragment {
 
                     expandedPosition = isExpanded ? -1 : position;
                     notifyDataSetChanged();
+                }
+            });
+
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ProviderActivity_.intent(getContext()).providerKey(provider.getKey()).start();
                 }
             });
         }

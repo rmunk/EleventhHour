@@ -99,6 +99,9 @@ public class DrawerActivity extends AppCompatActivity
             case R.id.nav_favorites:
                 MainActivity_.intent(this).flags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP).action(MainActivity.ACTION_FAVORITES).start();
                 break;
+            case R.id.nav_top:
+                MainActivity_.intent(this).flags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP).action(MainActivity.ACTION_TOP).start();
+                break;
 
             case R.id.nav_sign_out:
                 SignInActivity_.intent(this).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK).action(SignInActivity.ACTION_SIGN_OUT).start();

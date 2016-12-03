@@ -81,7 +81,7 @@ dependencies {
     compile 'com.google.firebase:firebase-database:9.8.0'
     compile 'com.google.firebase:firebase-crash:9.8.0'
     compile 'com.google.firebase:firebase-messaging:9.8.0'
-    compile 'com.firebaseui:firebase-ui-database:0.6.2'
+    compile 'com.firebaseui:firebase-ui-database:1.0.0'
     compile 'com.firebase:geofire-android:2.1.0'
 
     compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
@@ -102,7 +102,6 @@ dependencies {
     compile 'com.github.sundeepk:compact-calendar-view:1.9.2'
 
     compile 'jp.wasabeef:recyclerview-animators:2.2.4'
-    compile 'eu.davidea:flexible-adapter:5.0.0-b8'
 
     // LeakCanary
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'

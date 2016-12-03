@@ -77,17 +77,17 @@
                 android:id="@+id/txt_ratings"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
                 android:drawablePadding="4dp"
                 android:drawableRight="@drawable/ic_person_black_18dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="@+id/rating_indicator"
                 app:layout_constraintLeft_toRightOf="@+id/rating_indicator"
                 app:layout_constraintTop_toTopOf="@+id/rating_indicator"
                 app:layout_constraintVertical_bias="0.0"
-                tools:text="1309"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
-                android:textSize="14sp"/>
+                tools:text="1309"/>
 
             <TextView
                 android:id="@+id/txt_distance"

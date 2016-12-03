@@ -161,8 +161,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 }
                 if (getSupportFragmentManager().findFragmentByTag(providerKey) == null) {
                     ProviderInfoFragment fragment = ProviderInfoFragment_.builder()
-                            .categoryKey(categoryKey)
-                            .subcategoryKey(subcategoryKey)
                             .providerKey(providerKey)
                             .distance(distance)
                             .build();
@@ -234,8 +232,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     @Click(R.id.fab)
     public void showProvider() {
         ProviderActivity_.intent(this)
-                .categoryKey(categoryKey)
-                .subcategoryKey(subcategoryKey)
                 .providerKey(providerKey)
                 .start();
     }

@@ -23,6 +23,7 @@
     <string name="title_fragment_home">Home</string>
     <string name="title_fragment_calendar">My bookings</string>
     <string name="title_fragment_favorites">Favorite providers</string>
+    <string name="title_fragment_top">Top offers</string>
     <string name="title_activity_map">Map</string>
 
     <!-- Categories -->

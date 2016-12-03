@@ -36,6 +36,8 @@
             <intent-filter>
                 <action android:name="ch.photrack.discharge.ACTION_HOME"/>
                 <action android:name="ch.photrack.discharge.ACTION_CALENDAR"/>
+                <action android:name="ch.photrack.discharge.ACTION_FAVORITES"/>
+                <action android:name="ch.photrack.discharge.ACTION_TOP"/>
 
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>

@@ -32,10 +32,6 @@ import hr.nas2skupa.eleventhhour.utils.Utils;
 @EFragment(R.layout.fragment_provider_info)
 public class ProviderInfoFragment extends Fragment {
     @FragmentArg
-    String categoryKey;
-    @FragmentArg
-    String subcategoryKey;
-    @FragmentArg
     String providerKey;
     @FragmentArg
     String distance;
@@ -97,8 +93,6 @@ public class ProviderInfoFragment extends Fragment {
 
         providerReference = FirebaseDatabase.getInstance().getReference()
                 .child("providers")
-                .child(categoryKey)
-                .child(subcategoryKey)
                 .child(providerKey);
 
         favoriteReference = FirebaseDatabase.getInstance().getReference()

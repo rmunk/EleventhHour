@@ -28,7 +28,6 @@ import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.model.Category;
 import hr.nas2skupa.eleventhhour.model.Provider;
 import hr.nas2skupa.eleventhhour.ui.helpers.DrawerActivity;
 import hr.nas2skupa.eleventhhour.ui.viewholders.ProviderViewHolder;
@@ -37,10 +36,6 @@ import hr.nas2skupa.eleventhhour.ui.viewholders.ProviderViewHolder;
 @OptionsMenu(R.menu.main)
 public class ProviderActivity extends DrawerActivity {
     @Extra
-    String categoryKey;
-    @Extra
-    String subcategoryKey;
-    @Extra
     String providerKey;
 
     @ViewById(R.id.layout_main)
@@ -48,8 +43,6 @@ public class ProviderActivity extends DrawerActivity {
     @ViewById(R.id.app_bar)
     AppBarLayout appBar;
 
-    private DatabaseReference categoryReference;
-    private ValueEventListener categoryListener;
     private ProviderViewHolder providerViewHolder;
     private DatabaseReference providerReference;
     private ValueEventListener providerListener;
@@ -74,17 +67,12 @@ public class ProviderActivity extends DrawerActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        categoryReference = FirebaseDatabase.getInstance().getReference().child("categories").child(categoryKey);
         providerReference = FirebaseDatabase.getInstance().getReference()
                 .child("providers")
-                .child(categoryKey)
-                .child(subcategoryKey)
                 .child(providerKey);
 
         if (savedInstanceState == null) {
             ServicesFragment fragment = ServicesFragment_.builder()
-                    .categoryKey(categoryKey)
-                    .subcategoryKey(subcategoryKey)
                     .providerKey(providerKey)
                     .build();
             getSupportFragmentManager()
@@ -99,27 +87,6 @@ public class ProviderActivity extends DrawerActivity {
         super.onStart();
 
 //        EventBus.getDefault().register(this);
-
-        categoryListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Category category = dataSnapshot.getValue(Category.class);
-                if (category == null) return;
-
-                int color;
-                try {
-                    color = Color.parseColor(category.getColor());
-                } catch (Exception e) {
-                    color = Color.LTGRAY;
-                }
-                getDrawer().setStatusBarBackgroundColor(color);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        };
-        categoryReference.addValueEventListener(categoryListener);
 
         providerListener = new ValueEventListener() {
             @Override
@@ -145,7 +112,6 @@ public class ProviderActivity extends DrawerActivity {
 
 //        EventBus.getDefault().unregister(this);
 
-        if (categoryListener != null) categoryReference.removeEventListener(categoryListener);
         if (providerListener != null) providerReference.removeEventListener(providerListener);
     }
 

@@ -23,6 +23,7 @@ public class MainActivity extends DrawerActivity
     public static final String ACTION_HOME = "ch.photrack.discharge.ACTION_HOME";
     public static final String ACTION_CALENDAR = "ch.photrack.discharge.ACTION_CALENDAR";
     public static final String ACTION_FAVORITES = "ch.photrack.discharge.ACTION_FAVORITES";
+    public static final String ACTION_TOP = "ch.photrack.discharge.ACTION_TOP";
 
     @ViewById(R.id.toolbar)
     Toolbar toolbar;
@@ -75,9 +76,16 @@ public class MainActivity extends DrawerActivity
                 break;
             case ACTION_FAVORITES:
                 toolbar.setTitle(R.string.title_fragment_favorites);
-                if (getSupportFragmentManager().findFragmentByTag("FavoritesFragment") == null)
+                if (getSupportFragmentManager().findFragmentByTag("FavoriteProvidersFragment") == null)
                     getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, FavoritesFragment_.builder().build(), "FavoritesFragment")
+                            .replace(R.id.fragment_container, FavoriteProvidersFragment_.builder().build(), "FavoriteProvidersFragment")
+                            .commit();
+                break;
+            case ACTION_TOP:
+                toolbar.setTitle(R.string.title_fragment_top);
+                if (getSupportFragmentManager().findFragmentByTag("TopProvidersFragment") == null)
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, TopProvidersFragment_.builder().build(), "TopProvidersFragment")
                             .commit();
                 break;
             default:

@@ -85,12 +85,12 @@ public class CategoryActivity extends DrawerActivity {
     @UiThread(delay = 500)
     public void setProvidersFragment() {
         if (isFinishing()) return;
-        ProvidersFragment fragment = ProvidersFragment_.builder()
+        SubcategoryProvidersFragment fragment = SubcategoryProvidersFragment_.builder()
                 .categoryKey(categoryKey)
                 .subcategoryKey(subcategoryKey)
                 .build();
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment_container, fragment, "ProvidersFragment")
+                .add(R.id.fragment_container, fragment, "SubcategoryProvidersFragment")
                 .addToBackStack("ProvidersFragment")
                 .commit();
         fabMap.show();
@@ -208,8 +208,6 @@ public class CategoryActivity extends DrawerActivity {
                 Pair.create(event.getView().findViewById(R.id.layout_main), "provider_card")
         );
         ProviderActivity_.intent(this)
-                .categoryKey(categoryKey)
-                .subcategoryKey(subcategoryKey)
                 .providerKey(event.getProviderKey())
                 .withOptions(options.toBundle())
                 .start();
