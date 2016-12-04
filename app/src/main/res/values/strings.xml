@@ -102,4 +102,7 @@
     <string name="cancel_booking">Cancel booking</string>
     <string name="tap_for_directions">Tap me for directions!</string>
 
+    <!-- ProviderActivity -->
+    <string name="provider_removed">Provider %s no longer exists!</string>
+
 </resources>
