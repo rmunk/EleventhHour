@@ -34,13 +34,10 @@ import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.HashMap;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.events.FavoriteStatusChangedEvent;
-import hr.nas2skupa.eleventhhour.events.UserRatingChangedEvent;
 import hr.nas2skupa.eleventhhour.model.Provider;
 import hr.nas2skupa.eleventhhour.ui.viewholders.ProviderViewHolder;
 import hr.nas2skupa.eleventhhour.utils.Utils;
@@ -67,10 +64,7 @@ public abstract class ProvidersFragment extends Fragment {
     private ChildEventListener myFavoriteChangedListener;
     private HashMap<String, Boolean> favorites = new HashMap<>();
 
-    private DatabaseReference ratingReference;
     private Query dataRef;
-    private ChildEventListener myRatingChangedListener;
-    private HashMap<String, Float> ratings = new HashMap<>();
     private FirebaseRecyclerAdapter<Provider, ProviderViewHolder> adapter;
 
 
@@ -89,11 +83,6 @@ public abstract class ProvidersFragment extends Fragment {
                 .child(Utils.getMyUid())
                 .child("favorites");
 
-        ratingReference = FirebaseDatabase.getInstance().getReference()
-                .child("users")
-                .child(Utils.getMyUid())
-                .child("ratings");
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) setTransitions();
     }
 
@@ -108,8 +97,7 @@ public abstract class ProvidersFragment extends Fragment {
         recyclerView.getItemAnimator().setAddDuration(500);
         recyclerView.getItemAnimator().setRemoveDuration(500);
 
-        dataRef = FirebaseDatabase.getInstance().getReference()
-                .child("providers");
+        dataRef = FirebaseDatabase.getInstance().getReference().child("providers");
         adapter = new ProvidersAdapter(
                 Provider.class,
                 R.layout.item_provider,
@@ -136,8 +124,7 @@ public abstract class ProvidersFragment extends Fragment {
                 .child("providers")
                 .orderByChild("sale")
                 .equalTo(true);
-        else dataRef = FirebaseDatabase.getInstance().getReference()
-                .child("providers");
+        else dataRef = FirebaseDatabase.getInstance().getReference().child("providers");
 
         adapter = new ProvidersAdapter(Provider.class,
                 R.layout.item_provider,
@@ -153,9 +140,6 @@ public abstract class ProvidersFragment extends Fragment {
 
         myFavoriteChangedListener = new MyFavoriteChangedListener();
         favoriteReference.addChildEventListener(myFavoriteChangedListener);
-
-        myRatingChangedListener = new MyRatingChangedListener();
-        ratingReference.addChildEventListener(myRatingChangedListener);
     }
 
     @Override
@@ -164,16 +148,16 @@ public abstract class ProvidersFragment extends Fragment {
 
         if (myFavoriteChangedListener != null)
             favoriteReference.removeEventListener(myFavoriteChangedListener);
-
-        if (myRatingChangedListener != null)
-            ratingReference.removeEventListener(myRatingChangedListener);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
 
-        if (adapter != null) adapter.cleanup();
+        if (adapter != null) {
+            adapter.cleanup();
+            adapter = null;
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -202,15 +186,10 @@ public abstract class ProvidersFragment extends Fragment {
                     ? favorites.get(provider.getKey())
                     : false);
 
-            provider.setUserRating(ratings.containsKey(provider.getKey())
-                    ? ratings.get(provider.getKey())
-                    : 0f);
-
             viewHolder.bindToProvider(provider);
 
             final boolean isExpanded = position == expandedPosition;
             viewHolder.showDetails(isExpanded);
-//            viewHolder.showActionBar(isExpanded);
             viewHolder.itemView.setActivated(isExpanded);
             View imgExpand = viewHolder.itemView.findViewById(R.id.img_expand);
             imgExpand.setOnClickListener(new View.OnClickListener() {
@@ -231,20 +210,6 @@ public abstract class ProvidersFragment extends Fragment {
                     ProviderActivity_.intent(getContext()).providerKey(provider.getKey()).start();
                 }
             });
-        }
-
-        @Override
-        public void onViewAttachedToWindow(ProviderViewHolder holder) {
-            super.onViewAttachedToWindow(holder);
-
-            EventBus.getDefault().register(holder);
-        }
-
-        @Override
-        public void onViewDetachedFromWindow(ProviderViewHolder holder) {
-            super.onViewDetachedFromWindow(holder);
-
-            EventBus.getDefault().unregister(holder);
         }
 
         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -286,50 +251,21 @@ public abstract class ProvidersFragment extends Fragment {
     private class MyFavoriteChangedListener implements ChildEventListener {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            favorites.put(dataSnapshot.getKey(), dataSnapshot.getValue(boolean.class));
-            EventBus.getDefault().post(new FavoriteStatusChangedEvent(dataSnapshot.getKey(), dataSnapshot.getValue(boolean.class)));
+            favorites.put(dataSnapshot.getKey(), true);
+            adapter.notifyDataSetChanged();
         }
 
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            favorites.put(dataSnapshot.getKey(), dataSnapshot.getValue(boolean.class));
-            EventBus.getDefault().post(new FavoriteStatusChangedEvent(dataSnapshot.getKey(), dataSnapshot.getValue(boolean.class)));
+            Boolean value = dataSnapshot.getValue(Boolean.class);
+            favorites.put(dataSnapshot.getKey(), value != null);
+            adapter.notifyDataSetChanged();
         }
 
         @Override
         public void onChildRemoved(DataSnapshot dataSnapshot) {
             favorites.remove(dataSnapshot.getKey());
-            EventBus.getDefault().post(new FavoriteStatusChangedEvent(dataSnapshot.getKey(), false));
-        }
-
-        @Override
-        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-    }
-
-    private class MyRatingChangedListener implements ChildEventListener {
-        @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            ratings.put(dataSnapshot.getKey(), dataSnapshot.getValue(float.class));
-            EventBus.getDefault().post(new UserRatingChangedEvent(dataSnapshot.getKey(), dataSnapshot.getValue(float.class)));
-        }
-
-        @Override
-        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            ratings.put(dataSnapshot.getKey(), dataSnapshot.getValue(float.class));
-            EventBus.getDefault().post(new UserRatingChangedEvent(dataSnapshot.getKey(), dataSnapshot.getValue(float.class)));
-        }
-
-        @Override
-        public void onChildRemoved(DataSnapshot dataSnapshot) {
-            ratings.remove(dataSnapshot.getKey());
-            EventBus.getDefault().post(new UserRatingChangedEvent(dataSnapshot.getKey(), 0f));
+            adapter.notifyDataSetChanged();
         }
 
         @Override

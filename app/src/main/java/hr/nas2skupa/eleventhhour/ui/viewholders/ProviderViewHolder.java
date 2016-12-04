@@ -8,20 +8,8 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-
-import java.util.HashMap;
-
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.events.FavoriteStatusChangedEvent;
-import hr.nas2skupa.eleventhhour.events.ProviderSelectedEvent;
-import hr.nas2skupa.eleventhhour.events.UserRatingChangedEvent;
 import hr.nas2skupa.eleventhhour.model.Provider;
-import hr.nas2skupa.eleventhhour.utils.Utils;
 
 /**
  * Created by nas2skupa on 18/09/16.
@@ -47,13 +35,6 @@ public class ProviderViewHolder extends RecyclerView.ViewHolder {
     TextView txtEmail;
     TextView txtHours;
 
-    View separator2;
-    ViewGroup viewAction;
-    ImageView btnFavourite;
-    ImageView btnSchedule;
-    RatingBar ratingBar;
-
-    private Provider provider;
     private boolean detailsVisible = false;
 
 
@@ -79,37 +60,9 @@ public class ProviderViewHolder extends RecyclerView.ViewHolder {
         txtWeb = (TextView) itemView.findViewById(R.id.txt_web);
         txtEmail = (TextView) itemView.findViewById(R.id.txt_email);
         txtHours = (TextView) itemView.findViewById(R.id.txt_hours);
-
-        separator2 = itemView.findViewById(R.id.separator2);
-        viewAction = (ViewGroup) itemView.findViewById(R.id.provider_action);
-        btnFavourite = (ImageView) itemView.findViewById(R.id.btn_favourite);
-        btnSchedule = (ImageView) itemView.findViewById(R.id.btn_schedule);
-        ratingBar = (RatingBar) itemView.findViewById(R.id.rating_bar);
-
-        ratingBar.setOnRatingBarChangeListener(new UserRatingChangedListener());
-        btnFavourite.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                provider.setFavorite(!provider.isFavorite());
-                FirebaseDatabase.getInstance().getReference()
-                        .child("users")
-                        .child(Utils.getMyUid())
-                        .child("favorites")
-                        .child(provider.getKey())
-                        .setValue(provider.isFavorite() ? true : null);
-            }
-        });
-        btnSchedule.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EventBus.getDefault().post(new ProviderSelectedEvent(itemView, provider.getKey()));
-            }
-        });
     }
 
     public void bindToProvider(Provider provider) {
-        this.provider = provider;
-
         txtProviderName.setText(provider.getName());
         imgSale.setVisibility(provider.isSale() ? View.VISIBLE : View.GONE);
         imgFavorite.setVisibility(provider.isFavorite() ? View.VISIBLE : View.GONE);
@@ -128,9 +81,6 @@ public class ProviderViewHolder extends RecyclerView.ViewHolder {
         txtEmail.setVisibility(txtEmail.getText().length() > 0 ? View.VISIBLE : View.GONE);
         txtHours.setText(provider.getHours());
         txtHours.setVisibility(txtHours.getText().length() > 0 ? View.VISIBLE : View.GONE);
-
-        btnFavourite.setImageResource(provider.isFavorite() ? R.drawable.ic_heart_broken_black_24dp : R.drawable.ic_favorite_black_36dp);
-        ratingBar.setRating(provider.getUserRating());
     }
 
     public void showDetails(boolean show) {
@@ -145,59 +95,5 @@ public class ProviderViewHolder extends RecyclerView.ViewHolder {
                 : ObjectAnimator.ofFloat(imgExpand, "rotation", 180, 0);
         anim.setDuration(500);
         anim.start();
-    }
-
-    public void showActionBar(boolean show) {
-        separator2.setVisibility(show ? View.VISIBLE : View.GONE);
-        viewAction.setVisibility(show ? View.VISIBLE : View.GONE);
-    }
-
-    @Subscribe
-    public void updateFavorite(FavoriteStatusChangedEvent event) {
-        if (!event.getProviderKey().equals(provider.getKey())) return;
-
-        provider.setFavorite(event.isFavorite());
-        imgFavorite.setVisibility(provider.isFavorite() ? View.VISIBLE : View.GONE);
-        btnFavourite.setImageResource(provider.isFavorite() ? R.drawable.ic_heart_broken_black_24dp : R.drawable.ic_favorite_black_36dp);
-    }
-
-    @Subscribe
-    public void updateUserRating(UserRatingChangedEvent event) {
-        if (!event.getProviderKey().equals(provider.getKey())) return;
-
-        provider.setUserRating(event.getUserRating());
-        ratingBar.setRating(event.getUserRating());
-    }
-
-    private class UserRatingChangedListener implements RatingBar.OnRatingBarChangeListener {
-
-        @Override
-        public void onRatingChanged(RatingBar ratingBar, float newUserRating, boolean fromUser) {
-            if (!fromUser) return;
-
-            HashMap<String, Object> ratingUpdate = new HashMap<>();
-            float oldUserRating = provider.getUserRating();
-            int oldRatingsCnt = provider.getRatingsCnt();
-
-            boolean alreadyRated = oldUserRating > 0;
-            int newRatingsCnt = !alreadyRated ? oldRatingsCnt + 1
-                    : newUserRating > 0 ? oldRatingsCnt
-                    : oldRatingsCnt - 1;
-            float newRating = (oldRatingsCnt * provider.getRating() - oldUserRating + newUserRating) / newRatingsCnt;
-            ratingUpdate.put("rating", newRating);
-            ratingUpdate.put("ratingsCnt", newRatingsCnt);
-            ratingUpdate.put(".priority", 5 - newRating);
-            DatabaseReference providers = FirebaseDatabase.getInstance().getReference()
-                    .child("providers")
-                    .child(provider.getKey());
-            providers.updateChildren(ratingUpdate);
-
-            FirebaseDatabase.getInstance().getReference()
-                    .child("users")
-                    .child(Utils.getMyUid())
-                    .child("ratings")
-                    .child(provider.getKey())
-                    .setValue(newUserRating > 0 ? newUserRating : null);
-        }
     }
 }
