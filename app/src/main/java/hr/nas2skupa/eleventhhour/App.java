@@ -7,7 +7,6 @@ import android.util.Log;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.google.firebase.database.FirebaseDatabase;
-import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.Interceptor;
@@ -37,13 +36,6 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
-        if (LeakCanary.isInAnalyzerProcess(this)) {
-            // This process is dedicated to LeakCanary for heap analysis.
-            // You should not init your app in this process.
-            return;
-        }
-        refWatcher = LeakCanary.install(this);
 
         CrashlyticsCore core = new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build();
         Fabric.with(this, new Crashlytics.Builder().core(core).build());
