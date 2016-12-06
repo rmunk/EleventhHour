@@ -1,13 +1,11 @@
 package hr.nas2skupa.eleventhhour;
 
 import android.app.Application;
-import android.content.Context;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.google.firebase.database.FirebaseDatabase;
-import com.squareup.leakcanary.RefWatcher;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
@@ -25,13 +23,6 @@ import io.fabric.sdk.android.Fabric;
  */
 
 public class App extends Application {
-
-    public static RefWatcher getRefWatcher(Context context) {
-        App application = (App) context.getApplicationContext();
-        return application.refWatcher;
-    }
-
-    private RefWatcher refWatcher;
 
     @Override
     public void onCreate() {
