@@ -103,6 +103,6 @@
     <string name="tap_for_directions">Tap me for directions!</string>
 
     <!-- ProviderActivity -->
-    <string name="provider_removed">Provider %s no longer exists!</string>
+    <string name="provider_removed">Provider %s is no longer available!</string>
 
 </resources>

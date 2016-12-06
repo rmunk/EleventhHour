@@ -24,7 +24,7 @@
     <string name="make_booking_action">Zatraži termin</string>
     <string name="make_booking_cancel">Odustani</string>
     <string name="menu_calendar">Kalendar</string>
-    <string name="menu_favorites">Najdraže</string>
+    <string name="menu_favorites">Favoriti</string>
     <string name="menu_home">Početna</string>
     <string name="menu_notifications">Obavijesti</string>
     <string name="menu_top">Top ponude</string>
@@ -71,4 +71,7 @@
     <string name="menu_help">Pomoć</string>
     <string name="menu_sale">Akcija</string>
     <string name="title_activity_map">Karta</string>
+    <string name="title_fragment_top">Top ponude</string>
+    <string name="title_fragment_favorites">Favoriti</string>
+    <string name="provider_removed">Pružatelj usluga %s više nije dostupan!</string>
 </resources>
