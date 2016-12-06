@@ -39,8 +39,8 @@ android {
         applicationId "hr.nas2skupa.eleventhhour"
         minSdkVersion 16
         targetSdkVersion 24
-        versionCode 5
-        versionName "0.2.0"
+        versionCode 6
+        versionName "0.3.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = false
     }
