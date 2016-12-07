@@ -34,10 +34,8 @@
             android:screenOrientation="portrait"
             android:theme="@style/MaterialTheme.Light.DarkToolbar.TranslucentStatus">
             <intent-filter>
-                <action android:name="ch.photrack.discharge.ACTION_HOME"/>
-                <action android:name="ch.photrack.discharge.ACTION_CALENDAR"/>
-                <action android:name="ch.photrack.discharge.ACTION_FAVORITES"/>
-                <action android:name="ch.photrack.discharge.ACTION_TOP"/>
+                <action android:name="hr.nas2skupa.eleventhhour.ACTION_HOME"/>
+                <action android:name="hr.nas2skupa.eleventhhour.ACTION_CALENDAR"/>
 
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>

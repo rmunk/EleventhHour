@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Eleventh Hour</string>
+    <string name="help_page" translatable="false">http://nas2skupa.com/</string>
 
     <!-- Navigation drawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>

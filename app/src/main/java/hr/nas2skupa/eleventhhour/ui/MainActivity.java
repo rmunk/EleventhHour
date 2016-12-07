@@ -1,11 +1,14 @@
 package hr.nas2skupa.eleventhhour.ui;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
@@ -20,10 +23,11 @@ import hr.nas2skupa.eleventhhour.ui.helpers.DrawerActivity;
 public class MainActivity extends DrawerActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    public static final String ACTION_HOME = "ch.photrack.discharge.ACTION_HOME";
-    public static final String ACTION_CALENDAR = "ch.photrack.discharge.ACTION_CALENDAR";
-    public static final String ACTION_FAVORITES = "ch.photrack.discharge.ACTION_FAVORITES";
-    public static final String ACTION_TOP = "ch.photrack.discharge.ACTION_TOP";
+    public static final String ACTION_HOME = "hr.nas2skupa.eleventhhour.ACTION_HOME";
+    public static final String ACTION_CALENDAR = "hr.nas2skupa.eleventhhour.ACTION_CALENDAR";
+    public static final String ACTION_FAVORITES = "hr.nas2skupa.eleventhhour.ACTION_FAVORITES";
+    public static final String ACTION_TOP = "hr.nas2skupa.eleventhhour.ACTION_TOP";
+    public static final String ACTION_HELP = "hr.nas2skupa.eleventhhour.ACTION_HELP";
 
     @ViewById(R.id.toolbar)
     Toolbar toolbar;
@@ -87,6 +91,14 @@ public class MainActivity extends DrawerActivity
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, TopProvidersFragment_.builder().build(), "TopProvidersFragment")
                             .commit();
+                break;
+            case ACTION_HELP:
+                try {
+                    Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.help_page)));
+                    startActivity(myIntent);
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(this, "You can't access help without web browser!", Toast.LENGTH_LONG).show();
+                }
                 break;
             default:
                 setPage(ACTION_HOME);
