@@ -43,6 +43,7 @@ import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.events.CancelBookingEvent;
 import hr.nas2skupa.eleventhhour.model.Booking;
 import hr.nas2skupa.eleventhhour.model.BookingStatus;
+import hr.nas2skupa.eleventhhour.model.Provider;
 import hr.nas2skupa.eleventhhour.utils.StringUtils;
 import hr.nas2skupa.eleventhhour.utils.Utils;
 
@@ -109,7 +110,7 @@ public class BookingDetailsDialog extends DialogFragment implements OnMapReadyCa
         int zoom = 16;
         GoogleMapOptions options = new GoogleMapOptions()
                 .camera(CameraPosition.fromLatLngZoom(target, zoom))
-//                .liteMode(true)
+                .liteMode(true)
                 .compassEnabled(true);
         SupportMapFragment mapFragment = SupportMapFragment.newInstance(options);
 
@@ -168,6 +169,7 @@ public class BookingDetailsDialog extends DialogFragment implements OnMapReadyCa
                 txtBookingStatus.setText(StringUtils.printBookingStatus(getContext(), booking.getStatus()));
                 txtBookingPrice.setText(booking.getPrice());
                 txtBookingNote.setText(booking.getNote());
+                txtBookingNote.setVisibility(booking.getNote().isEmpty() ? View.GONE : View.VISIBLE);
 
                 if (booking.getStatus() == BookingStatus.PENDING || booking.getStatus() == BookingStatus.PROVIDER_ACCEPTED)
                     ((AlertDialog) getDialog()).getButton(DialogInterface.BUTTON_POSITIVE)
@@ -176,29 +178,46 @@ public class BookingDetailsDialog extends DialogFragment implements OnMapReadyCa
                         .setVisibility(View.GONE);
 
 
-                DatabaseReference ref = FirebaseDatabase.getInstance().getReference("geofire/providers");
-                geoFire = new GeoFire(ref);
-                geoFire.getLocation(booking.getProviderId(), new LocationCallback() {
-                    @Override
-                    public void onLocationResult(String key, GeoLocation location) {
-                        if (getActivity() == null) return;
+                FirebaseDatabase.getInstance().getReference("providers").child(booking.getProviderId())
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (dataSnapshot != null) {
+                                    Provider provider = dataSnapshot.getValue(Provider.class);
+                                    DatabaseReference ref = FirebaseDatabase.getInstance()
+                                            .getReference("geofire/providers")
+                                            .child(provider.getCategory())
+                                            .child(provider.getSubcategory());
+                                    geoFire = new GeoFire(ref);
+                                    geoFire.getLocation(booking.getProviderId(), new LocationCallback() {
+                                        @Override
+                                        public void onLocationResult(String key, GeoLocation location) {
+                                            if (getActivity() == null) return;
 
-                        if (location != null) {
-                            LatLng target = new LatLng(location.latitude, location.longitude);
-                            marker = map.addMarker(new MarkerOptions()
-                                    .position(target)
-                                    .title(booking.getProviderName())
-                                    .snippet(getString(R.string.tap_for_directions)));
-                            map.moveCamera(CameraUpdateFactory.newLatLng(target));
-                            marker.showInfoWindow();
-                        }
-                    }
+                                            if (location != null) {
+                                                LatLng target = new LatLng(location.latitude, location.longitude);
+                                                marker = map.addMarker(new MarkerOptions()
+                                                        .position(target)
+                                                        .title(booking.getProviderName()));
+                                                map.moveCamera(CameraUpdateFactory.newLatLng(target));
+                                                marker.showInfoWindow();
+                                            }
+                                        }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                });
+                                        }
+                                    });
+
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
             }
         }
 

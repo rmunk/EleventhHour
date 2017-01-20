@@ -66,7 +66,7 @@
                     android:id="@+id/txt_booking_status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/ic_info_outline_black_18dp"
+                    android:drawableLeft="@drawable/ic_info_black_18dp"
                     android:drawablePadding="4dp"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     app:layout_constraintLeft_toLeftOf="@+id/txt_booking_provider"
