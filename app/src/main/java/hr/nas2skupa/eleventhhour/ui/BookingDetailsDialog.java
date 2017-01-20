@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +42,7 @@ import org.greenrobot.eventbus.EventBus;
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.events.CancelBookingEvent;
 import hr.nas2skupa.eleventhhour.model.Booking;
+import hr.nas2skupa.eleventhhour.model.BookingStatus;
 import hr.nas2skupa.eleventhhour.utils.StringUtils;
 import hr.nas2skupa.eleventhhour.utils.Utils;
 
@@ -119,7 +121,7 @@ public class BookingDetailsDialog extends DialogFragment implements OnMapReadyCa
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         final LayoutInflater inflater = getActivity().getLayoutInflater();
         view = inflater.inflate(R.layout.dialog_booking_details, null);
 
@@ -166,6 +168,13 @@ public class BookingDetailsDialog extends DialogFragment implements OnMapReadyCa
                 txtBookingStatus.setText(StringUtils.printBookingStatus(getContext(), booking.getStatus()));
                 txtBookingPrice.setText(booking.getPrice());
                 txtBookingNote.setText(booking.getNote());
+
+                if (booking.getStatus() == BookingStatus.PENDING || booking.getStatus() == BookingStatus.PROVIDER_ACCEPTED)
+                    ((AlertDialog) getDialog()).getButton(DialogInterface.BUTTON_POSITIVE)
+                            .setVisibility(View.VISIBLE);
+                else ((AlertDialog) getDialog()).getButton(DialogInterface.BUTTON_POSITIVE)
+                        .setVisibility(View.GONE);
+
 
                 DatabaseReference ref = FirebaseDatabase.getInstance().getReference("geofire/providers");
                 geoFire = new GeoFire(ref);
