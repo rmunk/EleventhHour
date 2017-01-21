@@ -6,6 +6,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresPermission;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -18,9 +19,12 @@ import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -43,8 +47,18 @@ import java.util.Locale;
 import hr.nas2skupa.eleventhhour.R;
 
 @EActivity(R.layout.activity_map)
-public class MapActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-    private static final int REQUEST_LOCATION = 1234;
+public class MapActivity extends FragmentActivity implements
+        OnMapReadyCallback,
+        GoogleMap.OnCameraIdleListener,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationSource,
+        LocationListener {
+    private static final int REQUEST_LOCATION_PERMISSION = 1000;
+
+    // location accuracy settings
+    private static final LocationRequest LOCATION_REQUEST = LocationRequest.create()
+            .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
     @Extra
     String categoryKey;
@@ -57,6 +71,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     FloatingActionButton fab;
 
     private GoogleMap map;
+    private OnLocationChangedListener mapLocationListener = null;
     private GeoQueryEventListener geoQueryEventListener;
     private GeoQuery geoQuery;
     private LatLng zagreb;
@@ -171,21 +186,16 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 return true;
             }
         });
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION);
-        } else map.setMyLocationEnabled(true);
-
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
-            case REQUEST_LOCATION:
+            case REQUEST_LOCATION_PERMISSION:
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    map.setMyLocationEnabled(true);
-                    if (googleApiClient.isConnected())
-                        lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+                    if (googleApiClient.isConnected()) {
+                        initLocation();
+                    }
                 }
                 break;
         }
@@ -213,10 +223,23 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION_PERMISSION);
             return;
         }
+        initLocation();
+    }
+
+    @RequiresPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+    private void initLocation() throws SecurityException {
         lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+        map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude())));
+
+        map.setLocationSource(this);
+        map.setMyLocationEnabled(true);
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                googleApiClient,
+                LOCATION_REQUEST,
+                this);
     }
 
     @Override
@@ -234,6 +257,23 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         ProviderActivity_.intent(this)
                 .providerKey(providerKey)
                 .start();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        if (mapLocationListener != null) {
+            mapLocationListener.onLocationChanged(location);
+        }
+    }
+
+    @Override
+    public void activate(OnLocationChangedListener onLocationChangedListener) {
+        mapLocationListener = onLocationChangedListener;
+    }
+
+    @Override
+    public void deactivate() {
+        mapLocationListener = null;
     }
 
     private class GeoQueryEventListener implements com.firebase.geofire.GeoQueryEventListener {
