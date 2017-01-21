@@ -1,12 +1,17 @@
 package hr.nas2skupa.eleventhhour.ui;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.CardView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.Toolbar;
 import android.transition.AutoTransition;
 import android.transition.Transition;
@@ -17,6 +22,9 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.Toast;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.LocationCallback;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -43,6 +51,8 @@ import hr.nas2skupa.eleventhhour.utils.Utils;
 @EActivity(R.layout.activity_provider)
 @OptionsMenu(R.menu.main)
 public class ProviderActivity extends DrawerActivity implements RatingBar.OnRatingBarChangeListener {
+    private static final int REQUEST_PHONE_PERMISSION = 1;
+
     @Extra
     String providerKey;
 
@@ -63,7 +73,7 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
         ratingBar.setOnRatingBarChangeListener(this);
     }
 
-    private ProviderViewHolder providerViewHolder;
+    private ProviderViewHolder viewHolder;
     private DatabaseReference providerReference;
     private ValueEventListener providerListener;
     private DatabaseReference favoriteReference;
@@ -84,7 +94,96 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
     }
 
     void setProviderView(@ViewById(R.id.item_provider) View providerInfo) {
-        providerViewHolder = new ProviderViewHolder(providerInfo);
+        viewHolder = new ProviderViewHolder(providerInfo);
+
+        viewHolder.imgExpand.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    Transition transition = new AutoTransition();
+                    transition.setDuration(200);
+                    TransitionManager.beginDelayedTransition(layoutMain, transition);
+                }
+
+                showDetails = !showDetails;
+                viewHolder.showDetails(showDetails);
+                providerAction.setVisibility(showDetails ? View.VISIBLE : View.GONE);
+            }
+        });
+
+        viewHolder.txtPhone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (ActivityCompat.checkSelfPermission(ProviderActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(ProviderActivity.this, new String[]{Manifest.permission.CALL_PHONE}, REQUEST_PHONE_PERMISSION);
+                    return;
+                }
+                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + provider.getPhone()));
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(intent);
+                }
+            }
+        });
+        viewHolder.txtWeb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String url = provider.getWeb();
+                if (!url.startsWith("http://") && !url.startsWith("https://"))
+                    url = "http://" + url;
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(intent);
+                }
+            }
+        });
+        viewHolder.txtEmail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + provider.getEmail()));
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(Intent.createChooser(intent, "Email"));
+                }
+            }
+        });
+        viewHolder.txtAddress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DatabaseReference ref = FirebaseDatabase.getInstance()
+                        .getReference("geofire/providers")
+                        .child(provider.getCategory())
+                        .child(provider.getSubcategory());
+                GeoFire geoFire = new GeoFire(ref);
+                geoFire.getLocation(providerKey, new LocationCallback() {
+                    @Override
+                    public void onLocationResult(String key, GeoLocation location) {
+                        String uriString;
+                        if (location != null) {
+                            uriString = String.format(Locale.getDefault(), "geo:%f,%f?q=%f,%f(%s)",
+                                    location.latitude,
+                                    location.longitude,
+                                    location.latitude,
+                                    location.longitude,
+                                    Uri.encode(provider.getName()));
+                        } else {
+                            uriString = String.format(Locale.getDefault(), "geo:%f,%f?q=%s",
+                                    0,
+                                    0,
+                                    Uri.encode(provider.getAddress()));
+                        }
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uriString));
+                        intent.setPackage("com.google.android.apps.maps");
+                        if (intent.resolveActivity(getPackageManager()) != null) {
+                            startActivity(intent);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
+        });
     }
 
 
@@ -123,6 +222,20 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_PHONE_PERMISSION:
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + provider.getPhone()));
+                    if (intent.resolveActivity(getPackageManager()) != null) {
+                        startActivity(intent);
+                    }
+                }
+                break;
+        }
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
 
@@ -143,19 +256,6 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
     @OptionsItem(android.R.id.home)
     void homeSelected() {
         onBackPressed();
-    }
-
-    @Click(R.id.item_provider)
-    public void showProviderDetails(CardView providerCard) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Transition transition = new AutoTransition();
-            transition.setDuration(200);
-            TransitionManager.beginDelayedTransition(layoutMain, transition);
-        }
-
-        showDetails = !showDetails;
-        providerViewHolder.showDetails(showDetails);
-        providerAction.setVisibility(showDetails ? View.VISIBLE : View.GONE);
     }
 
     @Click(R.id.btn_favorite)
@@ -213,7 +313,8 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
 
             newProvider.setFavorite(provider != null && provider.isFavorite());
             provider = newProvider;
-            providerViewHolder.bindToProvider(provider);
+            provider.setKey(dataSnapshot.getKey());
+            viewHolder.bindToProvider(provider);
         }
 
         @Override
@@ -227,7 +328,7 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
         public void onDataChange(DataSnapshot dataSnapshot) {
             Boolean value = dataSnapshot.getValue(Boolean.class);
             provider.setFavorite(value != null);
-            providerViewHolder.bindToProvider(provider);
+            viewHolder.bindToProvider(provider);
             btnFavorite.setImageResource(provider.isFavorite() ? R.drawable.ic_heart_broken_black_24dp : R.drawable.ic_favorite_black_36dp);
         }
 

@@ -1,10 +1,16 @@
 package hr.nas2skupa.eleventhhour.ui;
 
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +26,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.LocationCallback;
 import com.firebase.ui.database.FirebaseIndexRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.ChildEventListener;
@@ -36,6 +45,7 @@ import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.model.Provider;
@@ -50,6 +60,8 @@ import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 @EFragment(R.layout.fragment_providers)
 @OptionsMenu(R.menu.providers)
 public abstract class ProvidersFragment extends Fragment {
+    private static final int REQUEST_PHONE_PERMISSION = 1;
+
     @FragmentArg
     String categoryKey;
     @FragmentArg
@@ -66,6 +78,7 @@ public abstract class ProvidersFragment extends Fragment {
 
     private Query dataRef;
     private FirebaseRecyclerAdapter<Provider, ProviderViewHolder> adapter;
+    private String providerPhone;
 
 
     public abstract Query getKeyRef();
@@ -171,6 +184,20 @@ public abstract class ProvidersFragment extends Fragment {
         setReturnTransition(new Slide(Gravity.TOP));
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_PHONE_PERMISSION:
+                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + providerPhone));
+                    if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                        startActivity(intent);
+                    }
+                }
+                break;
+        }
+    }
+
     public class ProvidersAdapter extends FirebaseIndexRecyclerAdapter<Provider, ProviderViewHolder> {
         public int expandedPosition = -1;
 
@@ -191,8 +218,7 @@ public abstract class ProvidersFragment extends Fragment {
             final boolean isExpanded = position == expandedPosition;
             viewHolder.showDetails(isExpanded);
             viewHolder.itemView.setActivated(isExpanded);
-            View imgExpand = viewHolder.itemView.findViewById(R.id.img_expand);
-            imgExpand.setOnClickListener(new View.OnClickListener() {
+            viewHolder.imgExpand.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
@@ -201,6 +227,80 @@ public abstract class ProvidersFragment extends Fragment {
 
                     expandedPosition = isExpanded ? -1 : position;
                     notifyDataSetChanged();
+                }
+            });
+            viewHolder.txtPhone.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                        providerPhone = provider.getPhone();
+                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CALL_PHONE}, REQUEST_PHONE_PERMISSION);
+                        return;
+                    }
+                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + provider.getPhone()));
+                    if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                        startActivity(intent);
+                    }
+                }
+            });
+            viewHolder.txtWeb.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String url = provider.getWeb();
+                    if (!url.startsWith("http://") && !url.startsWith("https://"))
+                        url = "http://" + url;
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                        startActivity(intent);
+                    }
+                }
+            });
+            viewHolder.txtEmail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + provider.getEmail()));
+                    if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                        startActivity(Intent.createChooser(intent, "Email"));
+                    }
+                }
+            });
+            viewHolder.txtAddress.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    DatabaseReference ref = FirebaseDatabase.getInstance()
+                            .getReference("geofire/providers")
+                            .child(provider.getCategory())
+                            .child(provider.getSubcategory());
+                    GeoFire geoFire = new GeoFire(ref);
+                    geoFire.getLocation(provider.getKey(), new LocationCallback() {
+                        @Override
+                        public void onLocationResult(String key, GeoLocation location) {
+                            String uriString;
+                            if (location != null) {
+                                uriString = String.format(Locale.getDefault(), "geo:%f,%f?q=%f,%f(%s)",
+                                        location.latitude,
+                                        location.longitude,
+                                        location.latitude,
+                                        location.longitude,
+                                        Uri.encode(provider.getName()));
+                            } else {
+                                uriString = String.format(Locale.getDefault(), "geo:%f,%f?q=%s",
+                                        0,
+                                        0,
+                                        Uri.encode(provider.getAddress()));
+                            }
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uriString));
+                            intent.setPackage("com.google.android.apps.maps");
+                            if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                                startActivity(intent);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
                 }
             });
 

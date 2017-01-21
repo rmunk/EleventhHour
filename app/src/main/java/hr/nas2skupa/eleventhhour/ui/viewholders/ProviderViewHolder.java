@@ -24,16 +24,16 @@ public class ProviderViewHolder extends RecyclerView.ViewHolder {
     RatingBar ratingIndicator;
     TextView txtRatings;
     TextView txtDistance;
-    ImageView imgExpand;
+    public ImageView imgExpand;
 
     View separator1;
     ViewGroup viewDetails;
-    TextView txtDescription;
-    TextView txtPhone;
-    TextView txtAddress;
-    TextView txtWeb;
-    TextView txtEmail;
-    TextView txtHours;
+    public TextView txtDescription;
+    public TextView txtPhone;
+    public TextView txtAddress;
+    public TextView txtWeb;
+    public TextView txtEmail;
+    public TextView txtHours;
 
     private boolean detailsVisible = false;
 

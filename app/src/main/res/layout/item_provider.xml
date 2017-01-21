@@ -95,9 +95,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="@drawable/text_link_selector"
                 app:layout_constraintLeft_toLeftOf="@+id/rating_indicator"
                 app:layout_constraintTop_toBottomOf="@+id/rating_indicator"
-                tools:text="Trnjanska cesta 108, 10000, Zagreb"/>
+                tools:text="Trnjanska cesta 108, 10000, Zagreb" />
 
             <ImageView
                 android:id="@+id/img_expand"

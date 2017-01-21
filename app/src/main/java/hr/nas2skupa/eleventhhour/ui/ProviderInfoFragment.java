@@ -1,9 +1,15 @@
 package hr.nas2skupa.eleventhhour.ui;
 
 
+import android.Manifest;
 import android.animation.ObjectAnimator;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,16 +17,22 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.LocationCallback;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
+
+import java.util.Locale;
 
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.model.Provider;
@@ -31,6 +43,8 @@ import hr.nas2skupa.eleventhhour.utils.Utils;
  */
 @EFragment(R.layout.fragment_provider_info)
 public class ProviderInfoFragment extends Fragment {
+    private static final int REQUEST_PHONE_PERMISSION = 1;
+
     @FragmentArg
     String providerKey;
     @FragmentArg
@@ -82,6 +96,7 @@ public class ProviderInfoFragment extends Fragment {
     private ValueEventListener providerListener;
     private DatabaseReference favoriteReference;
     private ValueEventListener favoriteListener;
+    private Provider provider;
 
     public ProviderInfoFragment() {
         // Required empty public constructor
@@ -109,9 +124,10 @@ public class ProviderInfoFragment extends Fragment {
         providerListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Provider provider = dataSnapshot.getValue(Provider.class);
+                provider = dataSnapshot.getValue(Provider.class);
                 if (provider == null) return;
 
+                provider.setKey(dataSnapshot.getKey());
                 updateView(provider);
             }
 
@@ -143,6 +159,97 @@ public class ProviderInfoFragment extends Fragment {
 
         if (providerListener != null) providerReference.removeEventListener(providerListener);
         if (favoriteListener != null) favoriteReference.removeEventListener(favoriteListener);
+    }
+
+    @AfterViews
+    public void afterViews() {
+        txtPhone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CALL_PHONE}, REQUEST_PHONE_PERMISSION);
+                    return;
+                }
+                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + provider.getPhone()));
+                if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                    startActivity(intent);
+                }
+            }
+        });
+        txtWeb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String url = provider.getWeb();
+                if (!url.startsWith("http://") && !url.startsWith("https://"))
+                    url = "http://" + url;
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                    startActivity(intent);
+                }
+            }
+        });
+        txtEmail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + provider.getEmail()));
+                if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                    startActivity(Intent.createChooser(intent, "Email"));
+                }
+            }
+        });
+        txtAddress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DatabaseReference ref = FirebaseDatabase.getInstance()
+                        .getReference("geofire/providers")
+                        .child(provider.getCategory())
+                        .child(provider.getSubcategory());
+                GeoFire geoFire = new GeoFire(ref);
+                geoFire.getLocation(provider.getKey(), new LocationCallback() {
+                    @Override
+                    public void onLocationResult(String key, GeoLocation location) {
+                        String uriString;
+                        if (location != null) {
+                            uriString = String.format(Locale.getDefault(), "geo:%f,%f?q=%f,%f(%s)",
+                                    location.latitude,
+                                    location.longitude,
+                                    location.latitude,
+                                    location.longitude,
+                                    Uri.encode(provider.getName()));
+                        } else {
+                            uriString = String.format(Locale.getDefault(), "geo:%f,%f?q=%s",
+                                    0,
+                                    0,
+                                    Uri.encode(provider.getAddress()));
+                        }
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uriString));
+                        intent.setPackage("com.google.android.apps.maps");
+                        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                            startActivity(intent);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_PHONE_PERMISSION:
+                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + provider.getPhone()));
+                    if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                        startActivity(intent);
+                    }
+                }
+                break;
+        }
     }
 
     private void updateView(Provider provider) {
