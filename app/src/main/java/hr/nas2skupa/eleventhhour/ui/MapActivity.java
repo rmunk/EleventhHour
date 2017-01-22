@@ -233,7 +233,9 @@ public class MapActivity extends FragmentActivity implements
     @RequiresPermission(Manifest.permission.ACCESS_FINE_LOCATION)
     private void initLocation() throws SecurityException {
         lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-        map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude())));
+        if (lastLocation == null) {
+            map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude())));
+        }
 
         map.setLocationSource(this);
         map.setMyLocationEnabled(true);
