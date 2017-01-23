@@ -25,6 +25,8 @@
     <color name="favorite">#c62828</color>
     <color name="divider">#1F000000</color>
     <color name="item_background">#8AFFFFFF</color>
+    <color name="rating_active">@color/colorAccent</color>
+    <color name="rating_background">#DBDBDB</color>
 
     <color name="event_active">#c2185b</color>
     <color name="event_inactive">#23000000</color>
