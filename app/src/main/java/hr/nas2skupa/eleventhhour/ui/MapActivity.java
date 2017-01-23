@@ -179,11 +179,21 @@ public class MapActivity extends FragmentActivity implements
                             .providerKey(providerKey)
                             .distance(distance)
                             .build();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment, providerKey).commit();
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
+                            .replace(R.id.fragment_container, fragment, providerKey)
+                            .commit();
                 }
                 behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
                 return true;
+            }
+        });
+        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             }
         });
     }
