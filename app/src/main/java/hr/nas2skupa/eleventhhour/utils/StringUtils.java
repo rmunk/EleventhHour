@@ -20,6 +20,8 @@ public class StringUtils {
                 return context.getString(R.string.booking_status_rejected) + " \uD83D\uDC4E";
             case BookingStatus.USER_CANCELED:
                 return context.getString(R.string.booking_status_canceled) + " ✗";
+            case BookingStatus.FINISHED:
+                return context.getString(R.string.booking_status_finished);
             default:
                 return context.getString(R.string.booking_status_unknown);
         }

@@ -8,8 +8,6 @@ import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.Date;
-
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.events.ShowBookingDetailsEvent;
 import hr.nas2skupa.eleventhhour.model.Booking;
@@ -49,8 +47,6 @@ public class BookingViewHolder extends RecyclerView.ViewHolder {
         txtService.setEnabled(booking.getStatus() >= 0);
         txtProvider.setText(booking.getProviderName());
         txtTime.setText(booking.getTime());
-        if (booking.getTo() > new Date().getTime())
-            txtStatus.setText(StringUtils.printBookingStatus(context, booking.getStatus()));
-        else txtStatus.setText("Finished");
+        txtStatus.setText(StringUtils.printBookingStatus(context, booking.getStatus()));
     }
 }

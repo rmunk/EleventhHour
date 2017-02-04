@@ -13,7 +13,8 @@ import java.lang.annotation.RetentionPolicy;
         BookingStatus.PENDING,
         BookingStatus.PROVIDER_ACCEPTED,
         BookingStatus.PROVIDER_REJECTED,
-        BookingStatus.USER_CANCELED
+        BookingStatus.USER_CANCELED,
+        BookingStatus.FINISHED
 })
 public @interface BookingStatus {
     /***
@@ -35,4 +36,8 @@ public @interface BookingStatus {
      * User has canceled booking after provider confirmation.
      */
     int USER_CANCELED = -2;
+    /***
+     * Booking has already finished.
+     */
+    int FINISHED = -3;
 }

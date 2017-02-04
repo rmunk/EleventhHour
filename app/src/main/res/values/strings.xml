@@ -94,6 +94,7 @@
     <string name="booking_status_confirmed">Confirmed︎</string>
     <string name="booking_status_rejected">Rejected</string>
     <string name="booking_status_canceled">Canceled</string>
+    <string name="booking_status_finished">Finished</string>
     <string name="booking_status_unknown">Unknown</string>
 
     <!-- CalendarFragment -->

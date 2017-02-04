@@ -7,6 +7,7 @@
     <string name="booking_status_pending">Čeka potvrdu</string>
     <string name="booking_status_rejected">Odbijeno</string>
     <string name="booking_status_unknown">Nepoznat</string>
+    <string name="booking_status_finished">Završeno</string>
     <string name="cancel_booking">Otkaži termin</string>
     <string name="confirmation_text" formatted="false">Želite li zakazati termin %s od %s do %s?</string>
     <string name="category_beauty">Ljepota</string>

@@ -3,6 +3,7 @@ package hr.nas2skupa.eleventhhour.model;
 import com.google.firebase.database.Exclude;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -100,7 +101,8 @@ public class Booking {
 
     @BookingStatus
     public int getStatus() {
-        return status;
+        if (getTo() > new Date().getTime()) return status;
+        else return BookingStatus.FINISHED;
     }
 
     public void setStatus(@BookingStatus int status) {
