@@ -39,6 +39,7 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder {
         }
         Picasso.with(iconView.getContext()).load(category.getIcon())
                 .networkPolicy(NetworkPolicy.OFFLINE)
+                .fit()
                 .into(iconView, new Callback() {
                     @Override
                     public void onSuccess() {
@@ -49,6 +50,7 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder {
                         //Try again online if cache failed
                         Picasso.with(iconView.getContext())
                                 .load(category.getIcon())
+                                .fit()
                                 .into(iconView);
                     }
                 });
