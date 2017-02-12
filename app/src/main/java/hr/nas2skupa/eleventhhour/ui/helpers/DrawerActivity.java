@@ -107,7 +107,7 @@ public class DrawerActivity extends AppCompatActivity
                 break;
 
             case R.id.nav_sign_out:
-                SignInActivity_.intent(this).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK).action(SignInActivity.ACTION_SIGN_OUT).start();
+                SignInActivity_.intent(this).flags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK).action(SignInActivity.ACTION_SIGN_OUT).start();
                 break;
         }
 
