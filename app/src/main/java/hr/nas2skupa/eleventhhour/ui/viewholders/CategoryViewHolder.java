@@ -32,6 +32,7 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder {
 
     public void bindToCategory(final Category category) {
         titleView.setText(category.getName());
+        titleView.setSelected(true);
         try {
             backgroundView.setBackgroundColor(Color.parseColor(category.getColor()));
         } catch (Exception ignored) {

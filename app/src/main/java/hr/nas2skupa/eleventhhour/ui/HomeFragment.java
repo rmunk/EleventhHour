@@ -23,7 +23,6 @@ import org.androidannotations.annotations.ViewById;
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.model.Category;
 import hr.nas2skupa.eleventhhour.ui.viewholders.CategoryViewHolder;
-import hr.nas2skupa.eleventhhour.utils.Utils;
 import jp.wasabeef.recyclerview.animators.LandingAnimator;
 
 @EFragment(R.layout.fragment_home)
@@ -48,7 +47,7 @@ public class HomeFragment extends Fragment {
         recyclerView.getItemAnimator().setRemoveDuration(300);
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        Query query = database.child("categories").orderByChild("name/" + Utils.getLanguageIso());
+        Query query = database.child("categories");
         adapter = new FirebaseRecyclerAdapter<Category, CategoryViewHolder>(Category.class, R.layout.item_category
                 , CategoryViewHolder.class, query) {
             @Override
