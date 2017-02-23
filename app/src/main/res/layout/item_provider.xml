@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-                                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                                    xmlns:tools="http://schemas.android.com/tools"
-                                    android:id="@+id/layout_main"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="4dp"
-                                    android:layout_marginLeft="8dp"
-                                    android:layout_marginRight="8dp"
-                                    android:layout_marginTop="4dp"
-                                    android:transitionName="provider_card">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_main"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:transitionName="provider_card">
 
     <LinearLayout
         android:id="@+id/layout_list"
@@ -17,99 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <android.support.constraint.ConstraintLayout
-            android:id="@+id/provider_summary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp">
-
-            <TextView
-                android:id="@+id/txt_provider_name"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:scrollHorizontally="true"
-                android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="Poliklinika sunce"/>
-
-            <ImageView
-                android:id="@+id/img_favorite"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:tint="@color/colorAccent"
-                app:layout_constraintBottom_toBottomOf="@+id/img_sale"
-                app:layout_constraintRight_toLeftOf="@+id/img_sale"
-                app:layout_constraintTop_toTopOf="@+id/img_sale"
-                app:srcCompat="@drawable/ic_favorite_black_24dp"/>
-
-            <ImageView
-                android:id="@+id/img_sale"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:tint="@color/sale"
-                app:layout_constraintBottom_toBottomOf="@+id/txt_provider_name"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/txt_provider_name"
-                app:srcCompat="@drawable/ic_redeem_black_24dp"/>
-
-            <RatingBar
-                android:id="@+id/rating_indicator"
-                style="@style/Widget.AppCompat.RatingBar.Small"
-                android:layout_width="0dp"
-                android:layout_height="16dp"
-                android:layout_marginTop="8dp"
-                app:layout_constraintLeft_toLeftOf="@+id/txt_provider_name"
-                app:layout_constraintTop_toBottomOf="@+id/txt_provider_name"
-                tools:rating="3.3"/>
-
-            <TextView
-                android:id="@+id/txt_ratings"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:drawablePadding="4dp"
-                android:drawableRight="@drawable/ic_person_black_18dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="@+id/rating_indicator"
-                app:layout_constraintLeft_toRightOf="@+id/rating_indicator"
-                app:layout_constraintTop_toTopOf="@+id/rating_indicator"
-                app:layout_constraintVertical_bias="0.0"
-                tools:text="1309"/>
-
-            <TextView
-                android:id="@+id/txt_address"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                android:textColor="@drawable/text_link_selector"
-                app:layout_constraintLeft_toLeftOf="@+id/rating_indicator"
-                app:layout_constraintTop_toBottomOf="@+id/rating_indicator"
-                tools:text="Trnjanska cesta 108, 10000, Zagreb" />
-
-            <ImageView
-                android:id="@+id/img_expand"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:alpha="0.54"
-                app:layout_constraintBottom_toBottomOf="@+id/txt_address"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/txt_address"
-                app:srcCompat="@drawable/ic_expand_more_black_24dp"/>
-        </android.support.constraint.ConstraintLayout>
+        <include layout="@layout/view_provider_main" />
 
         <View
             android:id="@+id/separator1"
@@ -117,9 +20,11 @@
             android:layout_height="1dp"
             android:background="@color/divider"
             android:visibility="gone"
-            tools:visibility="visible"/>
+            tools:visibility="visible" />
 
-        <include layout="@layout/view_provider_info"/>
+        <include
+            android:id="@+id/provider_details"
+            layout="@layout/view_provider_info" />
 
     </LinearLayout>
 </android.support.v7.widget.CardView>

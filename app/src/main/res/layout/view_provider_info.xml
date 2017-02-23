@@ -1,78 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/provider_details"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="16dp"
-    android:visibility="gone"
-    tools:visibility="visible">
+    android:paddingBottom="12dp"
+    android:paddingEnd="16dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingStart="16dp"
+    android:paddingTop="12dp"
+    tools:visibility="visible"
+    tools:showIn="@layout/item_provider">
 
     <TextView
         android:id="@+id/txt_description"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        app:layout_constraintHorizontal_bias="0.12"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         tools:text="Sustav Poliklinika Sunce danas je najveći privatni zdravstveni sustav u Hrvatskoj kojeg čini sedam moderno opremljenih poliklinika." />
 
     <TextView
         android:id="@+id/txt_phone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp"
         android:drawableLeft="@drawable/ic_phone_black_18dp"
         android:drawablePadding="8dp"
         android:textColor="@drawable/text_link_selector"
-        app:layout_constraintLeft_toLeftOf="@+id/txt_description"
-        app:layout_constraintTop_toBottomOf="@+id/txt_description"
         tools:text="0800 85 88" />
 
     <TextView
         android:id="@+id/txt_web"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp"
         android:drawableLeft="@drawable/ic_web_black_18dp"
         android:drawablePadding="8dp"
         android:textColor="@drawable/text_link_selector"
-        app:layout_constraintLeft_toLeftOf="@+id/txt_description"
-        app:layout_constraintTop_toBottomOf="@+id/txt_phone"
         tools:text="www.poliklinika.sunce.hr" />
 
     <TextView
         android:id="@+id/txt_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp"
         android:drawableLeft="@drawable/ic_mail_outline_black_18dp"
         android:drawablePadding="8dp"
         android:textColor="@drawable/text_link_selector"
-        app:layout_constraintLeft_toLeftOf="@+id/txt_description"
-        app:layout_constraintTop_toBottomOf="@+id/txt_web"
         tools:text="info@poliklinika.sunce.hr" />
 
     <TextView
         android:id="@+id/txt_hours"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp"
         android:drawableLeft="@drawable/ic_access_time_black_18dp"
         android:drawablePadding="8dp"
-        app:layout_constraintLeft_toLeftOf="@+id/txt_description"
-        app:layout_constraintTop_toBottomOf="@+id/txt_email"
         tools:text=" 8:00 - 20:00" />
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>
 

@@ -26,9 +26,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 
-import com.firebase.geofire.GeoFire;
-import com.firebase.geofire.GeoLocation;
-import com.firebase.geofire.LocationCallback;
 import com.firebase.ui.database.FirebaseIndexRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.ChildEventListener;
@@ -45,10 +42,10 @@ import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.HashMap;
-import java.util.Locale;
 
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.model.Provider;
+import hr.nas2skupa.eleventhhour.ui.helpers.VerticalSpaceItemDecoration;
 import hr.nas2skupa.eleventhhour.ui.viewholders.ProviderViewHolder;
 import hr.nas2skupa.eleventhhour.utils.Utils;
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
@@ -109,6 +106,7 @@ public abstract class ProvidersFragment extends Fragment {
         recyclerView.setItemAnimator(new SlideInUpAnimator(new OvershootInterpolator(0.1f)));
         recyclerView.getItemAnimator().setAddDuration(500);
         recyclerView.getItemAnimator().setRemoveDuration(500);
+        recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(getContext(), 8));
 
         dataRef = FirebaseDatabase.getInstance().getReference().child("providers");
         adapter = new ProvidersAdapter(
@@ -262,45 +260,6 @@ public abstract class ProvidersFragment extends Fragment {
                     if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
                         startActivity(Intent.createChooser(intent, "Email"));
                     }
-                }
-            });
-            viewHolder.txtAddress.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    DatabaseReference ref = FirebaseDatabase.getInstance()
-                            .getReference("geofire/providers")
-                            .child(provider.getCategory())
-                            .child(provider.getSubcategory());
-                    GeoFire geoFire = new GeoFire(ref);
-                    geoFire.getLocation(provider.getKey(), new LocationCallback() {
-                        @Override
-                        public void onLocationResult(String key, GeoLocation location) {
-                            String uriString;
-                            if (location != null) {
-                                uriString = String.format(Locale.getDefault(), "geo:%f,%f?q=%f,%f(%s)",
-                                        location.latitude,
-                                        location.longitude,
-                                        location.latitude,
-                                        location.longitude,
-                                        Uri.encode(provider.getName()));
-                            } else {
-                                uriString = String.format(Locale.getDefault(), "geo:%f,%f?q=%s",
-                                        0,
-                                        0,
-                                        Uri.encode(provider.getAddress()));
-                            }
-                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uriString));
-                            intent.setPackage("com.google.android.apps.maps");
-                            if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-                                startActivity(intent);
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
                 }
             });
 

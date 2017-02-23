@@ -1,6 +1,7 @@
 package hr.nas2skupa.eleventhhour.ui;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -13,18 +14,26 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.Toolbar;
-import android.transition.AutoTransition;
+import android.transition.Slide;
 import android.transition.Transition;
 import android.transition.TransitionManager;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RatingBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.LocationCallback;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -45,12 +54,11 @@ import java.util.Locale;
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.model.Provider;
 import hr.nas2skupa.eleventhhour.ui.helpers.DrawerActivity;
-import hr.nas2skupa.eleventhhour.ui.viewholders.ProviderViewHolder;
 import hr.nas2skupa.eleventhhour.utils.Utils;
 
 @EActivity(R.layout.activity_provider)
 @OptionsMenu(R.menu.main)
-public class ProviderActivity extends DrawerActivity implements RatingBar.OnRatingBarChangeListener {
+public class ProviderActivity extends DrawerActivity implements RatingBar.OnRatingBarChangeListener, OnMapReadyCallback {
     private static final int REQUEST_PHONE_PERMISSION = 1;
 
     @Extra
@@ -61,19 +69,41 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
     @ViewById(R.id.app_bar)
     AppBarLayout appBar;
 
-    @ViewById(R.id.provider_action)
-    ViewGroup providerAction;
     @ViewById(R.id.btn_favorite)
     ImageView btnFavorite;
     @ViewById(R.id.rating_bar)
     RatingBar ratingBar;
 
-    @AfterViews
-    void initViews() {
-        ratingBar.setOnRatingBarChangeListener(this);
-    }
+    @ViewById(R.id.txt_provider_name)
+    TextView txtProviderName;
+    @ViewById(R.id.img_favorite)
+    ImageView imgFavorite;
+    @ViewById(R.id.img_sale)
+    ImageView imgSale;
+    @ViewById(R.id.rating_indicator)
+    RatingBar ratingIndicator;
+    @ViewById(R.id.txt_ratings)
+    TextView txtRatings;
+    @ViewById(R.id.txt_distance)
+    TextView txtDistance;
+    @ViewById(R.id.img_expand)
+    ImageView imgExpand;
 
-    private ProviderViewHolder viewHolder;
+    @ViewById(R.id.provider_more)
+    ViewGroup viewDetails;
+    @ViewById(R.id.txt_description)
+    TextView txtDescription;
+    @ViewById(R.id.txt_phone)
+    TextView txtPhone;
+    @ViewById(R.id.txt_address)
+    TextView txtAddress;
+    @ViewById(R.id.txt_web)
+    TextView txtWeb;
+    @ViewById(R.id.txt_email)
+    TextView txtEmail;
+    @ViewById(R.id.txt_hours)
+    TextView txtHours;
+
     private DatabaseReference providerReference;
     private ValueEventListener providerListener;
     private DatabaseReference favoriteReference;
@@ -82,6 +112,8 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
     private ValueEventListener ratingListener;
     private boolean showDetails = false;
     private Provider provider;
+
+    private GoogleMap map;
 
     @SuppressWarnings("ConstantConditions")
     void setToolbar(@ViewById(R.id.toolbar) Toolbar toolbar) {
@@ -93,25 +125,33 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
         getDrawer().setStatusBarBackgroundColor(Color.LTGRAY);
     }
 
-    void setProviderView(@ViewById(R.id.item_provider) View providerInfo) {
-        viewHolder = new ProviderViewHolder(providerInfo);
+    @AfterViews
+    void initViews() {
+        ratingBar.setOnRatingBarChangeListener(this);
+    }
 
-        viewHolder.imgExpand.setOnClickListener(new View.OnClickListener() {
+    @AfterViews
+    void setProviderView() {
+        imgExpand.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    Transition transition = new AutoTransition();
-                    transition.setDuration(200);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Transition transition = new Slide(Gravity.TOP);
                     TransitionManager.beginDelayedTransition(layoutMain, transition);
                 }
 
                 showDetails = !showDetails;
-                viewHolder.showDetails(showDetails);
-                providerAction.setVisibility(showDetails ? View.VISIBLE : View.GONE);
+                viewDetails.setVisibility(showDetails ? View.VISIBLE : View.GONE);
+
+                ObjectAnimator anim = showDetails
+                        ? ObjectAnimator.ofFloat(imgExpand, "rotation", 0, 180)
+                        : ObjectAnimator.ofFloat(imgExpand, "rotation", 180, 0);
+                anim.setDuration(500);
+                anim.start();
             }
         });
 
-        viewHolder.txtPhone.setOnClickListener(new View.OnClickListener() {
+        txtPhone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (ActivityCompat.checkSelfPermission(ProviderActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
@@ -124,7 +164,7 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
                 }
             }
         });
-        viewHolder.txtWeb.setOnClickListener(new View.OnClickListener() {
+        txtWeb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String url = provider.getWeb();
@@ -136,7 +176,7 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
                 }
             }
         });
-        viewHolder.txtEmail.setOnClickListener(new View.OnClickListener() {
+        txtEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + provider.getEmail()));
@@ -145,47 +185,33 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
                 }
             }
         });
-        viewHolder.txtAddress.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DatabaseReference ref = FirebaseDatabase.getInstance()
-                        .getReference("geofire/providers")
-                        .child(provider.getCategory())
-                        .child(provider.getSubcategory());
-                GeoFire geoFire = new GeoFire(ref);
-                geoFire.getLocation(providerKey, new LocationCallback() {
-                    @Override
-                    public void onLocationResult(String key, GeoLocation location) {
-                        String uriString;
-                        if (location != null) {
-                            uriString = String.format(Locale.getDefault(), "geo:%f,%f?q=%f,%f(%s)",
-                                    location.latitude,
-                                    location.longitude,
-                                    location.latitude,
-                                    location.longitude,
-                                    Uri.encode(provider.getName()));
-                        } else {
-                            uriString = String.format(Locale.getDefault(), "geo:%f,%f?q=%s",
-                                    0,
-                                    0,
-                                    Uri.encode(provider.getAddress()));
-                        }
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uriString));
-                        intent.setPackage("com.google.android.apps.maps");
-                        if (intent.resolveActivity(getPackageManager()) != null) {
-                            startActivity(intent);
-                        }
-                    }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-            }
-        });
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
 
+    public void bindToProvider(Provider provider) {
+        txtProviderName.setText(provider.getName());
+        imgSale.setVisibility(provider.isSale() ? View.VISIBLE : View.GONE);
+        imgFavorite.setVisibility(provider.isFavorite() ? View.VISIBLE : View.GONE);
+        ratingIndicator.setRating(provider.getRating());
+        txtRatings.setText(String.valueOf(provider.getRatingsCnt()));
+
+        txtDescription.setText(provider.getDescription());
+        txtDescription.setVisibility(txtDescription.getText().length() > 0 ? View.VISIBLE : View.GONE);
+        txtPhone.setText(provider.getPhone());
+        txtPhone.setVisibility(txtPhone.getText().length() > 0 ? View.VISIBLE : View.GONE);
+        txtAddress.setText(provider.getAddress());
+        txtAddress.setVisibility(txtAddress.getText().length() > 0 ? View.VISIBLE : View.GONE);
+        txtAddress.setSelected(true);
+        txtWeb.setText(provider.getWeb());
+        txtWeb.setVisibility(txtWeb.getText().length() > 0 ? View.VISIBLE : View.GONE);
+        txtEmail.setText(provider.getEmail());
+        txtEmail.setVisibility(txtEmail.getText().length() > 0 ? View.VISIBLE : View.GONE);
+        txtHours.setText(provider.getHours());
+        txtHours.setVisibility(txtHours.getText().length() > 0 ? View.VISIBLE : View.GONE);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -258,6 +284,10 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
         onBackPressed();
     }
 
+    @Click(R.id.provider_more)
+    public void consumeClick() {
+    }
+
     @Click(R.id.btn_favorite)
     public void toggleFavorite(ImageView imageView) {
         provider.setFavorite(!provider.isFavorite());
@@ -299,6 +329,16 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
                 .setValue(newUserRating > 0 ? newUserRating : null);
     }
 
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        map = googleMap;
+
+        map.setBuildingsEnabled(true);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+            map.setMyLocationEnabled(true);
+    }
+
     private class ProviderChangedListener implements ValueEventListener {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -314,7 +354,31 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
             newProvider.setFavorite(provider != null && provider.isFavorite());
             provider = newProvider;
             provider.setKey(dataSnapshot.getKey());
-            viewHolder.bindToProvider(provider);
+            bindToProvider(provider);
+
+
+            DatabaseReference ref = FirebaseDatabase.getInstance()
+                    .getReference("geofire/providers")
+                    .child(provider.getCategory())
+                    .child(provider.getSubcategory());
+            GeoFire geoFire = new GeoFire(ref);
+            geoFire.getLocation(providerKey, new LocationCallback() {
+                @Override
+                public void onLocationResult(String key, GeoLocation location) {
+                    if (map != null && location != null) {
+                        LatLng target = new LatLng(location.latitude, location.longitude);
+                        map.addMarker(new MarkerOptions()
+                                .position(target)
+                                .title(provider.getName()));
+                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(target, 16));
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
         }
 
         @Override
@@ -328,7 +392,7 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
         public void onDataChange(DataSnapshot dataSnapshot) {
             Boolean value = dataSnapshot.getValue(Boolean.class);
             provider.setFavorite(value != null);
-            viewHolder.bindToProvider(provider);
+            bindToProvider(provider);
             btnFavorite.setImageResource(provider.isFavorite() ? R.drawable.ic_heart_broken_black_24dp : R.drawable.ic_favorite_black_36dp);
         }
 

@@ -2,7 +2,6 @@ package hr.nas2skupa.eleventhhour.ui;
 
 
 import android.Manifest;
-import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -27,7 +26,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
@@ -68,8 +66,6 @@ public class ProviderInfoFragment extends Fragment {
     @ViewById(R.id.txt_distance)
     TextView txtDistance;
 
-    @ViewById(R.id.separator1)
-    View separator1;
     @ViewById(R.id.provider_details)
     ViewGroup providerDetails;
     @ViewById(R.id.txt_description)
@@ -84,13 +80,6 @@ public class ProviderInfoFragment extends Fragment {
     TextView txtEmail;
     @ViewById(R.id.txt_hours)
     TextView txtHours;
-
-    @ViewById(R.id.separator2)
-    View separator2;
-    @ViewById(R.id.rating_bar)
-    RatingBar ratingBar;
-
-    private boolean showDetails = false;
 
     private DatabaseReference providerReference;
     private ValueEventListener providerListener;
@@ -266,28 +255,12 @@ public class ProviderInfoFragment extends Fragment {
         txtPhone.setVisibility(txtPhone.getText().length() > 0 ? View.VISIBLE : View.GONE);
         txtAddress.setText(provider.getAddress());
         txtAddress.setVisibility(txtAddress.getText().length() > 0 ? View.VISIBLE : View.GONE);
+        txtAddress.setSelected(true);
         txtWeb.setText(provider.getWeb());
         txtWeb.setVisibility(txtWeb.getText().length() > 0 ? View.VISIBLE : View.GONE);
         txtEmail.setText(provider.getEmail());
         txtEmail.setVisibility(txtEmail.getText().length() > 0 ? View.VISIBLE : View.GONE);
         txtHours.setText(provider.getHours());
         txtHours.setVisibility(txtHours.getText().length() > 0 ? View.VISIBLE : View.GONE);
-
-        ratingBar.setRating(provider.getUserRating());
-    }
-
-    @Click(R.id.img_expand)
-    public void toggleDetails(ImageView imgExpand) {
-        showDetails = !showDetails;
-
-        separator1.setVisibility(showDetails ? View.VISIBLE : View.GONE);
-        providerDetails.setVisibility(showDetails ? View.VISIBLE : View.GONE);
-
-        ObjectAnimator anim = showDetails
-                ? ObjectAnimator.ofFloat(imgExpand, "rotation", 0, 180)
-                : ObjectAnimator.ofFloat(imgExpand, "rotation", 180, 0);
-        anim.setDuration(500);
-        anim.start();
-
     }
 }

@@ -75,12 +75,15 @@ public class ProviderViewHolder extends RecyclerView.ViewHolder {
         txtPhone.setVisibility(txtPhone.getText().length() > 0 ? View.VISIBLE : View.GONE);
         txtAddress.setText(provider.getAddress());
         txtAddress.setVisibility(txtAddress.getText().length() > 0 ? View.VISIBLE : View.GONE);
+        txtAddress.setSelected(true);
         txtWeb.setText(provider.getWeb());
         txtWeb.setVisibility(txtWeb.getText().length() > 0 ? View.VISIBLE : View.GONE);
         txtEmail.setText(provider.getEmail());
         txtEmail.setVisibility(txtEmail.getText().length() > 0 ? View.VISIBLE : View.GONE);
         txtHours.setText(provider.getHours());
         txtHours.setVisibility(txtHours.getText().length() > 0 ? View.VISIBLE : View.GONE);
+
+        viewDetails.setVisibility(detailsVisible ? View.VISIBLE : View.GONE);
     }
 
     public void showDetails(boolean show) {
