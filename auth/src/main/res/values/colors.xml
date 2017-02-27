@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#adbb00</color>
+    <color name="colorPrimaryDark">#727922</color>
+    <color name="colorPrimaryLight">#aed581</color>
+    <color name="colorAccent">#c2185b</color>
+
+    <color name="firebaseUiText">#ffffff</color>
+    <color name="linkColor">#ffffff</color>
+    <color name="errorColor">@color/material_color_red_900</color>
+
+    <color name="colorWhite">#ffffff</color>
+</resources>

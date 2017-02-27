@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Eleventh Hour Auth</string>
+
+    <!-- Facebook -->
+    <string name="facebook_application_id" translatable="false">1780695342188362</string>
+    <string name="facebook_login_protocol_scheme" translatable="false">fb1780695342188362</string>
+
+    <!-- Twitter -->
+    <string name="twitter_consumer_key" translatable="false">BHRR4Sb5xzVjdtQKpUNYlQTbD</string>
+    <string name="twitter_consumer_secret" translatable="false">c7rNanLQZY7BwOGqJXG24ICDTQgFqiqr0TAQ0YnXT3mq0EfQEE</string>
+
+    <string name="sign_in_cancelled">Sign in cancelled</string>
+    <string name="no_internet_connection">No internet connection</string>
+    <string name="unknown_error">Sorry, we cannot sign you in at the moment</string>
+    <string name="sign_out_failed">Sign out failed</string>
+
+</resources>

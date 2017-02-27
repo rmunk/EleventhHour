@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item>
+        <shape>
+            <solid android:color="@color/colorPrimary" />
+        </shape>
+    </item>
+
+    <item>
+        <bitmap
+            android:alpha="0.54"
+            android:scaleType="center"
+            android:src="@drawable/background_doodles"
+            android:tint="@color/colorWhite" />
+    </item>
+
+    <item>
+        <shape>
+            <gradient
+                android:centerColor="#3000"
+                android:centerY="0.3"
+                android:endColor="#6000"
+                android:gradientRadius="400"
+                android:startColor="#0000"
+                android:type="radial" />
+        </shape>
+    </item>
+
+</layer-list>
