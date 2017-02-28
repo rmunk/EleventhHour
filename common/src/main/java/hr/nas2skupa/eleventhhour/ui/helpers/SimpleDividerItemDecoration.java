@@ -7,7 +7,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.common.R;
+
 
 /**
  * Created by nas2skupa on 01/10/2016.
