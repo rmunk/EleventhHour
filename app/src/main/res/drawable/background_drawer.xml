@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item>
+        <shape>
+            <solid android:color="@color/colorPrimary" />
+        </shape>
+    </item>
+
+    <item>
+        <bitmap
+            android:alpha="0.54"
+            android:gravity="center_horizontal|top"
+            android:scaleType="center"
+            android:src="@drawable/background_doodles"
+            android:tint="@color/colorWhite" />
+    </item>
+
+    <item
+        android:drawable="@drawable/logo"
+        android:bottom="30dp"/>
+
+    <item>
+        <shape>
+            <gradient
+                android:centerColor="#3000"
+                android:endColor="#6000"
+                android:gradientRadius="300"
+                android:startColor="#0000"
+                android:type="radial" />
+        </shape>
+    </item>
+
+</layer-list>

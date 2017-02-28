@@ -116,7 +116,9 @@ public class DrawerActivity extends AppCompatActivity
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
-                                    startActivity(new Intent(DrawerActivity.this, SignInActivity.class));
+                                    Intent intent = new Intent(DrawerActivity.this, SignInActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(intent);
                                     finish();
                                 } else {
                                     Toast.makeText(DrawerActivity.this, R.string.sign_out_failed, Toast.LENGTH_LONG);

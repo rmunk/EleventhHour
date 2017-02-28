@@ -62,7 +62,6 @@ public class SignInActivity extends AppCompatActivity {
                 // Sign in failed
                 if (response == null) {
                     // User pressed back button
-                    Toast.makeText(SignInActivity.this, R.string.sign_in_cancelled, Toast.LENGTH_LONG).show();
                     finish();
                     return;
                 }
@@ -87,7 +86,9 @@ public class SignInActivity extends AppCompatActivity {
             Bundle bundle = ai.metaData;
             String entryPoint = bundle.getString("app_entry_point");
             if (entryPoint != null) {
-                startActivity(new Intent(entryPoint));
+                Intent intent = new Intent(entryPoint);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
             } else {
                 throw new IllegalStateException("You must configure <meta-data android:name=\\\"app_entry_point\\\" android:value=\\\" main entry intent action\\\"/> in your AndroidManifest.xml file.\"");
             }

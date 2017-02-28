@@ -28,19 +28,6 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
-        CrashlyticsCore core = new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build();
-        Fabric.with(this, new Crashlytics.Builder().core(core).build());
-
-        if (BuildConfig.DEBUG) {
-            Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-                @Override
-                public void uncaughtException(Thread thread, Throwable e) {
-                    Log.wtf("Alert", e.getMessage(), e);
-                    System.exit(2); //Prevents the service/app from freezing
-                }
-            });
-        }
-
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
         OkHttpClient okHttpClient = new OkHttpClient();
