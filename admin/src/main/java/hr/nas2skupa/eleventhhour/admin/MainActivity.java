@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -77,6 +78,14 @@ public class MainActivity extends AppCompatActivity {
         if (adapter != null) adapter.cleanup();
     }
 
+    @SuppressWarnings("ConstantConditions")
+    void setToolbar(@ViewById(R.id.toolbar) Toolbar toolbar) {
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+    }
+
     @AfterViews
     public void init() {
         LinearLayoutManager manager = new LinearLayoutManager(this);
@@ -92,14 +101,14 @@ public class MainActivity extends AppCompatActivity {
                 ProviderViewHolder.class,
                 query) {
             @Override
-            protected void populateViewHolder(final ProviderViewHolder viewHolder, Provider model, int position) {
-                final DatabaseReference categoryRef = getRef(position);
-
+            protected void populateViewHolder(final ProviderViewHolder viewHolder, Provider model, final int position) {
                 viewHolder.bindToProvider(model);
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        // TODO: open provider page
+                     ProviderDetailsActivity_.intent(MainActivity.this)
+                             .providerKey(getRef(position).getKey())
+                             .start();
                     }
                 });
             }
