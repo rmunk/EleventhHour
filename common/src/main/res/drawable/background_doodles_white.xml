@@ -9,7 +9,7 @@
 
     <item>
         <bitmap
-            android:alpha="0.25"
+            android:alpha="0.2"
             android:scaleType="centerCrop"
             android:src="@drawable/background_doodles" />
     </item>

@@ -9,14 +9,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="hr.nas2skupa.eleventhhour.auth.SplashActivity">
+        <activity
+            android:name="hr.nas2skupa.eleventhhour.auth.SignInActivity"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity_">
+        <activity
+            android:name=".MainActivity_"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="hr.nas2skupa.eleventhhour.panel.MAIN" />
 

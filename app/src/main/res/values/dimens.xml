@@ -6,15 +6,4 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
-
-
-    <dimen name="g_top_margin">100dp</dimen>
-    <dimen name="sign_in_header_hight">150dp</dimen>
-    <dimen name="mb_height_56">56dp</dimen>
-
-    <dimen name="toolbar_icon_height">48dp</dimen>
-
-    <dimen name="category_card_width">104dp</dimen>
-    <dimen name="category_card_height">144dp</dimen>
-    <dimen name="category_header_height">64dp</dimen>
 </resources>

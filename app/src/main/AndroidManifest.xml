@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="hr.nas2skupa.eleventhhour">
+          package="hr.nas2skupa.eleventhhour">
 
-    <uses-permission android:name="android.permission.CALL_PHONE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.CALL_PHONE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <application
         android:name=".App"
@@ -14,59 +13,45 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="hr.nas2skupa.eleventhhour.auth.SplashActivity">
+        <activity
+            android:name="hr.nas2skupa.eleventhhour.auth.SignInActivity"
+            android:theme="@style/SplashTheme">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
             android:name=".ui.MainActivity_"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/MaterialTheme.Light.DarkToolbar.TranslucentStatus">
+            android:theme="@style/AppTheme">
             <intent-filter>
-                <action android:name="hr.nas2skupa.eleventhhour.MAIN" />
-                <action android:name="hr.nas2skupa.eleventhhour.ACTION_HOME" />
-                <action android:name="hr.nas2skupa.eleventhhour.ACTION_CALENDAR" />
+                <action android:name="hr.nas2skupa.eleventhhour.MAIN"/>
+                <action android:name="hr.nas2skupa.eleventhhour.ACTION_HOME"/>
+                <action android:name="hr.nas2skupa.eleventhhour.ACTION_CALENDAR"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
         <activity
             android:name=".ui.CategoryActivity_"
             android:screenOrientation="portrait"
-            android:theme="@style/MaterialTheme.Light.DarkToolbar.TranslucentStatus" />
+            android:theme="@style/AppTheme"/>
         <activity
             android:name=".ui.ProviderActivity_"
             android:screenOrientation="portrait"
-            android:theme="@style/MaterialTheme.Light.TranslucentStatus" />
+            android:theme="@style/ProviderTheme"/>
         <activity
             android:name=".ui.MapActivity_"
             android:label="@string/title_activity_map"
             android:screenOrientation="portrait"
-            android:theme="@style/MaterialTheme.Light.TranslucentStatus" />
-
-        <!--
-             The API key for Google Maps-based APIs is defined as a string resource.
-             (See the file "res/values/google_maps_api.xml").
-             Note that the API key is linked to the encryption key used to sign the APK.
-             You need a different API key for each encryption key, including the release key that is used to
-             sign the APK for publishing.
-             You can define the keys for the debug and release targets in src/debug/ and src/release/. 
-        -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
-        <!--<meta-data-->
-            <!--android:name="io.fabric.ApiKey"-->
-            <!--android:value="cd3d2c728913a7a16aea78e2d76ccc5fa27f9892"-->
-            <!--tools:replace="android:value" />-->
+            android:theme="@style/MaterialTheme.Light.TranslucentStatus"/>
 
         <meta-data
             android:name="app_entry_point"
-            android:value="hr.nas2skupa.eleventhhour.MAIN" />
+            android:value="hr.nas2skupa.eleventhhour.MAIN"/>
     </application>
 
 </manifest>
