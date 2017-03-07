@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer-array name="standard_palette">
+        <item>0xfff16364</item>
+        <item>0xfff58559</item>
+        <item>0xfff9a43e</item>
+        <item>0xffe4c62e</item>
+        <item>0xff67bf74</item>
+        <item>0xff59a2be</item>
+        <item>0xff2093cd</item>
+        <item>0xffad62a7</item>
+        <item>0xff805781</item>
+    </integer-array>
+
+    <integer-array name="material_palette">
+        <item>0xffe57373</item>
+        <item>0xfff06292</item>
+        <item>0xffba68c8</item>
+        <item>0xff9575cd</item>
+        <item>0xff7986cb</item>
+        <item>0xff64b5f6</item>
+        <item>0xff4fc3f7</item>
+        <item>0xff4dd0e1</item>
+        <item>0xff4db6ac</item>
+        <item>0xff81c784</item>
+        <item>0xffaed581</item>
+        <item>0xffff8a65</item>
+        <item>0xffd4e157</item>
+        <item>0xffffd54f</item>
+        <item>0xffffb74d</item>
+        <item>0xffa1887f</item>
+        <item>0xff90a4ae</item>
+    </integer-array>
+
+    <integer-array name="flat_palette">
+        <item>0xff1abc9c</item>
+        <item>0xff2ecc71</item>
+        <item>0xff3498db</item>
+        <item>0xff9b59b6</item>
+        <item>0xff34495e</item>
+        <item>0xff16a085</item>
+        <item>0xff27ae60</item>
+        <item>0xff2980b9</item>
+        <item>0xff8e44ad</item>
+        <item>0xff2c3e50</item>
+        <item>0xfff1c40f</item>
+        <item>0xffe67e22</item>
+        <item>0xffe74c3c</item>
+        <item>0xffecf0f1</item>
+        <item>0xff95a5a6</item>
+        <item>0xfff39c12</item>
+        <item>0xffd35400</item>
+        <item>0xffc0392b</item>
+        <item>0xffbdc3c7</item>
+        <item>0xff7f8c8d</item>
+    </integer-array>
+
+    <integer-array name="metro_palette">
+        <item>0xff606060</item>
+        <item>0xff525252</item>
+        <item>0xff6d84b4</item>
+        <item>0xff365899</item>
+        <item>0xff738ABA</item>
+        <item>0xff2C4987</item>
+        <item>0xff1d4088</item>
+        <item>0xff4966A6</item>
+        <item>0xff355492</item>
+        <item>0xff2A4887</item>
+        <item>0xff29487d</item>
+        <item>0xffa4c400</item>
+        <item>0xff60a917</item>
+        <item>0xff008a00</item>
+        <item>0xff00aba9</item>
+        <item>0xff1ba1e2</item>
+        <item>0xff0050ef</item>
+        <item>0xff6a00ff</item>
+        <item>0xffaa00ff</item>
+        <item>0xfff472d0</item>
+        <item>0xffd80073</item>
+        <item>0xffa20025</item>
+        <item>0xffe51400</item>
+        <item>0xfffa6800</item>
+        <item>0xfff0a30a</item>
+        <item>0xffe3c800</item>
+        <item>0xff825a2c</item>
+        <item>0xff6d8764</item>
+        <item>0xff647687</item>
+        <item>0xff76608a</item>
+        <item>0xffa0522d</item>
+        <item>0xffCD4B5B</item>
+    </integer-array>
+
+</resources>
