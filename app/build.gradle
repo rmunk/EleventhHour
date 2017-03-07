@@ -60,20 +60,8 @@ dependencies {
     compile "com.android.support:recyclerview-v7:$supportLibraryVersion"
     compile 'com.android.support.constraint:constraint-layout:1.0.0'
 
-    compile "com.google.android.gms:play-services-maps:$playServicesVersion"
-    compile "com.google.android.gms:play-services-location:$playServicesVersion"
-
-    compile "com.google.firebase:firebase-core:$firebaseVersion"
-    compile "com.google.firebase:firebase-auth:$firebaseVersion"
-    compile "com.google.firebase:firebase-database:$firebaseVersion"
-    compile "com.google.firebase:firebase-crash:$firebaseVersion"
-    compile "com.google.firebase:firebase-messaging:$firebaseVersion"
     compile "com.firebaseui:firebase-ui-database:$firebaseUIVersion"
     compile 'com.firebase:geofire-android:2.1.1'
-
-    compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
-        transitive = true;
-    }
 
     compile 'org.androidannotations:androidannotations-api:4.1.0'
     apt 'org.androidannotations:androidannotations:4.1.0'
@@ -84,7 +72,6 @@ dependencies {
 
     compile 'org.greenrobot:eventbus:3.0.0'
 
-    compile 'com.mikepenz:materialize:1.0.0@aar'
     compile 'com.wdullaer:materialdatetimepicker:2.5.0'
     compile 'com.github.sundeepk:compact-calendar-view:1.9.2'
 
