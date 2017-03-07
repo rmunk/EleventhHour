@@ -14,7 +14,6 @@ public class Provider {
     private String name;
     private float rating;
     private int ratingsCnt;
-    private Location location;
     private boolean sale;
 
     private String description;
