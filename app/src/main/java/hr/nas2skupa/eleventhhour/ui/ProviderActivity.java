@@ -61,48 +61,29 @@ import hr.nas2skupa.eleventhhour.utils.Utils;
 public class ProviderActivity extends DrawerActivity implements RatingBar.OnRatingBarChangeListener, OnMapReadyCallback {
     private static final int REQUEST_PHONE_PERMISSION = 1;
 
-    @Extra
-    String providerKey;
+    @Extra String providerKey;
 
-    @ViewById(R.id.layout_main)
-    ViewGroup layoutMain;
-    @ViewById(R.id.app_bar)
-    AppBarLayout appBar;
+    @ViewById ViewGroup layoutMain;
+    @ViewById AppBarLayout appBar;
 
-    @ViewById(R.id.btn_favorite)
-    ImageView btnFavorite;
-    @ViewById(R.id.rating_bar)
-    RatingBar ratingBar;
+    @ViewById ImageView btnFavorite;
+    @ViewById RatingBar ratingBar;
 
-    @ViewById(R.id.txt_provider_name)
-    TextView txtProviderName;
-    @ViewById(R.id.img_favorite)
-    ImageView imgFavorite;
-    @ViewById(R.id.img_sale)
-    ImageView imgSale;
-    @ViewById(R.id.rating_indicator)
-    RatingBar ratingIndicator;
-    @ViewById(R.id.txt_ratings)
-    TextView txtRatings;
-    @ViewById(R.id.txt_distance)
-    TextView txtDistance;
-    @ViewById(R.id.img_expand)
-    ImageView imgExpand;
+    @ViewById TextView txtProviderName;
+    @ViewById ImageView imgFavorite;
+    @ViewById ImageView imgSale;
+    @ViewById RatingBar ratingIndicator;
+    @ViewById TextView txtRatings;
+    @ViewById TextView txtDistance;
+    @ViewById ImageView imgExpand;
 
-    @ViewById(R.id.provider_more)
-    ViewGroup viewDetails;
-    @ViewById(R.id.txt_description)
-    TextView txtDescription;
-    @ViewById(R.id.txt_phone)
-    TextView txtPhone;
-    @ViewById(R.id.txt_address)
-    TextView txtAddress;
-    @ViewById(R.id.txt_web)
-    TextView txtWeb;
-    @ViewById(R.id.txt_email)
-    TextView txtEmail;
-    @ViewById(R.id.txt_hours)
-    TextView txtHours;
+    @ViewById ViewGroup providerMore;
+    @ViewById TextView txtDescription;
+    @ViewById TextView txtPhone;
+    @ViewById TextView txtAddress;
+    @ViewById TextView txtWeb;
+    @ViewById TextView txtEmail;
+    @ViewById TextView txtHours;
 
     private DatabaseReference providerReference;
     private ValueEventListener providerListener;
@@ -141,7 +122,7 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
                 }
 
                 showDetails = !showDetails;
-                viewDetails.setVisibility(showDetails ? View.VISIBLE : View.GONE);
+                providerMore.setVisibility(showDetails ? View.VISIBLE : View.GONE);
 
                 ObjectAnimator anim = showDetails
                         ? ObjectAnimator.ofFloat(imgExpand, "rotation", 0, 180)

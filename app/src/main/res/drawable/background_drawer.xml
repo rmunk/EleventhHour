@@ -25,7 +25,7 @@
             <gradient
                 android:centerColor="#3000"
                 android:endColor="#6000"
-                android:gradientRadius="300"
+                android:gradientRadius="150dp"
                 android:startColor="#0000"
                 android:type="radial" />
         </shape>
