@@ -3,4 +3,17 @@
 
     <!-- Actions -->
     <string name="action_sign_out">Sign out</string>
+    <string name="action_display_range">Display range</string>
+    <string name="action_show_one_day">1 day</string>
+    <string name="action_show_three_days">3 days</string>
+    <string name="action_show_week">Week</string>
+    <string name="action_today">Today</string>
+    <string name="action_show_cancelled">Show cancelled bookings</string>
+
+    <!-- BookingDetailsDialog -->
+    <string name="reject_booking">Reject</string>
+    <string name="cancel_booking">Cancel booking</string>
+    <string name="confirm_booking">Confirm</string>
+    <string name="msg_booking_failed">Sorry, booking could not be updated. Please try again later.</string>
+
 </resources>
