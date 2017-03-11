@@ -25,6 +25,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".ProviderDetailsActivity_"/>
+        <activity android:name=".ProviderEditActivity_"/>
 
         <meta-data
             android:name="app_entry_point"
