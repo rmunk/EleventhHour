@@ -7,4 +7,7 @@
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
 
+    <!-- ProviderFragment -->
+    <string name="msg_provider_location_selected">Selected location:\n%s</string>
+
 </resources>
