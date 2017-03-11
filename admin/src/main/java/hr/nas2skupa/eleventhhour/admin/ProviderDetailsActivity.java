@@ -2,14 +2,12 @@ package hr.nas2skupa.eleventhhour.admin;
 
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.support.annotation.Dimension;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.ColorUtils;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -24,11 +22,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -136,6 +132,13 @@ public class ProviderDetailsActivity extends AppCompatActivity implements OnMapR
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
         map.setBuildingsEnabled(true);
+        map.getUiSettings().setMapToolbarEnabled(false);
+        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                // Don't open Google maps
+            }
+        });
         int padding = toolbarLayout.getWidth() / 2 - 60;
         map.setPadding(padding, 0, padding, 0);
         try {
@@ -178,8 +181,7 @@ public class ProviderDetailsActivity extends AppCompatActivity implements OnMapR
                         ColorUtils.colorToHSL(ContextCompat.getColor(ProviderDetailsActivity.this, R.color.colorAccent), hsl);
                         map.addMarker(new MarkerOptions()
                                 .position(target)
-                                .icon(BitmapDescriptorFactory.defaultMarker(hsl[0]))
-                                .title(provider.getName()));
+                                .icon(BitmapDescriptorFactory.defaultMarker(hsl[0])));
                         map.animateCamera(CameraUpdateFactory.newLatLngZoom(target, 16));
                     }
                 }

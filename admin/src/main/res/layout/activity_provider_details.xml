@@ -32,11 +32,7 @@
                 android:layout_height="match_parent"
                 android:background="@android:color/darker_gray"
                 app:layout_collapseMode="parallax"
-                app:uiRotateGestures="false"
-                app:uiScrollGestures="false"
-                app:uiTiltGestures="false"
-                app:uiZoomControls="false"
-                app:uiZoomGestures="false"
+                app:liteMode="true"
                 tools:context=".ui.ProviderDetailsActivity" />
 
             <android.support.v7.widget.Toolbar
@@ -50,9 +46,10 @@
                 android:id="@+id/rating_holder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|left|start"
+                android:layout_gravity="bottom|start"
                 android:layout_marginBottom="8dp"
                 android:layout_marginLeft="32dp"
+                android:layout_marginStart="32dp"
                 android:orientation="horizontal"
                 app:layout_collapseMode="none">
 
