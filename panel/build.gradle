@@ -33,7 +33,7 @@ dependencies {
 
     compile "com.android.support:appcompat-v7:$supportLibraryVersion"
     compile "com.android.support:design:$supportLibraryVersion"
-    compile 'com.android.support.constraint:constraint-layout:1.0.0'
+    compile "com.android.support.constraint:constraint-layout:$constraintLayoutVersion"
 
     compile "com.firebaseui:firebase-ui-database:$firebaseUIVersion"
 

@@ -1,10 +1,7 @@
 package hr.nas2skupa.eleventhhour;
 
 import android.app.Application;
-import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
-import com.crashlytics.android.core.CrashlyticsCore;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.Interceptor;
@@ -14,8 +11,6 @@ import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
-
-import io.fabric.sdk.android.Fabric;
 
 
 /**
