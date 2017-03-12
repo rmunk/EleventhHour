@@ -11,13 +11,11 @@ import android.widget.EditText;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
-import com.firebase.geofire.LocationCallback;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,12 +29,13 @@ import org.androidannotations.annotations.Touch;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import hr.nas2skupa.eleventhhour.model.Category;
+import hr.nas2skupa.eleventhhour.model.Location;
 import hr.nas2skupa.eleventhhour.model.Provider;
 import hr.nas2skupa.eleventhhour.model.Subcategory;
-import hr.nas2skupa.eleventhhour.utils.StringUtils;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -55,7 +54,7 @@ public class ProviderFragment extends Fragment {
 
     @ViewById(R.id.txt_name) EditText txtName;
     @ViewById(R.id.txt_category) EditText txtCategory;
-    @ViewById(R.id.txt_subcategory) EditText txtSubcategory;
+    @ViewById(R.id.txt_subcategories) EditText txtSubcategories;
     @ViewById(R.id.txt_location) EditText txtLocation;
     @ViewById(R.id.txt_address) EditText txtAddress;
     @ViewById(R.id.txt_description) EditText txtDescription;
@@ -70,8 +69,7 @@ public class ProviderFragment extends Fragment {
     private boolean locationPickerStarted;
     private boolean pickingCategory;
     private boolean pickingSubcategory;
-    private LatLng providerLocation;
-    private Provider provider;
+    private Provider provider = new Provider();
     private DatabaseReference providersReference = FirebaseDatabase.getInstance().
             getReference().child("providers");
 
@@ -79,8 +77,11 @@ public class ProviderFragment extends Fragment {
     @AfterViews
     void loadProvider() {
         if (providerKey != null) {
-            providersReference.child(providerKey)
-                    .addListenerForSingleValueEvent(new ProviderChangedListener());
+            if (editable) {
+                providersReference.child(providerKey).addListenerForSingleValueEvent(new ProviderChangedListener());
+            } else {
+                providersReference.child(providerKey).addValueEventListener(new ProviderChangedListener());
+            }
         }
     }
 
@@ -120,8 +121,9 @@ public class ProviderFragment extends Fragment {
                                                     public void onClick(DialogInterface dialog, int which) {
                                                         provider.setCategory(categories.get(which));
                                                         provider.setSubcategory(null);
+                                                        provider.setSubcategories(null);
                                                         txtCategory.setText(categoryNames.get(which));
-                                                        txtSubcategory.setText(null);
+                                                        txtSubcategories.setText(null);
                                                     }
                                                 })
                                         .setPositiveButton("Pick", new DialogInterface.OnClickListener() {
@@ -144,7 +146,7 @@ public class ProviderFragment extends Fragment {
         return true;
     }
 
-    @Touch(R.id.txt_subcategory)
+    @Touch(R.id.txt_subcategories)
     boolean pickSubcategory() {
         if (pickingSubcategory) return true;
         pickingSubcategory = true;
@@ -158,30 +160,45 @@ public class ProviderFragment extends Fragment {
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 pickingSubcategory = false;
 
-                                final List<String> subcategories = new ArrayList<>();
-                                final List<String> subcategoryNames = new ArrayList<>();
                                 final Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                                final int cnt = (int) dataSnapshot.getChildrenCount();
+                                final String[] keys = new String[cnt];
+                                final String[] names = new String[cnt];
+                                final boolean[] checked = new boolean[cnt];
+
+                                int i = 0;
                                 for (DataSnapshot child : children) {
                                     Subcategory subcategory = child.getValue(Subcategory.class);
                                     if (subcategory != null) {
-                                        subcategories.add(child.getKey());
-                                        subcategoryNames.add(subcategory.getName());
+                                        keys[i] = child.getKey();
+                                        names[i] = subcategory.getName();
+                                        checked[i] = provider.getSubcategories() != null && provider.getSubcategories().containsKey(child.getKey());
+                                        i++;
                                     }
                                 }
+
                                 new AlertDialog.Builder(getContext())
                                         .setTitle("Pick subcategory")
-                                        .setSingleChoiceItems(subcategoryNames.toArray(new String[]{}), 0,
-                                                new DialogInterface.OnClickListener() {
+                                        .setMultiChoiceItems(names, checked,
+                                                new DialogInterface.OnMultiChoiceClickListener() {
                                                     @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        provider.setSubcategory(subcategories.get(which));
-                                                        txtSubcategory.setText(subcategoryNames.get(which));
+                                                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                                                        checked[which] = isChecked;
                                                     }
                                                 })
                                         .setPositiveButton("Pick", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
-
+                                                HashMap<String, Boolean> subcategories = new HashMap<>();
+                                                StringBuilder builder = new StringBuilder();
+                                                for (int j = 0; j < checked.length; j++) {
+                                                    if (checked[j]) {
+                                                        subcategories.put(keys[j], true);
+                                                        builder.append(names[j] + " ");
+                                                    }
+                                                }
+                                                provider.setSubcategories(subcategories);
+                                                txtSubcategories.setText(builder.toString());
                                             }
                                         })
                                         .setNegativeButton("Cancel", null)
@@ -227,8 +244,8 @@ public class ProviderFragment extends Fragment {
                     Place place = PlacePicker.getPlace(data, getContext());
                     String toastMsg = String.format(getString(R.string.msg_provider_location_selected), place.getName());
                     Snackbar.make(getView(), toastMsg, Snackbar.LENGTH_SHORT).show();
-                    providerLocation = place.getLatLng();
-                    txtLocation.setText(StringUtils.locationToDMS(providerLocation));
+                    provider.setLocation(new Location(place.getLatLng()));
+                    txtLocation.setText(provider.getLocation().toString());
                 }
                 break;
             case GOOGLE_PLAY_SERVICES_REPAIRABLE_REQUEST:
@@ -246,9 +263,6 @@ public class ProviderFragment extends Fragment {
         }
 
         provider.setName(txtName.getText().toString());
-        provider.setCategory(txtCategory.getText().toString());
-        provider.setSubcategory(txtSubcategory.getText().toString());
-        provider.setAddress(txtAddress.getText().toString());
         provider.setAddress(txtAddress.getText().toString());
         provider.setDescription(txtDescription.getText().toString());
         provider.setPhone(txtPhone.getText().toString());
@@ -257,22 +271,49 @@ public class ProviderFragment extends Fragment {
         provider.setHours(txtHours.getText().toString());
 
         if (providerKey != null) {
-            providersReference.updateChildren(provider.toMap());
+            providersReference.child(providerKey).updateChildren(provider.toMap());
         } else {
             providerKey = providersReference.push().getKey();
             providersReference.child(providerKey).setValue(provider);
         }
 
-        DatabaseReference ref = FirebaseDatabase.getInstance()
-                .getReference("geofire/providers")
+        FirebaseDatabase.getInstance().getReference()
+                .child("subcategories")
                 .child(provider.getCategory())
-                .child(provider.getSubcategory());
-        GeoFire geoFire = new GeoFire(ref);
-        geoFire.setLocation(providerKey, new GeoLocation(providerLocation.latitude, providerLocation.longitude));
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        final Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                        for (DataSnapshot child : children) {
+                            String key = child.getKey();
+
+                            // Update provider in each subcategory
+                            child.child("providers").child(providerKey).getRef()
+                                    .setValue(provider.getSubcategories().get(key));
+
+                            // Update provider location for each subcategory
+                            DatabaseReference ref = FirebaseDatabase.getInstance()
+                                    .getReference("geofire/providers")
+                                    .child(provider.getCategory());
+                            if (provider.getSubcategories().containsKey(key)) {
+                                final GeoLocation location = new GeoLocation(provider.getLocation().latitude, provider.getLocation().longitude);
+                                new GeoFire(ref.child(key)).setLocation(providerKey, location);
+                            } else {
+                                new GeoFire(ref.child(key)).removeLocation(providerKey);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 
-    private void bindToProvider(Provider provider) {
+    private void bindToProvider(final Provider provider) {
         txtName.setText(provider.getName());
+        if (provider.getLocation() != null) txtLocation.setText(provider.getLocation().toString());
         txtAddress.setText(provider.getAddress());
         txtDescription.setText(provider.getDescription());
         txtPhone.setText(provider.getPhone());
@@ -282,18 +323,8 @@ public class ProviderFragment extends Fragment {
 
         layoutName.setVisibility(editable ? View.VISIBLE : View.GONE);
         layoutLocation.setVisibility(editable ? View.VISIBLE : View.GONE);
-    }
 
-    private class ProviderChangedListener implements ValueEventListener {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            final Provider newProvider = dataSnapshot.getValue(Provider.class);
-            if (newProvider == null) return;
-
-            provider = newProvider;
-            provider.setKey(dataSnapshot.getKey());
-            bindToProvider(provider);
-
+        if (provider.getCategory() != null) {
             FirebaseDatabase.getInstance().getReference()
                     .child("categories")
                     .child(provider.getCategory())
@@ -311,18 +342,26 @@ public class ProviderFragment extends Fragment {
 
                         }
                     });
+        }
 
+        if (provider.getSubcategories() != null) {
             FirebaseDatabase.getInstance().getReference()
                     .child("subcategories")
                     .child(provider.getCategory())
-                    .child(provider.getSubcategory())
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            Subcategory subcategory = dataSnapshot.getValue(Subcategory.class);
-                            if (subcategory != null) {
-                                txtSubcategory.setText(subcategory.getName());
+                            String subcategories = "";
+                            int cnt = provider.getSubcategories().size();
+                            Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                            for (DataSnapshot child : children) {
+                                Subcategory subcategory = child.getValue(Subcategory.class);
+                                if (subcategory != null && provider.getSubcategories().containsKey(child.getKey())) {
+                                    subcategories += subcategory.getName();
+                                    if (--cnt > 0) subcategories += ", ";
+                                }
                             }
+                            txtSubcategories.setText(subcategories);
                         }
 
                         @Override
@@ -330,25 +369,18 @@ public class ProviderFragment extends Fragment {
 
                         }
                     });
+        }
+    }
 
-            GeoFire geoFire = new GeoFire(FirebaseDatabase.getInstance()
-                    .getReference("geofire/providers")
-                    .child(provider.getCategory())
-                    .child(provider.getSubcategory()));
-            geoFire.getLocation(providerKey, new LocationCallback() {
-                @Override
-                public void onLocationResult(String key, GeoLocation geoLocation) {
-                    if (geoLocation != null) {
-                        providerLocation = new LatLng(geoLocation.latitude, geoLocation.longitude);
-                        txtLocation.setText(StringUtils.locationToDMS(providerLocation));
-                    }
-                }
+    private class ProviderChangedListener implements ValueEventListener {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            final Provider newProvider = dataSnapshot.getValue(Provider.class);
+            if (newProvider == null) return;
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
+            provider = newProvider;
+            provider.setKey(dataSnapshot.getKey());
+            bindToProvider(provider);
         }
 
         @Override

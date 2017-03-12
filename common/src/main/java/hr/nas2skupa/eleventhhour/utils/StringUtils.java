@@ -2,8 +2,6 @@ package hr.nas2skupa.eleventhhour.utils;
 
 import android.content.Context;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import hr.nas2skupa.eleventhhour.common.R;
 import hr.nas2skupa.eleventhhour.model.BookingStatus;
 
@@ -29,51 +27,5 @@ public class StringUtils {
             default:
                 return context.getString(R.string.booking_status_unknown);
         }
-    }
-
-    public static String locationToDMS(LatLng location) {
-        String output, degrees, minutes, seconds, direction;
-
-        double decimal = location.latitude;
-
-        direction = "N";
-        if (decimal < 0) {
-            decimal *= -1;
-            direction = "S";
-        }
-
-        double mod = decimal % 1;
-        degrees = String.valueOf((int) decimal);
-
-        decimal = mod * 60;
-        mod = decimal % 1;
-        minutes = String.valueOf((int) decimal);
-
-        decimal = mod * 60;
-        seconds = String.valueOf((int) decimal);
-
-        output = degrees + "°" + minutes + "'" + seconds + "\"" + direction;
-
-        decimal = location.longitude;
-
-        direction = "E";
-        if (decimal < 0) {
-            decimal *= -1;
-            direction = "W";
-        }
-
-        mod = decimal % 1;
-        degrees = String.valueOf((int) decimal);
-
-        decimal = mod * 60;
-        mod = decimal % 1;
-        minutes = String.valueOf((int) decimal);
-
-        decimal = mod * 60;
-        seconds = String.valueOf((int) decimal);
-
-        output += " " + degrees + "°" + minutes + "'" + seconds + "\"" + direction;
-
-        return output;
     }
 }

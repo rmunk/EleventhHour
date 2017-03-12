@@ -59,10 +59,10 @@
                 android:layout_marginTop="8dp">
 
                 <EditText
-                    android:id="@+id/txt_subcategory"
+                    android:id="@+id/txt_subcategories"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Subcategory"
+                    android:hint="Subcategories"
                     android:inputType="textCapSentences|textPersonName"/>
             </android.support.design.widget.TextInputLayout>
 

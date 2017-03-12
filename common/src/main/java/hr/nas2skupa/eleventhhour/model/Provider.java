@@ -10,12 +10,14 @@ public class Provider {
     private String key;
     private String category;
     private String subcategory;
+    private HashMap<String, Boolean> subcategories;
 
     private String name;
     private float rating;
     private int ratingsCnt;
     private boolean sale;
 
+    private Location location;
     private String description;
     private String phone;
     private String address;
@@ -32,6 +34,8 @@ public class Provider {
     public Provider() {
     }
 
+
+    // Getters
     public String getKey() {
         return key;
     }
@@ -48,6 +52,10 @@ public class Provider {
         return subcategory;
     }
 
+    public HashMap<String, Boolean> getSubcategories() {
+        return subcategories;
+    }
+
     public String getName() {
         return name;
     }
@@ -62,6 +70,10 @@ public class Provider {
 
     public boolean isSale() {
         return sale;
+    }
+
+    public hr.nas2skupa.eleventhhour.model.Location getLocation() {
+        return location;
     }
 
     public String getDescription() {
@@ -92,12 +104,18 @@ public class Provider {
         return payment;
     }
 
+
+    // Setters
     public void setCategory(String category) {
         this.category = category;
     }
 
     public void setSubcategory(String subcategory) {
         this.subcategory = subcategory;
+    }
+
+    public void setSubcategories(HashMap<String, Boolean> subcategories) {
+        this.subcategories = subcategories;
     }
 
     public void setName(String name) {
@@ -114,6 +132,10 @@ public class Provider {
 
     public void setSale(boolean sale) {
         this.sale = sale;
+    }
+
+    public void setLocation(hr.nas2skupa.eleventhhour.model.Location location) {
+        this.location = location;
     }
 
     public void setDescription(String description) {
@@ -144,6 +166,7 @@ public class Provider {
         this.payment = payment;
     }
 
+
     // User related properties
     public boolean isFavorite() {
         return favorite;
@@ -166,8 +189,10 @@ public class Provider {
 
         providerMap.put("category", category);
         providerMap.put("subcategory", subcategory);
+        providerMap.put("subcategories", subcategories);
 
         providerMap.put("name", name);
+        providerMap.put("location", location);
         providerMap.put("address", address);
         providerMap.put("description", description);
         providerMap.put("phone", phone);
@@ -180,4 +205,5 @@ public class Provider {
         providerMap.put("sale", sale);
         return providerMap;
     }
+
 }

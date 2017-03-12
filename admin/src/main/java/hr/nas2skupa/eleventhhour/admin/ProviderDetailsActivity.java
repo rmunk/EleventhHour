@@ -15,9 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RatingBar;
 
-import com.firebase.geofire.GeoFire;
-import com.firebase.geofire.GeoLocation;
-import com.firebase.geofire.LocationCallback;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -167,30 +164,15 @@ public class ProviderDetailsActivity extends AppCompatActivity implements OnMapR
             toolbarLayout.setTitle(provider.getName());
             ratingBar.setRating(provider.getRating());
 
-            DatabaseReference ref = FirebaseDatabase.getInstance()
-                    .getReference("geofire/providers")
-                    .child(provider.getCategory())
-                    .child(provider.getSubcategory());
-            GeoFire geoFire = new GeoFire(ref);
-            geoFire.getLocation(providerKey, new LocationCallback() {
-                @Override
-                public void onLocationResult(String key, GeoLocation location) {
-                    if (map != null && location != null) {
-                        LatLng target = new LatLng(location.latitude, location.longitude);
-                        float[] hsl = new float[3];
-                        ColorUtils.colorToHSL(ContextCompat.getColor(ProviderDetailsActivity.this, R.color.colorAccent), hsl);
-                        map.addMarker(new MarkerOptions()
-                                .position(target)
-                                .icon(BitmapDescriptorFactory.defaultMarker(hsl[0])));
-                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(target, 16));
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
+            if (map != null && provider.getLocation() != null) {
+                LatLng target = new LatLng(provider.getLocation().latitude, provider.getLocation().longitude);
+                float[] hsl = new float[3];
+                ColorUtils.colorToHSL(ContextCompat.getColor(ProviderDetailsActivity.this, R.color.colorAccent), hsl);
+                map.addMarker(new MarkerOptions()
+                        .position(target)
+                        .icon(BitmapDescriptorFactory.defaultMarker(hsl[0])));
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(target, 16));
+            }
         }
 
         @Override
