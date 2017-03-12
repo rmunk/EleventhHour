@@ -28,9 +28,7 @@ import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.Touch;
 import org.androidannotations.annotations.ViewById;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import hr.nas2skupa.eleventhhour.model.Category;
 import hr.nas2skupa.eleventhhour.model.Location;
@@ -101,38 +99,50 @@ public class ProviderFragment extends Fragment {
                         new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                pickingCategory = false;
-
-                                final List<String> categories = new ArrayList<>();
-                                final List<String> categoryNames = new ArrayList<>();
                                 final Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                                final int cnt = (int) dataSnapshot.getChildrenCount();
+                                final String[] keys = new String[cnt];
+                                final String[] names = new String[cnt];
+                                final int[] selected = {0};
+
+                                int i = 0;
                                 for (DataSnapshot child : children) {
                                     Category category = child.getValue(Category.class);
                                     if (category != null) {
-                                        categories.add(child.getKey());
-                                        categoryNames.add(category.getName());
+                                        keys[i] = child.getKey();
+                                        names[i] = category.getName();
+                                        if (provider.getCategory().equals(keys[i])) selected[0] = i;
+                                        i++;
                                     }
                                 }
+
                                 new AlertDialog.Builder(getContext())
                                         .setTitle("Pick category")
-                                        .setSingleChoiceItems(categoryNames.toArray(new String[]{}), 0,
+                                        .setSingleChoiceItems(names, selected[0],
                                                 new DialogInterface.OnClickListener() {
                                                     @Override
                                                     public void onClick(DialogInterface dialog, int which) {
-                                                        provider.setCategory(categories.get(which));
-                                                        provider.setSubcategory(null);
-                                                        provider.setSubcategories(null);
-                                                        txtCategory.setText(categoryNames.get(which));
-                                                        txtSubcategories.setText(null);
+                                                        selected[0] = which;
                                                     }
                                                 })
                                         .setPositiveButton("Pick", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
+                                                pickingCategory = false;
 
+                                                provider.setCategory(keys[selected[0]]);
+                                                provider.setSubcategory(null);
+                                                provider.setSubcategories(null);
+                                                txtCategory.setText(names[selected[0]]);
+                                                txtSubcategories.setText(null);
                                             }
                                         })
-                                        .setNegativeButton("Cancel", null)
+                                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                pickingCategory = false;
+                                            }
+                                        })
                                         .create()
                                         .show();
                             }
@@ -158,8 +168,6 @@ public class ProviderFragment extends Fragment {
                         new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                pickingSubcategory = false;
-
                                 final Iterable<DataSnapshot> children = dataSnapshot.getChildren();
                                 final int cnt = (int) dataSnapshot.getChildrenCount();
                                 final String[] keys = new String[cnt];
@@ -189,6 +197,7 @@ public class ProviderFragment extends Fragment {
                                         .setPositiveButton("Pick", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
+                                                pickingSubcategory = false;
                                                 HashMap<String, Boolean> subcategories = new HashMap<>();
                                                 StringBuilder builder = new StringBuilder();
                                                 for (int j = 0; j < checked.length; j++) {
@@ -201,7 +210,12 @@ public class ProviderFragment extends Fragment {
                                                 txtSubcategories.setText(builder.toString());
                                             }
                                         })
-                                        .setNegativeButton("Cancel", null)
+                                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                pickingSubcategory = false;
+                                            }
+                                        })
                                         .create()
                                         .show();
                             }
