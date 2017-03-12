@@ -1,13 +1,14 @@
 package hr.nas2skupa.eleventhhour.admin;
 
+import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.ColorUtils;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -53,8 +54,8 @@ public class ProviderDetailsActivity extends AppCompatActivity implements OnMapR
 
     private DatabaseReference providerReference;
     private ValueEventListener providerListener;
-    private SupportMapFragment mapFragment;
     private GoogleMap map;
+    private Provider provider = new Provider();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -100,6 +101,19 @@ public class ProviderDetailsActivity extends AppCompatActivity implements OnMapR
 
     @OptionsItem(R.id.action_delete)
     void deleteProvider() {
+        new AlertDialog.Builder(this)
+                .setTitle(String.format(getString(R.string.provider_delete_title), provider.getName()))
+                .setMessage(String.format(getString(R.string.provider_delete_message), provider.getName()))
+                .setPositiveButton(getString(R.string.action_delete), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        providerReference.removeValue();
+                        onBackPressed();
+                    }
+                })
+                .setNegativeButton(R.string.action_cancel, null)
+                .create()
+                .show();
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -121,8 +135,7 @@ public class ProviderDetailsActivity extends AppCompatActivity implements OnMapR
 
     @AfterViews
     void initMap() {
-        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
     }
 
     @Override
@@ -159,7 +172,7 @@ public class ProviderDetailsActivity extends AppCompatActivity implements OnMapR
             Provider newProvider = dataSnapshot.getValue(Provider.class);
             if (newProvider == null) return;
 
-            final Provider provider = newProvider;
+            provider = newProvider;
             provider.setKey(dataSnapshot.getKey());
             toolbarLayout.setTitle(provider.getName());
             ratingBar.setRating(provider.getRating());
@@ -177,7 +190,7 @@ public class ProviderDetailsActivity extends AppCompatActivity implements OnMapR
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            Snackbar.make(layoutMain, "Failed to load provider.", Snackbar.LENGTH_LONG).show();
+
         }
     }
 }
