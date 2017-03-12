@@ -120,7 +120,9 @@ public class ProviderFragment extends Fragment {
                                     if (category != null) {
                                         keys[i] = child.getKey();
                                         names[i] = category.getName();
-                                        if (provider.getCategory().equals(keys[i])) selected[0] = i;
+                                        if (provider.getCategory() != null && provider.getCategory().equals(keys[i])) {
+                                            selected[0] = i;
+                                        }
                                         i++;
                                     }
                                 }
