@@ -47,7 +47,6 @@ public class ProviderEditActivity extends AppCompatActivity {
     }
 
     public void save(View view) {
-        providerFragment.saveProvider();
-        onBackPressed();
+        if (providerFragment.saveProvider()) onBackPressed();
     }
 }

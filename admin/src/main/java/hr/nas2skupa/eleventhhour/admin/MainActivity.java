@@ -1,5 +1,7 @@
 package hr.nas2skupa.eleventhhour.admin;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -34,6 +36,7 @@ import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.auth.SignInActivity;
 import hr.nas2skupa.eleventhhour.model.Provider;
+import hr.nas2skupa.eleventhhour.ui.helpers.DelayedProgressDialog;
 import hr.nas2skupa.eleventhhour.ui.helpers.SimpleDividerItemDecoration;
 import hr.nas2skupa.eleventhhour.utils.Utils;
 
@@ -48,25 +51,38 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
 
     private FirebaseRecyclerAdapter<Provider, ProviderViewHolder> adapter;
+    private ProgressDialog progressDialog;
+    private boolean authenticated;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        progressDialog = DelayedProgressDialog.show(this, null, getString(R.string.user_authenticating), 500l);
+        progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                if (!authenticated) signOut();
+            }
+        });
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseDatabase.getInstance()
                 .getReference("admins")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
+                        progressDialog.dismiss();
+                        progressDialog.cancel();
                         if (!dataSnapshot.hasChild(user.getUid())) {
-                            Toast.makeText(MainActivity.this, user.getDisplayName() + " is not EleventhHour administrator!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(MainActivity.this, String.format(getString(R.string.user_not_admin), user.getDisplayName()), Toast.LENGTH_LONG).show();
                             signOut();
-                        }
+                        } else authenticated = true;
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
+                        progressDialog.dismiss();
+                        progressDialog.cancel();
                         signOut();
                     }
                 });
@@ -107,9 +123,9 @@ public class MainActivity extends AppCompatActivity {
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                     ProviderDetailsActivity_.intent(MainActivity.this)
-                             .providerKey(getRef(position).getKey())
-                             .start();
+                        ProviderDetailsActivity_.intent(MainActivity.this)
+                                .providerKey(getRef(position).getKey())
+                                .start();
                     }
                 });
             }

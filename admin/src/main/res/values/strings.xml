@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">Eleventh Hour Admin</string>
 
+    <!-- Main Activity -->
+    <string name="user_not_admin">%s is not EleventhHour administrator!</string>
+    <string name="user_authenticating">Authenticating administrator</string>
+
     <!-- ProviderDetailsActivity -->
     <string name="action_cancel">Cancel</string>
     <string name="action_save">Save</string>
@@ -9,5 +13,10 @@
 
     <!-- ProviderFragment -->
     <string name="msg_provider_location_selected">Selected location:\n%s</string>
+    <string name="provider_error_name">You must give this provider a name</string>
+    <string name="provider_error_category">You must pick a category</string>
+    <string name="provider_error_subcategory">You must pick at least one subcategory</string>
+    <string name="provider_error_location">You must set your location</string>
+    <string name="provider_error_address">You must enter your address</string>
 
 </resources>

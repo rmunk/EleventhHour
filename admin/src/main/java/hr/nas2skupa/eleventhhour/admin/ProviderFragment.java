@@ -1,11 +1,13 @@
 package hr.nas2skupa.eleventhhour.admin;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 
@@ -34,6 +36,7 @@ import hr.nas2skupa.eleventhhour.model.Category;
 import hr.nas2skupa.eleventhhour.model.Location;
 import hr.nas2skupa.eleventhhour.model.Provider;
 import hr.nas2skupa.eleventhhour.model.Subcategory;
+import hr.nas2skupa.eleventhhour.ui.helpers.DelayedProgressDialog;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -62,11 +65,16 @@ public class ProviderFragment extends Fragment {
     @ViewById(R.id.txt_hours) EditText txtHours;
 
     @ViewById(R.id.layout_name) TextInputLayout layoutName;
+    @ViewById(R.id.layout_category) TextInputLayout layoutCategory;
+    @ViewById(R.id.layout_subcategories) TextInputLayout layoutSubcategories;
     @ViewById(R.id.layout_location) TextInputLayout layoutLocation;
+    @ViewById(R.id.layout_address) TextInputLayout layoutAddress;
 
     private boolean locationPickerStarted;
     private boolean pickingCategory;
     private boolean pickingSubcategory;
+    private ProgressDialog progressDialog;
+
     private Provider provider = new Provider();
     private DatabaseReference providersReference = FirebaseDatabase.getInstance().
             getReference().child("providers");
@@ -89,9 +97,10 @@ public class ProviderFragment extends Fragment {
     }
 
     @Touch(R.id.txt_category)
-    boolean pickCategory() {
-        if (pickingCategory) return true;
+    boolean pickCategory(View v, MotionEvent event) {
+        if (pickingCategory || event.getAction() != MotionEvent.ACTION_UP) return true;
         pickingCategory = true;
+        progressDialog = DelayedProgressDialog.show(getContext(), null, "Fetching categories", 500l);
 
         FirebaseDatabase.getInstance().getReference()
                 .child("categories")
@@ -115,6 +124,9 @@ public class ProviderFragment extends Fragment {
                                         i++;
                                     }
                                 }
+
+                                progressDialog.dismiss();
+                                progressDialog.cancel();
 
                                 new AlertDialog.Builder(getContext())
                                         .setTitle("Pick category")
@@ -157,10 +169,11 @@ public class ProviderFragment extends Fragment {
     }
 
     @Touch(R.id.txt_subcategories)
-    boolean pickSubcategory() {
-        if (pickingSubcategory) return true;
+    boolean pickSubcategory(View v, MotionEvent event) {
+        if (pickingSubcategory || event.getAction() != MotionEvent.ACTION_UP) return true;
         pickingSubcategory = true;
 
+        progressDialog = DelayedProgressDialog.show(getContext(), null, "Fetching subcategories", 500l);
         FirebaseDatabase.getInstance().getReference()
                 .child("subcategories")
                 .child(provider.getCategory())
@@ -184,6 +197,9 @@ public class ProviderFragment extends Fragment {
                                         i++;
                                     }
                                 }
+
+                                progressDialog.dismiss();
+                                progressDialog.cancel();
 
                                 new AlertDialog.Builder(getContext())
                                         .setTitle("Pick subcategory")
@@ -230,30 +246,40 @@ public class ProviderFragment extends Fragment {
     }
 
     @Touch(R.id.txt_location)
-    boolean editLocation() {
-        if (locationPickerStarted) return true;
+    boolean editLocation(View v, MotionEvent event) {
+        if (locationPickerStarted || event.getAction() != MotionEvent.ACTION_UP) return true;
+        startLocationPicker();
+        return true;
+    }
 
+    private void startLocationPicker() {
+        progressDialog = DelayedProgressDialog.show(getContext(), null, "Starting location picker", 500l);
         try {
             PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
             startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);
             locationPickerStarted = true;
+            progressDialog.dismiss();
+            progressDialog.cancel();
         } catch (GooglePlayServicesRepairableException e) {
             if (isAdded()) {
                 GoogleApiAvailability.getInstance().getErrorDialog(getActivity(), e.getConnectionStatusCode(), GOOGLE_PLAY_SERVICES_REPAIRABLE_REQUEST).show();
+                progressDialog.dismiss();
+                progressDialog.cancel();
             }
         } catch (GooglePlayServicesNotAvailableException e) {
             if (isAdded()) {
                 GoogleApiAvailability.getInstance().getErrorDialog(getActivity(), e.errorCode, GOOGLE_PLAY_SERVICES_NOT_AVAILABLE_REQUEST).show();
+                progressDialog.dismiss();
+                progressDialog.cancel();
             }
         }
-        return true;
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        locationPickerStarted = false;
 
         switch (requestCode) {
             case PLACE_PICKER_REQUEST:
+                locationPickerStarted = false;
                 if (resultCode == RESULT_OK) {
                     Place place = PlacePicker.getPlace(data, getContext());
                     String toastMsg = String.format(getString(R.string.msg_provider_location_selected), place.getName());
@@ -263,18 +289,40 @@ public class ProviderFragment extends Fragment {
                 }
                 break;
             case GOOGLE_PLAY_SERVICES_REPAIRABLE_REQUEST:
-                if (resultCode == RESULT_OK) editLocation();
+                if (resultCode == RESULT_OK) startLocationPicker();
                 break;
             case GOOGLE_PLAY_SERVICES_NOT_AVAILABLE_REQUEST:
                 break;
         }
     }
 
-    public void saveProvider() {
-        if (provider == null) {
-            if (providerKey == null) provider = new Provider();
-            else return;
+    private boolean validate() {
+        boolean valid = true;
+        if (txtName.getText().toString().isEmpty()) {
+            layoutName.setError(getString(R.string.provider_error_name));
+            valid = false;
         }
+        if (txtCategory.getText().toString().isEmpty()) {
+            layoutCategory.setError(getString(R.string.provider_error_category));
+            valid = false;
+        }
+        if (txtSubcategories.getText().toString().isEmpty()) {
+            layoutSubcategories.setError(getString(R.string.provider_error_subcategory));
+            valid = false;
+        }
+        if (txtLocation.getText().toString().isEmpty()) {
+            layoutLocation.setError(getString(R.string.provider_error_location));
+            valid = false;
+        }
+        if (txtAddress.getText().toString().isEmpty()) {
+            layoutAddress.setError(getString(R.string.provider_error_address));
+            valid = false;
+        }
+        return valid;
+    }
+
+    public boolean saveProvider() {
+        if (!validate()) return false;
 
         provider.setName(txtName.getText().toString());
         provider.setAddress(txtAddress.getText().toString());
@@ -323,6 +371,7 @@ public class ProviderFragment extends Fragment {
 
                     }
                 });
+        return true;
     }
 
     private void bindToProvider(final Provider provider) {
@@ -399,7 +448,7 @@ public class ProviderFragment extends Fragment {
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            Snackbar.make(getView(), "Failed to load provider.", Snackbar.LENGTH_LONG).show();
+
         }
     }
 }
