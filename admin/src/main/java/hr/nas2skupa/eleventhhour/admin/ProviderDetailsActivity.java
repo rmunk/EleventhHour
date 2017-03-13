@@ -1,6 +1,7 @@
 package hr.nas2skupa.eleventhhour.admin;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -87,6 +88,11 @@ public class ProviderDetailsActivity extends AppCompatActivity implements OnMapR
         super.onStop();
 
         providerReference.removeEventListener(providerListener);
+    }
+
+    @Override
+    public void onBackPressed() {
+        MainActivity_.intent(this).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK).start();
     }
 
     @OptionsItem(android.R.id.home)

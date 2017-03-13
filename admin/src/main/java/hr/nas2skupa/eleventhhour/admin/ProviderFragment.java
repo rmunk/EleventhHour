@@ -11,8 +11,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 
-import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.core.GeoHash;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -30,7 +30,9 @@ import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.Touch;
 import org.androidannotations.annotations.ViewById;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 import hr.nas2skupa.eleventhhour.model.Category;
 import hr.nas2skupa.eleventhhour.model.Location;
@@ -100,7 +102,7 @@ public class ProviderFragment extends Fragment {
     boolean pickCategory(View v, MotionEvent event) {
         if (pickingCategory || event.getAction() != MotionEvent.ACTION_UP) return true;
         pickingCategory = true;
-        progressDialog = DelayedProgressDialog.show(getContext(), null, "Fetching categories", 500l);
+        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_loading_categories), 500l);
 
         FirebaseDatabase.getInstance().getReference()
                 .child("categories")
@@ -175,7 +177,7 @@ public class ProviderFragment extends Fragment {
         if (pickingSubcategory || event.getAction() != MotionEvent.ACTION_UP) return true;
         pickingSubcategory = true;
 
-        progressDialog = DelayedProgressDialog.show(getContext(), null, "Fetching subcategories", 500l);
+        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_loading_subcategories), 500l);
         FirebaseDatabase.getInstance().getReference()
                 .child("subcategories")
                 .child(provider.getCategory())
@@ -255,7 +257,7 @@ public class ProviderFragment extends Fragment {
     }
 
     private void startLocationPicker() {
-        progressDialog = DelayedProgressDialog.show(getContext(), null, "Starting location picker", 500l);
+        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_starting_location_picker), 500l);
         try {
             PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
             startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);
@@ -323,8 +325,11 @@ public class ProviderFragment extends Fragment {
         return valid;
     }
 
-    public boolean saveProvider() {
-        if (!validate()) return false;
+    public void saveProvider(final SaveProviderListener listener) {
+        if (!validate()) {
+            listener.onProviderSavedListener(providerKey, false);
+            return;
+        }
 
         provider.setName(txtName.getText().toString());
         provider.setAddress(txtAddress.getText().toString());
@@ -334,13 +339,7 @@ public class ProviderFragment extends Fragment {
         provider.setEmail(txtEmail.getText().toString());
         provider.setHours(txtHours.getText().toString());
 
-        if (providerKey != null) {
-            providersReference.child(providerKey).updateChildren(provider.toMap());
-        } else {
-            providerKey = providersReference.push().getKey();
-            providersReference.child(providerKey).setValue(provider);
-        }
-
+        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_saving), 500l);
         FirebaseDatabase.getInstance().getReference()
                 .child("subcategories")
                 .child(provider.getCategory())
@@ -348,32 +347,57 @@ public class ProviderFragment extends Fragment {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         final Iterable<DataSnapshot> children = dataSnapshot.getChildren();
-                        for (DataSnapshot child : children) {
-                            String key = child.getKey();
+                        final HashMap<String, Object> childUpdates = new HashMap<>();
 
-                            // Update provider in each subcategory
-                            child.child("providers").child(providerKey).getRef()
-                                    .setValue(provider.getSubcategories().get(key));
+                        final GeoLocation location = new GeoLocation(provider.getLocation().latitude, provider.getLocation().longitude);
+                        GeoHash geoHash = new GeoHash(location);
+                        Map<String, Object> geoUpdates = new HashMap<>();
+                        geoUpdates.put(".priority", geoHash.getGeoHashString());
+                        geoUpdates.put("g", geoHash.getGeoHashString());
+                        geoUpdates.put("l", Arrays.asList(location.latitude, location.longitude));
 
-                            // Update provider location for each subcategory
-                            DatabaseReference ref = FirebaseDatabase.getInstance()
-                                    .getReference("geofire/providers")
-                                    .child(provider.getCategory());
-                            if (provider.getSubcategories().containsKey(key)) {
-                                final GeoLocation location = new GeoLocation(provider.getLocation().latitude, provider.getLocation().longitude);
-                                new GeoFire(ref.child(key)).setLocation(providerKey, location);
-                            } else {
-                                new GeoFire(ref.child(key)).removeLocation(providerKey);
-                            }
+                        if (providerKey == null) {
+                            providerKey = providersReference.push().getKey();
                         }
+
+                        childUpdates.put("/providers/" + providerKey, provider.toMap());
+
+                        for (DataSnapshot child : children) {
+                            String subcategory = child.getKey();
+                            boolean isInSubcategory = provider.getSubcategories().containsKey(subcategory);
+                            childUpdates.put(
+                                    String.format("/subcategories/%s/%s/providers/%s",
+                                            provider.getCategory(),
+                                            subcategory,
+                                            providerKey),
+                                    isInSubcategory ? true : null);
+                            childUpdates.put(
+                                    String.format("/geofire/providers/%s/%s/%s",
+                                            provider.getCategory(),
+                                            subcategory,
+                                            providerKey)
+                                    , isInSubcategory ? geoUpdates : null);
+                        }
+
+                        FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                listener.onProviderSavedListener(providerKey, databaseError == null);
+
+                                progressDialog.dismiss();
+                                progressDialog.cancel();
+                            }
+                        });
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
+                        listener.onProviderSavedListener(providerKey, false);
 
+                        progressDialog.dismiss();
+                        progressDialog.cancel();
                     }
                 });
-        return true;
     }
 
     private void bindToProvider(final Provider provider) {
@@ -452,5 +476,9 @@ public class ProviderFragment extends Fragment {
         public void onCancelled(DatabaseError databaseError) {
 
         }
+    }
+
+    public interface SaveProviderListener {
+        void onProviderSavedListener(String key, boolean saved);
     }
 }

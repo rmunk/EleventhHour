@@ -12,9 +12,16 @@
     <string name="provider_error_subcategory">You must pick at least one subcategory</string>
     <string name="provider_error_location">You must set your location</string>
     <string name="provider_error_address">You must enter your address</string>
+    <string name="msg_provider_starting_location_picker">Starting location picker</string>
+    <string name="msg_provider_loading_subcategories">Fetching subcategories</string>
+    <string name="msg_provider_loading_categories">Fetching categories</string>
+    <string name="msg_provider_saving">Saving provider</string>
 
     <!-- ProviderDetailsActivity -->
     <string name="provider_delete_title">Delete %s</string>
     <string name="provider_delete_message">Are you sure you want to delete %s</string>
+
+    <!-- ProviderEditActivity -->
+    <string name="msg_provider_save_failed">We couldn\'t save your changes. Please try again later.</string>
 
 </resources>

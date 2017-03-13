@@ -2,6 +2,7 @@ package hr.nas2skupa.eleventhhour.admin;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -46,7 +47,16 @@ public class ProviderEditActivity extends AppCompatActivity {
         onBackPressed();
     }
 
-    public void save(View view) {
-        if (providerFragment.saveProvider()) onBackPressed();
+    public void save(final View view) {
+        providerFragment.saveProvider(new ProviderFragment.SaveProviderListener() {
+            @Override
+            public void onProviderSavedListener(String key, boolean saved) {
+                if (saved) {
+                    ProviderDetailsActivity_.intent(ProviderEditActivity.this).providerKey(key).start();
+                } else {
+                    Snackbar.make(view, R.string.msg_provider_save_failed, Snackbar.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }
