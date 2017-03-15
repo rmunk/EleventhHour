@@ -2,6 +2,7 @@
     <string name="app_name">common</string>
 
     <!-- Actions -->
+    <string name="action_sign_out">Sign out</string>
     <string name="action_ok">OK</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_save">Save</string>

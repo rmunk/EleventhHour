@@ -1,11 +1,7 @@
 package hr.nas2skupa.eleventhhour.admin;
 
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,14 +14,9 @@ import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
@@ -36,7 +27,6 @@ import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.auth.SignInActivity;
 import hr.nas2skupa.eleventhhour.model.Provider;
-import hr.nas2skupa.eleventhhour.ui.helpers.DelayedProgressDialog;
 import hr.nas2skupa.eleventhhour.ui.helpers.SimpleDividerItemDecoration;
 import hr.nas2skupa.eleventhhour.utils.Utils;
 
@@ -51,42 +41,6 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
 
     private FirebaseRecyclerAdapter<Provider, ProviderViewHolder> adapter;
-    private ProgressDialog progressDialog;
-    private boolean authenticated;
-
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        progressDialog = DelayedProgressDialog.show(this, null, getString(R.string.user_authenticating), 500l);
-        progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                if (!authenticated) signOut();
-            }
-        });
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        FirebaseDatabase.getInstance()
-                .getReference("admins")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        progressDialog.dismiss();
-                        progressDialog.cancel();
-                        if (!dataSnapshot.hasChild(user.getUid())) {
-                            Toast.makeText(MainActivity.this, String.format(getString(R.string.user_not_admin), user.getDisplayName()), Toast.LENGTH_LONG).show();
-                            signOut();
-                        } else authenticated = true;
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        progressDialog.dismiss();
-                        progressDialog.cancel();
-                        signOut();
-                    }
-                });
-    }
 
     @Override
     public void onDestroy() {

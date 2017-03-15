@@ -20,13 +20,18 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity_"
-            android:screenOrientation="portrait">
+            android:name=".AuthActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="hr.nas2skupa.eleventhhour.admin.MAIN"/>
 
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".MainActivity_"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".ProviderDetailsActivity_"

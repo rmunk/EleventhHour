@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Eleventh Hour Admin</string>
 
-    <!-- Main Activity -->
+    <!-- AuthActivity -->
     <string name="user_not_admin">%s is not EleventhHour administrator!</string>
-    <string name="user_authenticating">Authenticating administrator</string>
+    <string name="checking_permissions">Checking permissions</string>
 
     <!-- ProviderFragment -->
     <string name="provider_name">Name</string>
