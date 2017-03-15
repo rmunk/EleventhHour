@@ -5,6 +5,11 @@
     <string name="user_not_admin">%s is not EleventhHour administrator!</string>
     <string name="checking_permissions">Checking permissions</string>
 
+    <!-- MainActivity -->
+    <string name="title_fragment_providers">Edit providers</string>
+    <string name="title_fragment_categories">Edit categories</string>
+    <string name="title_fragment_users">Edit users</string>
+
     <!-- ProviderFragment -->
     <string name="provider_name">Name</string>
     <string name="provider_category">Category</string>
@@ -39,5 +44,9 @@
     <string name="service_error_name">Service must have a name</string>
     <string name="service_error_duration">Please enter duration of service in minutes</string>
     <string name="service_error_price">Please enter price in correct format ($1,299.99 or 150 kn).</string>
+    <string name="menu_providers">Providers</string>
+    <string name="menu_categories">Categories</string>
+    <string name="menu_users">Users</string>
+    <string name="menu_sign_out">Sign out</string>
 
 </resources>

@@ -12,7 +12,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -46,7 +45,7 @@ import hr.nas2skupa.eleventhhour.model.Provider;
 
 @EActivity(R.layout.activity_provider_details)
 @OptionsMenu(R.menu.menu_provider_details)
-public class ProviderDetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class ProviderDetailsActivity extends DrawerActivity implements OnMapReadyCallback {
     @Extra String providerKey;
 
     @ViewById ViewGroup layoutMain;
@@ -125,6 +124,7 @@ public class ProviderDetailsActivity extends AppCompatActivity implements OnMapR
                 .setPositiveButton(getString(R.string.action_delete), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        // TODO: Remove provider from subcategories
                         providerReference.removeValue();
                         onBackPressed();
                     }

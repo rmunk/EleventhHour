@@ -11,6 +11,10 @@
     <string name="action_delete_title">Delete %s</string>
     <string name="action_delete_message">Are you sure you want to delete %s</string>
 
+    <!-- Navigation drawer -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
     <!-- BookingStatus -->
     <string name="booking_status_pending">Waiting confirmation</string>
     <string name="booking_status_confirmed">Confirmed︎</string>

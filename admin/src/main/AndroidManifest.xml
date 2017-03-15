@@ -31,7 +31,15 @@
         </activity>
         <activity
             android:name=".MainActivity_"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="hr.nas2skupa.eleventhhour.ACTION_PROVIDERS"/>
+                <action android:name="hr.nas2skupa.eleventhhour.ACTION_CATEGORIES"/>
+                <action android:name="hr.nas2skupa.eleventhhour.ACTION_USERS"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
         </activity>
         <activity
             android:name=".ProviderDetailsActivity_"
@@ -39,7 +47,8 @@
         <activity
             android:name=".ProviderEditActivity_"
             android:parentActivityName=".ProviderDetailsActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/MaterialTheme.Light.DarkToolbar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ProviderDetailsActivity"/>
