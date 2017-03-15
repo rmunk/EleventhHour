@@ -431,7 +431,7 @@ public class ProviderFragment extends Fragment {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             Category category = dataSnapshot.getValue(Category.class);
-                            if (category != null) {
+                            if (isAdded() && category != null) {
                                 txtCategory.setText(category.getName());
                             }
                         }
@@ -460,7 +460,7 @@ public class ProviderFragment extends Fragment {
                                     if (--cnt > 0) subcategories += ", ";
                                 }
                             }
-                            txtSubcategories.setText(subcategories);
+                            if (isAdded()) txtSubcategories.setText(subcategories);
                         }
 
                         @Override

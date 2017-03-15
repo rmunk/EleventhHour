@@ -2,6 +2,8 @@ package hr.nas2skupa.eleventhhour.utils;
 
 import android.content.Context;
 
+import java.util.Locale;
+
 import hr.nas2skupa.eleventhhour.common.R;
 import hr.nas2skupa.eleventhhour.model.BookingStatus;
 
@@ -27,5 +29,9 @@ public class StringUtils {
             default:
                 return context.getString(R.string.booking_status_unknown);
         }
+    }
+
+    public static String minutesToTime(int minutes) {
+        return String.format(Locale.getDefault(), "%d:%02d", minutes / 60, minutes % 60);
     }
 }

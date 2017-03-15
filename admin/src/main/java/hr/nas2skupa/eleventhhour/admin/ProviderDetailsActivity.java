@@ -7,8 +7,10 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.ColorUtils;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -32,6 +34,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.OptionsItem;
@@ -47,9 +50,12 @@ public class ProviderDetailsActivity extends AppCompatActivity implements OnMapR
     @Extra String providerKey;
 
     @ViewById ViewGroup layoutMain;
+    @ViewById AppBarLayout appBar;
     @ViewById CollapsingToolbarLayout toolbarLayout;
+    @ViewById NestedScrollView nestedScroll;
     @ViewById ViewGroup ratingHolder;
     @ViewById RatingBar ratingBar;
+    @ViewById FloatingActionButton fabServices;
 
     @DimensionPixelOffsetRes int appBarHeight;
 
@@ -92,7 +98,13 @@ public class ProviderDetailsActivity extends AppCompatActivity implements OnMapR
 
     @Override
     public void onBackPressed() {
-        MainActivity_.intent(this).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK).start();
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            appBar.setExpanded(true);
+            nestedScroll.setNestedScrollingEnabled(true);
+            super.onBackPressed();
+        } else {
+            MainActivity_.intent(this).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK).start();
+        }
     }
 
     @OptionsItem(android.R.id.home)
@@ -108,8 +120,8 @@ public class ProviderDetailsActivity extends AppCompatActivity implements OnMapR
     @OptionsItem(R.id.action_delete)
     void deleteProvider() {
         new AlertDialog.Builder(this)
-                .setTitle(String.format(getString(R.string.provider_delete_title), provider.getName()))
-                .setMessage(String.format(getString(R.string.provider_delete_message), provider.getName()))
+                .setTitle(String.format(getString(R.string.action_delete_title), provider.getName()))
+                .setMessage(String.format(getString(R.string.action_delete_message), provider.getName()))
                 .setPositiveButton(getString(R.string.action_delete), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -170,6 +182,19 @@ public class ProviderDetailsActivity extends AppCompatActivity implements OnMapR
         } catch (Resources.NotFoundException e) {
             Log.e("Map", "Can't find style. Error: ", e);
         }
+    }
+
+    @Click(R.id.fab_services)
+    void editServices(FloatingActionButton fab) {
+        appBar.setExpanded(false);
+        nestedScroll.setNestedScrollingEnabled(false);
+        ServicesFragment servicesFragment = ServicesFragment_.builder()
+                .providerKey(providerKey)
+                .build();
+        getSupportFragmentManager().beginTransaction()
+                .addToBackStack("ServicesFragment")
+                .replace(R.id.fragment_container, servicesFragment)
+                .commit();
     }
 
     private class ProviderChangedListener implements ValueEventListener {
