@@ -6,16 +6,27 @@
     <string name="user_authenticating">Authenticating administrator</string>
 
     <!-- ProviderFragment -->
-    <string name="msg_provider_location_selected">Selected location:\n%s</string>
+    <string name="provider_name">Name</string>
+    <string name="provider_category">Category</string>
+    <string name="provider_subcategories">Subcategories</string>
+    <string name="provider_location">Location</string>
+    <string name="provider_address">Address</string>
+    <string name="provider_description">Description</string>
+    <string name="provider_phone">Phone</string>
+    <string name="provider_web">Web</string>
+    <string name="provider_email">Email</string>
+    <string name="provider_hours">Hours</string>
     <string name="provider_error_name">You must give this provider a name</string>
     <string name="provider_error_category">You must pick a category</string>
     <string name="provider_error_subcategory">You must pick at least one subcategory</string>
     <string name="provider_error_location">You must set your location</string>
     <string name="provider_error_address">You must enter your address</string>
+    <string name="msg_provider_location_selected">Selected location:\n%s</string>
     <string name="msg_provider_starting_location_picker">Starting location picker</string>
     <string name="msg_provider_loading_subcategories">Fetching subcategories</string>
     <string name="msg_provider_loading_categories">Fetching categories</string>
     <string name="msg_provider_saving">Saving provider</string>
+    <string name="msg_pick_category_first">You must pick a category first</string>
 
     <!-- ProviderDetailsActivity -->
     <string name="provider_delete_title">Delete %s</string>

@@ -51,6 +51,7 @@ public class ProviderFragment extends Fragment {
     private static final int PLACE_PICKER_REQUEST = 1001;
     private static final int GOOGLE_PLAY_SERVICES_REPAIRABLE_REQUEST = 1002;
     private static final int GOOGLE_PLAY_SERVICES_NOT_AVAILABLE_REQUEST = 1003;
+    private static final long PROGRESS_DELAY = 500L;
 
     @FragmentArg String providerKey;
     @FragmentArg Boolean editable;
@@ -102,7 +103,7 @@ public class ProviderFragment extends Fragment {
     boolean pickCategory(View v, MotionEvent event) {
         if (pickingCategory || event.getAction() != MotionEvent.ACTION_UP) return true;
         pickingCategory = true;
-        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_loading_categories), 500l);
+        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_loading_categories), PROGRESS_DELAY);
 
         FirebaseDatabase.getInstance().getReference()
                 .child("categories")
@@ -173,11 +174,17 @@ public class ProviderFragment extends Fragment {
     }
 
     @Touch(R.id.txt_subcategories)
-    boolean pickSubcategory(View v, MotionEvent event) {
+    boolean pickSubcategory(View view, MotionEvent event) {
         if (pickingSubcategory || event.getAction() != MotionEvent.ACTION_UP) return true;
         pickingSubcategory = true;
 
-        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_loading_subcategories), 500l);
+        if (provider.getCategory() == null) {
+            Snackbar.make(view, R.string.msg_pick_category_first, Snackbar.LENGTH_SHORT).show();
+            pickingSubcategory = false;
+            return true;
+        }
+
+        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_loading_subcategories), 500L);
         FirebaseDatabase.getInstance().getReference()
                 .child("subcategories")
                 .child(provider.getCategory())
@@ -223,11 +230,14 @@ public class ProviderFragment extends Fragment {
                                                 for (int j = 0; j < checked.length; j++) {
                                                     if (checked[j]) {
                                                         subcategories.put(keys[j], true);
-                                                        builder.append(names[j] + " ");
+                                                        builder.append(names[j]).append(", ");
                                                     }
                                                 }
                                                 provider.setSubcategories(subcategories);
-                                                txtSubcategories.setText(builder.toString());
+                                                String txt = builder.toString();
+                                                if (txt.length() > 0) {
+                                                    txtSubcategories.setText(txt.substring(0, txt.length() - 2));
+                                                }
                                             }
                                         })
                                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -257,7 +267,7 @@ public class ProviderFragment extends Fragment {
     }
 
     private void startLocationPicker() {
-        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_starting_location_picker), 500l);
+        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_starting_location_picker), 500L);
         try {
             PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
             startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);
@@ -339,7 +349,7 @@ public class ProviderFragment extends Fragment {
         provider.setEmail(txtEmail.getText().toString());
         provider.setHours(txtHours.getText().toString());
 
-        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_saving), 500l);
+        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_saving), 500L);
         FirebaseDatabase.getInstance().getReference()
                 .child("subcategories")
                 .child(provider.getCategory())
