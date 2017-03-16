@@ -51,10 +51,10 @@ public class MainActivity extends DrawerActivity {
                 break;
             case ACTION_CATEGORIES:
                 toolbar.setTitle(R.string.title_fragment_categories);
-//                if (getSupportFragmentManager().findFragmentByTag("CalendarFragment") == null)
-//                    getSupportFragmentManager().beginTransaction()
-//                            .replace(R.id.fragment_container, CategoriesFragment_.builder().build(), "CategoriesFragment")
-//                            .commit();
+                if (getSupportFragmentManager().findFragmentByTag("CalendarFragment") == null)
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, CategoriesFragment_.builder().build(), "CategoriesFragment")
+                            .commit();
                 break;
             case ACTION_USERS:
                 toolbar.setTitle(R.string.title_fragment_users);

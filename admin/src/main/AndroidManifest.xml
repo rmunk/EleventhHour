@@ -53,6 +53,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ProviderDetailsActivity"/>
         </activity>
+        <activity
+            android:name=".CategoryActivity_"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme"/>
 
         <meta-data
             android:name="app_entry_point"

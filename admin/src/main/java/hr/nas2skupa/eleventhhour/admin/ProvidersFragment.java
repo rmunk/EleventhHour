@@ -6,6 +6,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
@@ -19,6 +20,7 @@ import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.model.Provider;
 import hr.nas2skupa.eleventhhour.ui.helpers.SimpleDividerItemDecoration;
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 
 /**
@@ -40,6 +42,7 @@ public class ProvidersFragment extends Fragment {
     public void init() {
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(manager);
+        recyclerView.setItemAnimator(new SlideInUpAnimator(new OvershootInterpolator(0.1f)));
         recyclerView.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();

@@ -39,6 +39,7 @@ dependencies {
     compile 'org.androidannotations:androidannotations-api:4.1.0'
     apt 'org.androidannotations:androidannotations:4.1.0'
 
+    compile 'jp.wasabeef:recyclerview-animators:2.2.4'
 
     testCompile 'junit:junit:4.12'
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
