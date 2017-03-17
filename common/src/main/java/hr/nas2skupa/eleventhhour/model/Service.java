@@ -13,6 +13,8 @@ public class Service {
     public Service() {
     }
 
+
+    // Getters
     public String getName() {
         return name;
     }
@@ -27,5 +29,23 @@ public class Service {
 
     public boolean isSale() {
         return sale;
+    }
+
+
+    // Setters
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public void setSale(boolean sale) {
+        this.sale = sale;
     }
 }

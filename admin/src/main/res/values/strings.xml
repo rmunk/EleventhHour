@@ -1,10 +1,52 @@
 <resources>
     <string name="app_name">Eleventh Hour Admin</string>
 
-    <!-- ProviderDetailsActivity -->
-    <string name="action_cancel">Cancel</string>
-    <string name="action_save">Save</string>
-    <string name="action_edit">Edit</string>
-    <string name="action_delete">Delete</string>
+    <!-- AuthActivity -->
+    <string name="user_not_admin">%s is not EleventhHour administrator!</string>
+    <string name="checking_permissions">Checking permissions</string>
+
+    <!-- MainActivity -->
+    <string name="title_fragment_providers">Edit providers</string>
+    <string name="title_fragment_categories">Edit categories</string>
+    <string name="title_fragment_users">Edit users</string>
+
+    <!-- ProviderFragment -->
+    <string name="provider_name">Name</string>
+    <string name="provider_category">Category</string>
+    <string name="provider_subcategories">Subcategories</string>
+    <string name="provider_location">Location</string>
+    <string name="provider_address">Address</string>
+    <string name="provider_description">Description</string>
+    <string name="provider_phone">Phone</string>
+    <string name="provider_web">Web</string>
+    <string name="provider_email">Email</string>
+    <string name="provider_hours">Hours</string>
+    <string name="provider_error_name">You must give this provider a name</string>
+    <string name="provider_error_category">You must pick a category</string>
+    <string name="provider_error_subcategory">You must pick at least one subcategory</string>
+    <string name="provider_error_location">You must set your location</string>
+    <string name="provider_error_address">You must enter your address</string>
+    <string name="msg_provider_location_selected">Selected location:\n%s</string>
+    <string name="msg_provider_starting_location_picker">Starting location picker</string>
+    <string name="msg_provider_loading_subcategories">Fetching subcategories</string>
+    <string name="msg_provider_loading_categories">Fetching categories</string>
+    <string name="msg_provider_saving">Saving provider</string>
+    <string name="msg_pick_category_first">You must pick a category first</string>
+
+    <!-- ProviderEditActivity -->
+    <string name="msg_provider_save_failed">We couldn\'t save your changes. Please try again later.</string>
+
+    <!-- ServiceDialog -->
+    <string name="service_name">Name</string>
+    <string name="service_price">Price</string>
+    <string name="service_duration">Duration in minutes</string>
+    <string name="service_sale">On sale</string>
+    <string name="service_error_name">Service must have a name</string>
+    <string name="service_error_duration">Please enter duration of service in minutes</string>
+    <string name="service_error_price">Please enter price in correct format ($1,299.99 or 150 kn).</string>
+    <string name="menu_providers">Providers</string>
+    <string name="menu_categories">Categories</string>
+    <string name="menu_users">Users</string>
+    <string name="menu_sign_out">Sign out</string>
 
 </resources>

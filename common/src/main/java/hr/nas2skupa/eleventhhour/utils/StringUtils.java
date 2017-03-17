@@ -1,7 +1,8 @@
 package hr.nas2skupa.eleventhhour.utils;
 
 import android.content.Context;
-import android.location.Location;
+
+import java.util.Locale;
 
 import hr.nas2skupa.eleventhhour.common.R;
 import hr.nas2skupa.eleventhhour.model.BookingStatus;
@@ -29,49 +30,8 @@ public class StringUtils {
                 return context.getString(R.string.booking_status_unknown);
         }
     }
-    public static String locationToDMS(Location location) {
-        String output, degrees, minutes, seconds, direction;
 
-        double decimal = location.getLatitude();
-
-        direction = "N";
-        if (decimal < 0) {
-            decimal *= -1;
-            direction = "S";
-        }
-
-        double mod = decimal % 1;
-        degrees = String.valueOf((int) decimal);
-
-        decimal = mod * 60;
-        mod = decimal % 1;
-        minutes = String.valueOf((int) decimal);
-
-        decimal = mod * 60;
-        seconds = String.valueOf((int) decimal);
-
-        output = degrees + "°" + minutes + "'" + seconds + "\"" + direction;
-
-        decimal = location.getLongitude();
-
-        direction = "E";
-        if (decimal < 0) {
-            decimal *= -1;
-            direction = "W";
-        }
-
-        mod = decimal % 1;
-        degrees = String.valueOf((int) decimal);
-
-        decimal = mod * 60;
-        mod = decimal % 1;
-        minutes = String.valueOf((int) decimal);
-
-        decimal = mod * 60;
-        seconds = String.valueOf((int) decimal);
-
-        output += " " + degrees + "°" + minutes + "'" + seconds + "\"" + direction;
-
-        return output;
+    public static String minutesToTime(int minutes) {
+        return String.format(Locale.getDefault(), "%d:%02d", minutes / 60, minutes % 60);
     }
 }

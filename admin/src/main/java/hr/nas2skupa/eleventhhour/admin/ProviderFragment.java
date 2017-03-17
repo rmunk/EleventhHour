@@ -1,26 +1,22 @@
 package hr.nas2skupa.eleventhhour.admin;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.location.Location;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
-import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
-import com.firebase.geofire.LocationCallback;
-import com.google.android.gms.common.ConnectionResult;
+import com.firebase.geofire.core.GeoHash;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -28,14 +24,21 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.androidannotations.annotations.Click;
+import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.Touch;
 import org.androidannotations.annotations.ViewById;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import hr.nas2skupa.eleventhhour.model.Category;
+import hr.nas2skupa.eleventhhour.model.Location;
 import hr.nas2skupa.eleventhhour.model.Provider;
-import hr.nas2skupa.eleventhhour.utils.StringUtils;
+import hr.nas2skupa.eleventhhour.model.Subcategory;
+import hr.nas2skupa.eleventhhour.ui.helpers.DelayedProgressDialog;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -44,13 +47,18 @@ import static android.app.Activity.RESULT_OK;
  */
 
 @EFragment(R.layout.fragment_provider)
-public class ProviderFragment extends Fragment implements GoogleApiClient.OnConnectionFailedListener {
-    private static final int PLACE_PICKER_REQUEST = 12345;
+public class ProviderFragment extends Fragment {
+    private static final int PLACE_PICKER_REQUEST = 1001;
+    private static final int GOOGLE_PLAY_SERVICES_REPAIRABLE_REQUEST = 1002;
+    private static final int GOOGLE_PLAY_SERVICES_NOT_AVAILABLE_REQUEST = 1003;
+    private static final long PROGRESS_DELAY = 500L;
 
     @FragmentArg String providerKey;
     @FragmentArg Boolean editable;
 
     @ViewById(R.id.txt_name) EditText txtName;
+    @ViewById(R.id.txt_category) EditText txtCategory;
+    @ViewById(R.id.txt_subcategories) EditText txtSubcategories;
     @ViewById(R.id.txt_location) EditText txtLocation;
     @ViewById(R.id.txt_address) EditText txtAddress;
     @ViewById(R.id.txt_description) EditText txtDescription;
@@ -60,42 +68,30 @@ public class ProviderFragment extends Fragment implements GoogleApiClient.OnConn
     @ViewById(R.id.txt_hours) EditText txtHours;
 
     @ViewById(R.id.layout_name) TextInputLayout layoutName;
+    @ViewById(R.id.layout_category) TextInputLayout layoutCategory;
+    @ViewById(R.id.layout_subcategories) TextInputLayout layoutSubcategories;
     @ViewById(R.id.layout_location) TextInputLayout layoutLocation;
+    @ViewById(R.id.layout_address) TextInputLayout layoutAddress;
 
-    private DatabaseReference providerReference;
-    private ValueEventListener providerListener;
-    private GoogleApiClient googleApiClient;
+    private boolean locationPickerStarted;
+    private boolean pickingCategory;
+    private boolean pickingSubcategory;
+    private ProgressDialog progressDialog;
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    private Provider provider = new Provider();
+    private DatabaseReference providersReference = FirebaseDatabase.getInstance().
+            getReference().child("providers");
 
-        providerReference = FirebaseDatabase.getInstance().getReference()
-                .child("providers")
-                .child(providerKey);
-        providerListener = new ProviderChangedListener();
 
-        googleApiClient = new GoogleApiClient
-                .Builder(getContext())
-                .addApi(Places.GEO_DATA_API)
-                .addApi(Places.PLACE_DETECTION_API)
-                .enableAutoManage(getActivity(), this)
-                .build();
-
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        providerReference.addValueEventListener(providerListener);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        providerReference.removeEventListener(providerListener);
+    @AfterViews
+    void loadProvider() {
+        if (providerKey != null) {
+            if (editable) {
+                providersReference.child(providerKey).addListenerForSingleValueEvent(new ProviderChangedListener());
+            } else {
+                providersReference.child(providerKey).addValueEventListener(new ProviderChangedListener());
+            }
+        }
     }
 
     @Touch(R.id.editing_shroud)
@@ -103,31 +99,320 @@ public class ProviderFragment extends Fragment implements GoogleApiClient.OnConn
         return !editable;
     }
 
-    @Click(R.id.txt_location)
-    void editLocation() {
-        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+    @Touch(R.id.txt_category)
+    boolean pickCategory(View v, MotionEvent event) {
+        if (pickingCategory || event.getAction() != MotionEvent.ACTION_UP) return true;
+        pickingCategory = true;
+        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_loading_categories), PROGRESS_DELAY);
 
-        try {
-            startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);
-        } catch (GooglePlayServicesRepairableException e) {
-            e.printStackTrace();
-        } catch (GooglePlayServicesNotAvailableException e) {
-            e.printStackTrace();
-        }
+        FirebaseDatabase.getInstance().getReference()
+                .child("categories")
+                .addListenerForSingleValueEvent(
+                        new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                final Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                                final int cnt = (int) dataSnapshot.getChildrenCount();
+                                final String[] keys = new String[cnt];
+                                final String[] names = new String[cnt];
+                                final int[] selected = {0};
+
+                                int i = 0;
+                                for (DataSnapshot child : children) {
+                                    Category category = child.getValue(Category.class);
+                                    if (category != null) {
+                                        keys[i] = child.getKey();
+                                        names[i] = category.getName();
+                                        if (provider.getCategory() != null && provider.getCategory().equals(keys[i])) {
+                                            selected[0] = i;
+                                        }
+                                        i++;
+                                    }
+                                }
+
+                                progressDialog.dismiss();
+                                progressDialog.cancel();
+
+                                new AlertDialog.Builder(getContext())
+                                        .setTitle("Pick category")
+                                        .setSingleChoiceItems(names, selected[0],
+                                                new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        selected[0] = which;
+                                                    }
+                                                })
+                                        .setPositiveButton("Pick", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                pickingCategory = false;
+
+                                                provider.setCategory(keys[selected[0]]);
+                                                provider.setSubcategory(null);
+                                                provider.setSubcategories(null);
+                                                txtCategory.setText(names[selected[0]]);
+                                                txtSubcategories.setText(null);
+                                            }
+                                        })
+                                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                pickingCategory = false;
+                                            }
+                                        })
+                                        .create()
+                                        .show();
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                pickingCategory = false;
+                            }
+                        }
+                );
+        return true;
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PLACE_PICKER_REQUEST) {
-            if (resultCode == RESULT_OK) {
-                Place place = PlacePicker.getPlace(data, getContext());
-                String toastMsg = String.format("Place: %s", place.getName());
-                Toast.makeText(getContext(), toastMsg, Toast.LENGTH_LONG).show();
+    @Touch(R.id.txt_subcategories)
+    boolean pickSubcategory(View view, MotionEvent event) {
+        if (pickingSubcategory || event.getAction() != MotionEvent.ACTION_UP) return true;
+        pickingSubcategory = true;
+
+        if (provider.getCategory() == null) {
+            Snackbar.make(view, R.string.msg_pick_category_first, Snackbar.LENGTH_SHORT).show();
+            pickingSubcategory = false;
+            return true;
+        }
+
+        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_loading_subcategories), 500L);
+        FirebaseDatabase.getInstance().getReference()
+                .child("subcategories")
+                .child(provider.getCategory())
+                .addListenerForSingleValueEvent(
+                        new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                final Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                                final int cnt = (int) dataSnapshot.getChildrenCount();
+                                final String[] keys = new String[cnt];
+                                final String[] names = new String[cnt];
+                                final boolean[] checked = new boolean[cnt];
+
+                                int i = 0;
+                                for (DataSnapshot child : children) {
+                                    Subcategory subcategory = child.getValue(Subcategory.class);
+                                    if (subcategory != null) {
+                                        keys[i] = child.getKey();
+                                        names[i] = subcategory.getName();
+                                        checked[i] = provider.getSubcategories() != null && provider.getSubcategories().containsKey(child.getKey());
+                                        i++;
+                                    }
+                                }
+
+                                progressDialog.dismiss();
+                                progressDialog.cancel();
+
+                                new AlertDialog.Builder(getContext())
+                                        .setTitle("Pick subcategory")
+                                        .setMultiChoiceItems(names, checked,
+                                                new DialogInterface.OnMultiChoiceClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                                                        checked[which] = isChecked;
+                                                    }
+                                                })
+                                        .setPositiveButton("Pick", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                pickingSubcategory = false;
+                                                HashMap<String, Boolean> subcategories = new HashMap<>();
+                                                StringBuilder builder = new StringBuilder();
+                                                for (int j = 0; j < checked.length; j++) {
+                                                    if (checked[j]) {
+                                                        subcategories.put(keys[j], true);
+                                                        builder.append(names[j]).append(", ");
+                                                    }
+                                                }
+                                                provider.setSubcategories(subcategories);
+                                                String txt = builder.toString();
+                                                if (txt.length() > 0) {
+                                                    txtSubcategories.setText(txt.substring(0, txt.length() - 2));
+                                                }
+                                            }
+                                        })
+                                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                pickingSubcategory = false;
+                                            }
+                                        })
+                                        .create()
+                                        .show();
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                pickingSubcategory = false;
+                            }
+                        }
+                );
+        return true;
+    }
+
+    @Touch(R.id.txt_location)
+    boolean editLocation(View v, MotionEvent event) {
+        if (locationPickerStarted || event.getAction() != MotionEvent.ACTION_UP) return true;
+        startLocationPicker();
+        return true;
+    }
+
+    private void startLocationPicker() {
+        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_starting_location_picker), 500L);
+        try {
+            PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+            startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);
+            locationPickerStarted = true;
+            progressDialog.dismiss();
+            progressDialog.cancel();
+        } catch (GooglePlayServicesRepairableException e) {
+            if (isAdded()) {
+                GoogleApiAvailability.getInstance().getErrorDialog(getActivity(), e.getConnectionStatusCode(), GOOGLE_PLAY_SERVICES_REPAIRABLE_REQUEST).show();
+                progressDialog.dismiss();
+                progressDialog.cancel();
+            }
+        } catch (GooglePlayServicesNotAvailableException e) {
+            if (isAdded()) {
+                GoogleApiAvailability.getInstance().getErrorDialog(getActivity(), e.errorCode, GOOGLE_PLAY_SERVICES_NOT_AVAILABLE_REQUEST).show();
+                progressDialog.dismiss();
+                progressDialog.cancel();
             }
         }
     }
 
-    private void bindToProvider(Provider provider) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        switch (requestCode) {
+            case PLACE_PICKER_REQUEST:
+                locationPickerStarted = false;
+                if (resultCode == RESULT_OK) {
+                    Place place = PlacePicker.getPlace(data, getContext());
+                    String toastMsg = String.format(getString(R.string.msg_provider_location_selected), place.getName());
+                    Snackbar.make(getView(), toastMsg, Snackbar.LENGTH_SHORT).show();
+                    provider.setLocation(new Location(place.getLatLng()));
+                    txtLocation.setText(provider.getLocation().toString());
+                }
+                break;
+            case GOOGLE_PLAY_SERVICES_REPAIRABLE_REQUEST:
+                if (resultCode == RESULT_OK) startLocationPicker();
+                break;
+            case GOOGLE_PLAY_SERVICES_NOT_AVAILABLE_REQUEST:
+                break;
+        }
+    }
+
+    private boolean validate() {
+        boolean valid = true;
+        if (txtName.getText().toString().isEmpty()) {
+            layoutName.setError(getString(R.string.provider_error_name));
+            valid = false;
+        }
+        if (txtCategory.getText().toString().isEmpty()) {
+            layoutCategory.setError(getString(R.string.provider_error_category));
+            valid = false;
+        }
+        if (txtSubcategories.getText().toString().isEmpty()) {
+            layoutSubcategories.setError(getString(R.string.provider_error_subcategory));
+            valid = false;
+        }
+        if (txtLocation.getText().toString().isEmpty()) {
+            layoutLocation.setError(getString(R.string.provider_error_location));
+            valid = false;
+        }
+        if (txtAddress.getText().toString().isEmpty()) {
+            layoutAddress.setError(getString(R.string.provider_error_address));
+            valid = false;
+        }
+        return valid;
+    }
+
+    public void saveProvider(final SaveProviderListener listener) {
+        if (!validate()) {
+            listener.onProviderSavedListener(providerKey, false);
+            return;
+        }
+
+        provider.setName(txtName.getText().toString());
+        provider.setAddress(txtAddress.getText().toString());
+        provider.setDescription(txtDescription.getText().toString());
+        provider.setPhone(txtPhone.getText().toString());
+        provider.setWeb(txtWeb.getText().toString());
+        provider.setEmail(txtEmail.getText().toString());
+        provider.setHours(txtHours.getText().toString());
+
+        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_saving), 500L);
+        FirebaseDatabase.getInstance().getReference()
+                .child("subcategories")
+                .child(provider.getCategory())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        final Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                        final HashMap<String, Object> childUpdates = new HashMap<>();
+
+                        final GeoLocation location = new GeoLocation(provider.getLocation().latitude, provider.getLocation().longitude);
+                        GeoHash geoHash = new GeoHash(location);
+                        Map<String, Object> geoUpdates = new HashMap<>();
+                        geoUpdates.put(".priority", geoHash.getGeoHashString());
+                        geoUpdates.put("g", geoHash.getGeoHashString());
+                        geoUpdates.put("l", Arrays.asList(location.latitude, location.longitude));
+
+                        if (providerKey == null) {
+                            providerKey = providersReference.push().getKey();
+                        }
+
+                        childUpdates.put("/providers/" + providerKey, provider.toMap());
+
+                        for (DataSnapshot child : children) {
+                            String subcategory = child.getKey();
+                            boolean isInSubcategory = provider.getSubcategories().containsKey(subcategory);
+                            childUpdates.put(
+                                    String.format("/subcategories/%s/%s/providers/%s",
+                                            provider.getCategory(),
+                                            subcategory,
+                                            providerKey),
+                                    isInSubcategory ? true : null);
+                            childUpdates.put(
+                                    String.format("/geofire/providers/%s/%s/%s",
+                                            provider.getCategory(),
+                                            subcategory,
+                                            providerKey)
+                                    , isInSubcategory ? geoUpdates : null);
+                        }
+
+                        FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                listener.onProviderSavedListener(providerKey, databaseError == null);
+
+                                progressDialog.dismiss();
+                                progressDialog.cancel();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        listener.onProviderSavedListener(providerKey, false);
+
+                        progressDialog.dismiss();
+                        progressDialog.cancel();
+                    }
+                });
+    }
+
+    private void bindToProvider(final Provider provider) {
         txtName.setText(provider.getName());
+        if (provider.getLocation() != null) txtLocation.setText(provider.getLocation().toString());
         txtAddress.setText(provider.getAddress());
         txtDescription.setText(provider.getDescription());
         txtPhone.setText(provider.getPhone());
@@ -137,11 +422,53 @@ public class ProviderFragment extends Fragment implements GoogleApiClient.OnConn
 
         layoutName.setVisibility(editable ? View.VISIBLE : View.GONE);
         layoutLocation.setVisibility(editable ? View.VISIBLE : View.GONE);
-    }
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        if (provider.getCategory() != null) {
+            FirebaseDatabase.getInstance().getReference()
+                    .child("categories")
+                    .child(provider.getCategory())
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Category category = dataSnapshot.getValue(Category.class);
+                            if (isAdded() && category != null) {
+                                txtCategory.setText(category.getName());
+                            }
+                        }
 
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+        }
+
+        if (provider.getSubcategories() != null) {
+            FirebaseDatabase.getInstance().getReference()
+                    .child("subcategories")
+                    .child(provider.getCategory())
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            String subcategories = "";
+                            int cnt = provider.getSubcategories().size();
+                            Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                            for (DataSnapshot child : children) {
+                                Subcategory subcategory = child.getValue(Subcategory.class);
+                                if (subcategory != null && provider.getSubcategories().containsKey(child.getKey())) {
+                                    subcategories += subcategory.getName();
+                                    if (--cnt > 0) subcategories += ", ";
+                                }
+                            }
+                            if (isAdded()) txtSubcategories.setText(subcategories);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+        }
     }
 
     private class ProviderChangedListener implements ValueEventListener {
@@ -150,36 +477,18 @@ public class ProviderFragment extends Fragment implements GoogleApiClient.OnConn
             final Provider newProvider = dataSnapshot.getValue(Provider.class);
             if (newProvider == null) return;
 
-            Provider provider = newProvider;
+            provider = newProvider;
             provider.setKey(dataSnapshot.getKey());
             bindToProvider(provider);
-
-            DatabaseReference ref = FirebaseDatabase.getInstance()
-                    .getReference("geofire/providers")
-                    .child(provider.getCategory())
-                    .child(provider.getSubcategory());
-            GeoFire geoFire = new GeoFire(ref);
-            geoFire.getLocation(providerKey, new LocationCallback() {
-                @Override
-                public void onLocationResult(String key, GeoLocation geoLocation) {
-                    if (geoLocation != null) {
-                        Location location = new Location("");
-                        location.setLatitude(geoLocation.latitude);
-                        location.setLongitude(geoLocation.longitude);
-                        txtLocation.setText(StringUtils.locationToDMS(location));
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
         }
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            Snackbar.make(getView(), "Failed to load provider.", Snackbar.LENGTH_LONG).show();
+
         }
+    }
+
+    public interface SaveProviderListener {
+        void onProviderSavedListener(String key, boolean saved);
     }
 }

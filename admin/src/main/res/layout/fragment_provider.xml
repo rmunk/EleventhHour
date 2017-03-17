@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/item_background"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ProviderFragment">
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="@color/item_background"
+             tools:context=".ProviderFragment">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -32,9 +32,38 @@
                     android:id="@+id/txt_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-                    android:hint="Name"
-                    android:inputType="textPersonName" />
+                    android:hint="@string/provider_name"
+                    android:inputType="textCapSentences|textPersonName"
+                    android:maxLines="2"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Display1"/>
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/layout_category"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+
+                <EditText
+                    android:id="@+id/txt_category"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/provider_category"
+                    android:inputType="textCapSentences|textPersonName"/>
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/layout_subcategories"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+
+                <EditText
+                    android:id="@+id/txt_subcategories"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/provider_subcategories"
+                    android:maxLines="5"/>
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -47,12 +76,11 @@
                     android:id="@+id/txt_location"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Location"
-                    android:maxLines="1"
-                    android:singleLine="true" />
+                    android:hint="@string/provider_location"/>
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
+                android:id="@+id/layout_address"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="8dp">
@@ -61,9 +89,9 @@
                     android:id="@+id/txt_address"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:editable="false"
-                    android:hint="Address"
-                    android:inputType="textPostalAddress" />
+                    android:hint="@string/provider_address"
+                    android:maxLines="2"
+                    android:inputType="textCapSentences|textPostalAddress"/>
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -76,8 +104,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
-                    android:hint="Description"
-                    android:inputType="textCapSentences|textMultiLine|textLongMessage" />
+                    android:hint="@string/provider_description"
+                    android:inputType="textCapSentences|textMultiLine|textLongMessage"/>
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -89,8 +117,8 @@
                     android:id="@+id/txt_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Phone"
-                    android:inputType="phone" />
+                    android:hint="@string/provider_phone"
+                    android:inputType="phone"/>
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -102,8 +130,8 @@
                     android:id="@+id/txt_web"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Web"
-                    android:inputType="textUri" />
+                    android:hint="@string/provider_web"
+                    android:inputType="textUri"/>
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -115,8 +143,8 @@
                     android:id="@+id/txt_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Email"
-                    android:inputType="textEmailAddress" />
+                    android:hint="@string/provider_email"
+                    android:inputType="textEmailAddress"/>
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -128,8 +156,8 @@
                     android:id="@+id/txt_hours"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Hours"
-                    android:inputType="time" />
+                    android:hint="@string/provider_hours"
+                    android:inputType="time"/>
             </android.support.design.widget.TextInputLayout>
         </LinearLayout>
     </ScrollView>

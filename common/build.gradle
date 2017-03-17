@@ -28,6 +28,7 @@ dependencies {
     })
     compile "com.android.support:appcompat-v7:$supportLibraryVersion"
     compile "com.android.support:recyclerview-v7:$supportLibraryVersion"
+    compile "com.android.support:design:$supportLibraryVersion"
 
     compile "com.google.android.gms:play-services-maps:$playServicesVersion"
     compile "com.google.android.gms:play-services-location:$playServicesVersion"
