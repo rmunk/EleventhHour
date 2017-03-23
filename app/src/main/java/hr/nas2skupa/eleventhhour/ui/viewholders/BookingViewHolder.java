@@ -43,9 +43,9 @@ public class BookingViewHolder extends RecyclerView.ViewHolder {
 
     public void bind(Context context, Booking booking) {
         this.booking = booking;
-        txtService.setText(booking.getServiceName());
+        txtService.setText(booking.serviceName);
         txtService.setEnabled(booking.getStatus() >= 0);
-        txtProvider.setText(booking.getProviderName());
+        txtProvider.setText(booking.providerName);
         txtTime.setText(booking.getTime());
         txtStatus.setText(StringUtils.printBookingStatus(context, booking.getStatus()));
     }

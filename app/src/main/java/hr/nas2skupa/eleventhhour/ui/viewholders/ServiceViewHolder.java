@@ -29,10 +29,10 @@ public class ServiceViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bindToService(final Service service) {
-        txtName.setText(service.getName());
-        imgSale.setVisibility(service.isSale() ? View.VISIBLE : View.GONE);
-        txtPrice.setText(service.getPrice());
-        String duration = String.format("%d:%02d", service.getDuration() / 60, service.getDuration() % 60);
+        txtName.setText(service.name);
+        imgSale.setVisibility(service.onSale ? View.VISIBLE : View.GONE);
+        txtPrice.setText(service.price);
+        String duration = String.format("%d:%02d", service.duration / 60, service.duration % 60);
         txtDuration.setText(duration);
     }
 }

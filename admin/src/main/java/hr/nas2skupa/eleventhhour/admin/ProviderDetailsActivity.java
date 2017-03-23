@@ -119,8 +119,8 @@ public class ProviderDetailsActivity extends DrawerActivity implements OnMapRead
     @OptionsItem(R.id.action_delete)
     void deleteProvider() {
         new AlertDialog.Builder(this)
-                .setTitle(String.format(getString(R.string.action_delete_title), provider.getName()))
-                .setMessage(String.format(getString(R.string.action_delete_message), provider.getName()))
+                .setTitle(String.format(getString(R.string.action_delete_title), provider.name))
+                .setMessage(String.format(getString(R.string.action_delete_message), provider.name))
                 .setPositiveButton(getString(R.string.action_delete), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -185,7 +185,7 @@ public class ProviderDetailsActivity extends DrawerActivity implements OnMapRead
     }
 
     @Click(R.id.fab_services)
-    void editServices(FloatingActionButton fab) {
+    void editServices() {
         appBar.setExpanded(false);
         nestedScroll.setNestedScrollingEnabled(false);
         ServicesFragment servicesFragment = ServicesFragment_.builder()
@@ -204,12 +204,12 @@ public class ProviderDetailsActivity extends DrawerActivity implements OnMapRead
             if (newProvider == null) return;
 
             provider = newProvider;
-            provider.setKey(dataSnapshot.getKey());
-            toolbarLayout.setTitle(provider.getName());
-            ratingBar.setRating(provider.getRating());
+            provider.key = dataSnapshot.getKey();
+            toolbarLayout.setTitle(provider.name);
+            ratingBar.setRating(provider.rating);
 
-            if (map != null && provider.getLocation() != null) {
-                LatLng target = new LatLng(provider.getLocation().latitude, provider.getLocation().longitude);
+            if (map != null && provider.location != null) {
+                LatLng target = new LatLng(provider.location.latitude, provider.location.longitude);
                 float[] hsl = new float[3];
                 ColorUtils.colorToHSL(ContextCompat.getColor(ProviderDetailsActivity.this, R.color.colorAccent), hsl);
                 map.addMarker(new MarkerOptions()

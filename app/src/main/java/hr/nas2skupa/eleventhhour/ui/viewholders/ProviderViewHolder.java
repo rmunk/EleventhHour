@@ -15,19 +15,17 @@ import hr.nas2skupa.eleventhhour.model.Provider;
  * Created by nas2skupa on 18/09/16.
  */
 public class ProviderViewHolder extends RecyclerView.ViewHolder {
-    ViewGroup layoutMain;
-    ViewGroup layoutList;
-
-    TextView txtProviderName;
-    ImageView imgFavorite;
-    ImageView imgSale;
-    RatingBar ratingIndicator;
-    TextView txtRatings;
-    TextView txtDistance;
+    private TextView txtProviderName;
+    private ImageView imgFavorite;
+    private ImageView imgSale;
+    private RatingBar ratingIndicator;
+    private TextView txtRatings;
+    private TextView txtDistance;
     public ImageView imgExpand;
 
-    View separator1;
-    ViewGroup viewDetails;
+    private View separator1;
+    private ViewGroup viewDetails;
+
     public TextView txtDescription;
     public TextView txtPhone;
     public TextView txtAddress;
@@ -40,9 +38,6 @@ public class ProviderViewHolder extends RecyclerView.ViewHolder {
 
     public ProviderViewHolder(final View itemView) {
         super(itemView);
-
-        layoutMain = (ViewGroup) itemView.findViewById(R.id.layout_main);
-        layoutList = (ViewGroup) itemView.findViewById(R.id.layout_list);
 
         txtProviderName = (TextView) itemView.findViewById(R.id.txt_provider_name);
         imgFavorite = (ImageView) itemView.findViewById(R.id.img_favorite);
@@ -63,24 +58,24 @@ public class ProviderViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bindToProvider(Provider provider) {
-        txtProviderName.setText(provider.getName());
-        imgSale.setVisibility(provider.isSale() ? View.VISIBLE : View.GONE);
-        imgFavorite.setVisibility(provider.isFavorite() ? View.VISIBLE : View.GONE);
-        ratingIndicator.setRating(provider.getRating());
-        txtRatings.setText(String.valueOf(provider.getRatingsCnt()));
+        txtProviderName.setText(provider.name);
+        imgSale.setVisibility(provider.hasSale ? View.VISIBLE : View.GONE);
+        imgFavorite.setVisibility(provider.favorite ? View.VISIBLE : View.GONE);
+        ratingIndicator.setRating(provider.rating);
+        txtRatings.setText(String.valueOf(provider.ratings));
 
-        txtDescription.setText(provider.getDescription());
+        txtDescription.setText(provider.description);
         txtDescription.setVisibility(txtDescription.getText().length() > 0 ? View.VISIBLE : View.GONE);
-        txtPhone.setText(provider.getPhone());
+        txtPhone.setText(provider.phone);
         txtPhone.setVisibility(txtPhone.getText().length() > 0 ? View.VISIBLE : View.GONE);
-        txtAddress.setText(provider.getAddress());
+        txtAddress.setText(provider.address);
         txtAddress.setVisibility(txtAddress.getText().length() > 0 ? View.VISIBLE : View.GONE);
         txtAddress.setSelected(true);
-        txtWeb.setText(provider.getWeb());
+        txtWeb.setText(provider.web);
         txtWeb.setVisibility(txtWeb.getText().length() > 0 ? View.VISIBLE : View.GONE);
-        txtEmail.setText(provider.getEmail());
+        txtEmail.setText(provider.email);
         txtEmail.setVisibility(txtEmail.getText().length() > 0 ? View.VISIBLE : View.GONE);
-        txtHours.setText(provider.getHours());
+        txtHours.setText(provider.hours);
         txtHours.setVisibility(txtHours.getText().length() > 0 ? View.VISIBLE : View.GONE);
 
         viewDetails.setVisibility(detailsVisible ? View.VISIBLE : View.GONE);

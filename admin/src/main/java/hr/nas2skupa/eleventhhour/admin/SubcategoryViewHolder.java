@@ -20,6 +20,6 @@ public class SubcategoryViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bindToSubcategory(Subcategory subcategory) {
-        titleView.setText(subcategory.getName());
+        titleView.setText(subcategory.getLocalName());
     }
 }

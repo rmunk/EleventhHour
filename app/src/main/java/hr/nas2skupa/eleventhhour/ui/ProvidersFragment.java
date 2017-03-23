@@ -133,7 +133,7 @@ public abstract class ProvidersFragment extends Fragment {
 
         if (item.isChecked()) dataRef = FirebaseDatabase.getInstance().getReference()
                 .child("providers")
-                .orderByChild("sale")
+                .orderByChild("hasSale")
                 .equalTo(true);
         else dataRef = FirebaseDatabase.getInstance().getReference().child("providers");
 
@@ -196,20 +196,20 @@ public abstract class ProvidersFragment extends Fragment {
         }
     }
 
-    public class ProvidersAdapter extends FirebaseIndexRecyclerAdapter<Provider, ProviderViewHolder> {
-        public int expandedPosition = -1;
+    private class ProvidersAdapter extends FirebaseIndexRecyclerAdapter<Provider, ProviderViewHolder> {
+        int expandedPosition = -1;
 
-        public ProvidersAdapter(Class<Provider> modelClass, int modelLayout, Class<ProviderViewHolder> viewHolderClass, Query keyRef, Query dataRef) {
+        ProvidersAdapter(Class<Provider> modelClass, int modelLayout, Class<ProviderViewHolder> viewHolderClass, Query keyRef, Query dataRef) {
             super(modelClass, modelLayout, viewHolderClass, keyRef, dataRef);
         }
 
         @Override
         protected void populateViewHolder(final ProviderViewHolder viewHolder, final Provider provider, final int position) {
-            provider.setKey(getRef(position).getKey());
+            provider.key = getRef(position).getKey();
 
-            provider.setFavorite(favorites.containsKey(provider.getKey())
-                    ? favorites.get(provider.getKey())
-                    : false);
+            provider.favorite = favorites.containsKey(provider.key)
+                    ? favorites.get(provider.key)
+                    : false;
 
             viewHolder.bindToProvider(provider);
 
@@ -231,11 +231,11 @@ public abstract class ProvidersFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                        providerPhone = provider.getPhone();
+                        providerPhone = provider.phone;
                         ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CALL_PHONE}, REQUEST_PHONE_PERMISSION);
                         return;
                     }
-                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + provider.getPhone()));
+                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + provider.phone));
                     if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
                         startActivity(intent);
                     }
@@ -244,7 +244,7 @@ public abstract class ProvidersFragment extends Fragment {
             viewHolder.txtWeb.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    String url = provider.getWeb();
+                    String url = provider.web;
                     if (!url.startsWith("http://") && !url.startsWith("https://"))
                         url = "http://" + url;
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -256,7 +256,7 @@ public abstract class ProvidersFragment extends Fragment {
             viewHolder.txtEmail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + provider.getEmail()));
+                    Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + provider.email));
                     if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
                         startActivity(Intent.createChooser(intent, "Email"));
                     }
@@ -266,7 +266,7 @@ public abstract class ProvidersFragment extends Fragment {
             viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ProviderActivity_.intent(getContext()).providerKey(provider.getKey()).start();
+                    ProviderActivity_.intent(getContext()).providerKey(provider.key).start();
                 }
             });
         }

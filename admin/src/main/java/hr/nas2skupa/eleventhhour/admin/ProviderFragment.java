@@ -122,8 +122,8 @@ public class ProviderFragment extends Fragment {
                                     Category category = child.getValue(Category.class);
                                     if (category != null) {
                                         keys[i] = child.getKey();
-                                        names[i] = category.getName();
-                                        if (provider.getCategory() != null && provider.getCategory().equals(keys[i])) {
+                                        names[i] = category.getLocalName();
+                                        if (provider.category != null && provider.category.equals(keys[i])) {
                                             selected[0] = i;
                                         }
                                         i++;
@@ -147,9 +147,8 @@ public class ProviderFragment extends Fragment {
                                             public void onClick(DialogInterface dialog, int which) {
                                                 pickingCategory = false;
 
-                                                provider.setCategory(keys[selected[0]]);
-                                                provider.setSubcategory(null);
-                                                provider.setSubcategories(null);
+                                                provider.category = keys[selected[0]];
+                                                provider.subcategories = null;
                                                 txtCategory.setText(names[selected[0]]);
                                                 txtSubcategories.setText(null);
                                             }
@@ -178,7 +177,7 @@ public class ProviderFragment extends Fragment {
         if (pickingSubcategory || event.getAction() != MotionEvent.ACTION_UP) return true;
         pickingSubcategory = true;
 
-        if (provider.getCategory() == null) {
+        if (provider.category == null) {
             Snackbar.make(view, R.string.msg_pick_category_first, Snackbar.LENGTH_SHORT).show();
             pickingSubcategory = false;
             return true;
@@ -187,7 +186,7 @@ public class ProviderFragment extends Fragment {
         progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_loading_subcategories), 500L);
         FirebaseDatabase.getInstance().getReference()
                 .child("subcategories")
-                .child(provider.getCategory())
+                .child(provider.category)
                 .addListenerForSingleValueEvent(
                         new ValueEventListener() {
                             @Override
@@ -203,8 +202,8 @@ public class ProviderFragment extends Fragment {
                                     Subcategory subcategory = child.getValue(Subcategory.class);
                                     if (subcategory != null) {
                                         keys[i] = child.getKey();
-                                        names[i] = subcategory.getName();
-                                        checked[i] = provider.getSubcategories() != null && provider.getSubcategories().containsKey(child.getKey());
+                                        names[i] = subcategory.getLocalName();
+                                        checked[i] = provider.subcategories != null && provider.subcategories.containsKey(child.getKey());
                                         i++;
                                     }
                                 }
@@ -233,7 +232,7 @@ public class ProviderFragment extends Fragment {
                                                         builder.append(names[j]).append(", ");
                                                     }
                                                 }
-                                                provider.setSubcategories(subcategories);
+                                                provider.subcategories = subcategories;
                                                 String txt = builder.toString();
                                                 if (txt.length() > 0) {
                                                     txtSubcategories.setText(txt.substring(0, txt.length() - 2));
@@ -295,11 +294,11 @@ public class ProviderFragment extends Fragment {
             case PLACE_PICKER_REQUEST:
                 locationPickerStarted = false;
                 if (resultCode == RESULT_OK) {
-                    Place place = PlacePicker.getPlace(data, getContext());
+                    Place place = PlacePicker.getPlace(getContext(), data);
                     String toastMsg = String.format(getString(R.string.msg_provider_location_selected), place.getName());
                     Snackbar.make(getView(), toastMsg, Snackbar.LENGTH_SHORT).show();
-                    provider.setLocation(new Location(place.getLatLng()));
-                    txtLocation.setText(provider.getLocation().toString());
+                    provider.location = new Location(place.getLatLng());
+                    txtLocation.setText(provider.location.toString());
                 }
                 break;
             case GOOGLE_PLAY_SERVICES_REPAIRABLE_REQUEST:
@@ -341,25 +340,25 @@ public class ProviderFragment extends Fragment {
             return;
         }
 
-        provider.setName(txtName.getText().toString());
-        provider.setAddress(txtAddress.getText().toString());
-        provider.setDescription(txtDescription.getText().toString());
-        provider.setPhone(txtPhone.getText().toString());
-        provider.setWeb(txtWeb.getText().toString());
-        provider.setEmail(txtEmail.getText().toString());
-        provider.setHours(txtHours.getText().toString());
+        provider.name = txtName.getText().toString();
+        provider.address = txtAddress.getText().toString();
+        provider.description = txtDescription.getText().toString();
+        provider.phone = txtPhone.getText().toString();
+        provider.web = txtWeb.getText().toString();
+        provider.email = txtEmail.getText().toString();
+        provider.hours = txtHours.getText().toString();
 
         progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_saving), 500L);
         FirebaseDatabase.getInstance().getReference()
                 .child("subcategories")
-                .child(provider.getCategory())
+                .child(provider.category)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         final Iterable<DataSnapshot> children = dataSnapshot.getChildren();
                         final HashMap<String, Object> childUpdates = new HashMap<>();
 
-                        final GeoLocation location = new GeoLocation(provider.getLocation().latitude, provider.getLocation().longitude);
+                        final GeoLocation location = new GeoLocation(provider.location.latitude, provider.location.longitude);
                         GeoHash geoHash = new GeoHash(location);
                         Map<String, Object> geoUpdates = new HashMap<>();
                         geoUpdates.put(".priority", geoHash.getGeoHashString());
@@ -374,16 +373,16 @@ public class ProviderFragment extends Fragment {
 
                         for (DataSnapshot child : children) {
                             String subcategory = child.getKey();
-                            boolean isInSubcategory = provider.getSubcategories().containsKey(subcategory);
+                            boolean isInSubcategory = provider.subcategories.containsKey(subcategory);
                             childUpdates.put(
                                     String.format("/subcategories/%s/%s/providers/%s",
-                                            provider.getCategory(),
+                                            provider.category,
                                             subcategory,
                                             providerKey),
                                     isInSubcategory ? true : null);
                             childUpdates.put(
                                     String.format("/geofire/providers/%s/%s/%s",
-                                            provider.getCategory(),
+                                            provider.category,
                                             subcategory,
                                             providerKey)
                                     , isInSubcategory ? geoUpdates : null);
@@ -411,28 +410,28 @@ public class ProviderFragment extends Fragment {
     }
 
     private void bindToProvider(final Provider provider) {
-        txtName.setText(provider.getName());
-        if (provider.getLocation() != null) txtLocation.setText(provider.getLocation().toString());
-        txtAddress.setText(provider.getAddress());
-        txtDescription.setText(provider.getDescription());
-        txtPhone.setText(provider.getPhone());
-        txtWeb.setText(provider.getWeb());
-        txtEmail.setText(provider.getEmail());
-        txtHours.setText(provider.getHours());
+        txtName.setText(provider.name);
+        if (provider.location != null) txtLocation.setText(provider.location.toString());
+        txtAddress.setText(provider.address);
+        txtDescription.setText(provider.description);
+        txtPhone.setText(provider.phone);
+        txtWeb.setText(provider.web);
+        txtEmail.setText(provider.email);
+        txtHours.setText(provider.hours);
 
         layoutName.setVisibility(editable ? View.VISIBLE : View.GONE);
         layoutLocation.setVisibility(editable ? View.VISIBLE : View.GONE);
 
-        if (provider.getCategory() != null) {
+        if (provider.category != null) {
             FirebaseDatabase.getInstance().getReference()
                     .child("categories")
-                    .child(provider.getCategory())
+                    .child(provider.category)
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             Category category = dataSnapshot.getValue(Category.class);
                             if (isAdded() && category != null) {
-                                txtCategory.setText(category.getName());
+                                txtCategory.setText(category.getLocalName());
                             }
                         }
 
@@ -443,20 +442,20 @@ public class ProviderFragment extends Fragment {
                     });
         }
 
-        if (provider.getSubcategories() != null) {
+        if (provider.subcategories != null) {
             FirebaseDatabase.getInstance().getReference()
                     .child("subcategories")
-                    .child(provider.getCategory())
+                    .child(provider.category)
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             String subcategories = "";
-                            int cnt = provider.getSubcategories().size();
+                            int cnt = provider.subcategories.size();
                             Iterable<DataSnapshot> children = dataSnapshot.getChildren();
                             for (DataSnapshot child : children) {
                                 Subcategory subcategory = child.getValue(Subcategory.class);
-                                if (subcategory != null && provider.getSubcategories().containsKey(child.getKey())) {
-                                    subcategories += subcategory.getName();
+                                if (subcategory != null && provider.subcategories.containsKey(child.getKey())) {
+                                    subcategories += subcategory.getLocalName();
                                     if (--cnt > 0) subcategories += ", ";
                                 }
                             }
@@ -478,7 +477,7 @@ public class ProviderFragment extends Fragment {
             if (newProvider == null) return;
 
             provider = newProvider;
-            provider.setKey(dataSnapshot.getKey());
+            provider.key = dataSnapshot.getKey();
             bindToProvider(provider);
         }
 
@@ -488,6 +487,7 @@ public class ProviderFragment extends Fragment {
         }
     }
 
+    @SuppressWarnings("WeakerAccess")
     public interface SaveProviderListener {
         void onProviderSavedListener(String key, boolean saved);
     }

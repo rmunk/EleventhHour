@@ -3,6 +3,7 @@ package hr.nas2skupa.eleventhhour.admin;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
@@ -61,6 +62,7 @@ public class ServiceDialog extends DialogFragment implements DialogInterface.OnS
         serviceReference.addListenerForSingleValueEvent(new ServiceListener());
     }
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         view = getActivity().getLayoutInflater().inflate(R.layout.dialog_service, null);
@@ -75,8 +77,8 @@ public class ServiceDialog extends DialogFragment implements DialogInterface.OnS
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     new AlertDialog.Builder(getContext())
-                            .setTitle(String.format(getString(R.string.action_delete_title), service.getName()))
-                            .setMessage(String.format(getString(R.string.action_delete_message), service.getName()))
+                            .setTitle(String.format(getString(R.string.action_delete_title), service.name))
+                            .setMessage(String.format(getString(R.string.action_delete_message), service.name))
                             .setPositiveButton(getString(R.string.action_delete), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -131,10 +133,10 @@ public class ServiceDialog extends DialogFragment implements DialogInterface.OnS
             public void onClick(View view) {
                 if (!validate()) return;
 
-                service.setName(txtName.getText().toString());
-                service.setDuration(Integer.parseInt(txtDuration.getText().toString()));
-                service.setPrice(txtPrice.getText().toString());
-                service.setSale(chkSale.isChecked());
+                service.name = txtName.getText().toString();
+                service.duration = Integer.parseInt(txtDuration.getText().toString());
+                service.price = txtPrice.getText().toString();
+                service.onSale = chkSale.isChecked();
 
                 DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("services").child(providerKey);
                 if (serviceKey == null) serviceKey = ref.push().getKey();
@@ -150,10 +152,10 @@ public class ServiceDialog extends DialogFragment implements DialogInterface.OnS
             service = dataSnapshot.getValue(Service.class);
 
             if (service != null) {
-                txtName.setText(service.getName());
-                txtDuration.setText(String.valueOf(service.getDuration()));
-                txtPrice.setText(service.getPrice());
-                chkSale.setChecked(service.isSale());
+                txtName.setText(service.name);
+                txtDuration.setText(String.valueOf(service.duration));
+                txtPrice.setText(service.price);
+                chkSale.setChecked(service.onSale);
             }
         }
 

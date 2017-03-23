@@ -47,6 +47,7 @@
     <!-- BookingDetailsDialog -->
     <string name="cancel_booking">Cancel booking</string>
     <string name="tap_for_directions">Tap me for directions!</string>
+    <string name="booking_provider_error">Ups, we couldn\'t find %s location.</string>
 
     <!-- ProviderActivity -->
     <string name="provider_removed">Provider %s is no longer available!</string>

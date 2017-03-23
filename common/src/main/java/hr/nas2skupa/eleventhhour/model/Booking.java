@@ -13,22 +13,23 @@ import java.util.Map;
  */
 
 public class Booking {
-    private String key;
+    @Exclude public String key;
 
-    private String userId;
-    private String providerId;
-    private String serviceId;
+    public String userId;
+    public String providerId;
+    public String serviceId;
 
-    private String userName;
-    private String providerName;
-    private String serviceName;
-    private String price;
-    private long from;
-    private long to;
-    private String note;
+    public String userName;
+    public String providerName;
+    public String serviceName;
+
+    public String price;
+    public long from;
+    public long to;
+    public String note;
 
     @BookingStatus
-    private int status = BookingStatus.PENDING;
+    public int status = BookingStatus.PENDING;
 
     public Booking() {
     }
@@ -46,90 +47,41 @@ public class Booking {
         this.note = note;
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public String getProviderId() {
-        return providerId;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public String getProviderName() {
-        return providerName;
-    }
-
-    public String getServiceName() {
-        return serviceName;
-    }
-
-    public String getPrice() {
-        return price;
-    }
-
-    public String getServiceId() {
-        return serviceId;
-    }
-
-    public long getFrom() {
-        return from;
-    }
-
-    public long getTo() {
-        return to;
-    }
-
+    @Exclude
     public String getTime() {
         SimpleDateFormat format = new SimpleDateFormat("HH:mm", Locale.getDefault());
         return String.format(Locale.getDefault(), "%s - %s", format.format(from), format.format(to));
     }
 
-    public String getNote() {
-        return note;
-    }
-
+    @Exclude
     @BookingStatus
     public int getStatus() {
-        if (getTo() > new Date().getTime()) return status;
+        if (to > new Date().getTime()) return status;
         else return BookingStatus.FINISHED;
-    }
-
-    public void setStatus(@BookingStatus int status) {
-        this.status = status;
     }
 
     @Exclude
     public Map<String, Object> toMap() {
-        HashMap<String, Object> result = new HashMap<>();
-        result.put("userId", userId);
-        result.put("providerId", providerId);
-        result.put("serviceId", serviceId);
-        result.put("from", from);
-        result.put("userName", userName);
-        result.put("providerName", providerName);
-        result.put("serviceName", serviceName);
-        result.put("price", price);
-        result.put("to", to);
-        result.put("note", note);
-        result.put("status", status);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("providerId", providerId);
+        map.put("serviceId", serviceId);
 
-        return result;
+        map.put("userName", userName);
+        map.put("providerName", providerName);
+        map.put("serviceName", serviceName);
+
+        map.put("price", price);
+        map.put("from", from);
+        map.put("to", to);
+        map.put("note", note);
+
+        map.put("status", status);
+        return map;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Booking) return ((Booking) obj).getKey().equals(key);
-        return false;
+        return this == obj || obj instanceof Booking && key != null && key.equals(((Booking) obj).key);
     }
 }

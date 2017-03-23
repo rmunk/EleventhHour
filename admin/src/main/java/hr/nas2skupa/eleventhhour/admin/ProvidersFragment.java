@@ -55,12 +55,12 @@ public class ProvidersFragment extends Fragment {
             @Override
             protected void populateViewHolder(final ProviderViewHolder viewHolder, final Provider model, int position) {
                 viewHolder.bindToProvider(model);
-                model.setKey(getRef(position).getKey());
+                model.key = getRef(position).getKey();
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         ProviderDetailsActivity_.intent(getContext())
-                                .providerKey(model.getKey())
+                                .providerKey(model.key)
                                 .start();
                     }
                 });

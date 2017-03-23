@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.animation.OvershootInterpolator;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
@@ -19,19 +20,17 @@ import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.model.Service;
 import hr.nas2skupa.eleventhhour.ui.helpers.SimpleDividerItemDecoration;
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 @EFragment(R.layout.fragment_services)
 public class ServicesFragment extends Fragment {
-    @FragmentArg
-    String providerKey;
+    @FragmentArg String providerKey;
 
-    @ViewById(R.id.recycler_view)
-    RecyclerView recyclerView;
+    @ViewById RecyclerView recyclerView;
 
-    private String serviceKey;
     private FirebaseRecyclerAdapter<Service, ServiceViewHolder> adapter;
 
     public ServicesFragment() {
@@ -49,33 +48,12 @@ public class ServicesFragment extends Fragment {
     public void init() {
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(manager);
+        recyclerView.setItemAnimator(new SlideInUpAnimator(new OvershootInterpolator(0.1f)));
         recyclerView.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         Query query = database.child("services").child(providerKey).orderByChild("name");
-        adapter = new FirebaseRecyclerAdapter<Service, ServiceViewHolder>(
-                Service.class,
-                R.layout.item_service,
-                ServiceViewHolder.class,
-                query) {
-            @Override
-            protected void populateViewHolder(final ServiceViewHolder viewHolder, final Service model, final int position) {
-                viewHolder.bindToService(model);
-                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        final DatabaseReference categoryRef = getRef(position);
-                        serviceKey = categoryRef.getKey();
-                        ServiceDialog_.builder()
-                                .providerKey(providerKey)
-                                .serviceKey(serviceKey)
-                                .build()
-                                .show(getFragmentManager(), "ServiceDialog");
-
-                    }
-                });
-            }
-        };
+        adapter = new ServicesAdapter(Service.class, R.layout.item_service, ServiceViewHolder.class, query);
         recyclerView.setAdapter(adapter);
     }
 
@@ -86,5 +64,27 @@ public class ServicesFragment extends Fragment {
                 .serviceKey(null)
                 .build()
                 .show(getFragmentManager(), "ServiceDialog");
+    }
+
+    private class ServicesAdapter extends FirebaseRecyclerAdapter<Service, ServiceViewHolder> {
+        public ServicesAdapter(Class<Service> modelClass, int modelLayout, Class<ServiceViewHolder> viewHolderClass, Query ref) {
+            super(modelClass, modelLayout, viewHolderClass, ref);
+        }
+
+        @Override
+        protected void populateViewHolder(ServiceViewHolder viewHolder, final Service model, int position) {
+            viewHolder.bindToService(model);
+            model.key = getRef(position).getKey();
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ServiceDialog_.builder()
+                            .providerKey(providerKey)
+                            .serviceKey(model.key)
+                            .build()
+                            .show(getFragmentManager(), "ServiceDialog");
+                }
+            });
+        }
     }
 }
