@@ -1,7 +1,9 @@
 package hr.nas2skupa.eleventhhour.panel;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
@@ -75,7 +77,9 @@ public class BookingDetailsDialog extends DialogFragment {
 
     }
 
+    @NonNull
     @Override
+    @SuppressLint("InflateParams")
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         final LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -105,33 +109,33 @@ public class BookingDetailsDialog extends DialogFragment {
 
     @Click(R.id.btn_confirm_booking)
     void confirmBooking() {
-        booking.setStatus(BookingStatus.PROVIDER_ACCEPTED);
+        booking.status = BookingStatus.PROVIDER_ACCEPTED;
         saveBooking();
         dismiss();
     }
 
     @Click(R.id.btn_reject_booking)
     void rejectBooking() {
-        booking.setStatus(BookingStatus.PROVIDER_REJECTED);
+        booking.status = BookingStatus.PROVIDER_REJECTED;
         saveBooking();
         dismiss();
     }
 
     @Click(R.id.btn_cancel_booking)
     void cancelBooking() {
-        booking.setStatus(BookingStatus.PROVIDER_CANCELED);
+        booking.status = BookingStatus.PROVIDER_CANCELED;
         saveBooking();
         dismiss();
     }
 
     private void saveBooking() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        String key = booking.getKey();
+        String key = booking.key;
         Map<String, Object> bookingValues = booking.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/bookings/" + booking.getProviderId() + "/" + key, bookingValues);
-        childUpdates.put("/users/" + booking.getUserId() + "/bookings/" + key, bookingValues);
+        childUpdates.put("/bookings/" + booking.providerId + "/" + key, bookingValues);
+        childUpdates.put("/users/" + booking.userId + "/bookings/" + key, bookingValues);
         reference.updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
@@ -149,14 +153,14 @@ public class BookingDetailsDialog extends DialogFragment {
             booking = dataSnapshot.getValue(Booking.class);
 
             if (booking != null) {
-                booking.setKey(dataSnapshot.getKey());
-                txtBookingService.setText(booking.getServiceName());
-                txtBookingUser.setText(booking.getUserName());
+                booking.key = dataSnapshot.getKey();
+                txtBookingService.setText(booking.serviceName);
+                txtBookingUser.setText(booking.userName);
                 txtBookingTime.setText(booking.getTime());
                 txtBookingStatus.setText(StringUtils.printBookingStatus(getContext(), booking.getStatus()));
-                txtBookingPrice.setText(booking.getPrice());
-                txtBookingNote.setText(booking.getNote());
-                txtBookingNote.setVisibility(booking.getNote().isEmpty() ? View.GONE : View.VISIBLE);
+                txtBookingPrice.setText(booking.price);
+                txtBookingNote.setText(booking.note);
+                txtBookingNote.setVisibility(booking.note.isEmpty() ? View.GONE : View.VISIBLE);
 
                 if (booking.getStatus() == BookingStatus.PENDING) {
                     btnConfirmBooking.setVisibility(View.VISIBLE);

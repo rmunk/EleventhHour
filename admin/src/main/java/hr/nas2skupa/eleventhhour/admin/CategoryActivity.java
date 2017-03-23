@@ -93,15 +93,15 @@ public class CategoryActivity extends DrawerActivity {
 
             int color;
             try {
-                color = Color.parseColor(category.getColor());
+                color = Color.parseColor(category.color);
             } catch (Exception e) {
                 color = ContextCompat.getColor(CategoryActivity.this, R.color.colorPrimary);
             }
 
-            txtCategoryName.setText(category.getName());
+            txtCategoryName.setText(category.getLocalName());
             appBar.setBackgroundColor(color);
             getDrawer().setStatusBarBackgroundColor(color);
-            Picasso.with(CategoryActivity.this).load(category.getIcon()).fit().into(imgCategoryIcon);
+            Picasso.with(CategoryActivity.this).load(category.icon).fit().into(imgCategoryIcon);
             categoryBackground.setBackgroundColor(color);
         }
 

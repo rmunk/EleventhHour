@@ -1,5 +1,7 @@
 package hr.nas2skupa.eleventhhour.model;
 
+import com.google.firebase.database.Exclude;
+
 import java.util.HashMap;
 
 import hr.nas2skupa.eleventhhour.utils.Utils;
@@ -9,22 +11,15 @@ import hr.nas2skupa.eleventhhour.utils.Utils;
  */
 
 public class Category {
-    private HashMap<String, String> name;
-    private String color;
-    private String icon;
+    public HashMap<String, String> name;
+    public String color;
+    public String icon;
 
     public Category() {
     }
 
-    public String getName() {
+    @Exclude
+    public String getLocalName() {
         return Utils.getLocaleString(name);
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public String getIcon() {
-        return icon;
     }
 }

@@ -114,7 +114,7 @@ public class CalendarFragment extends Fragment {
     @Subscribe
     public void showBooking(ShowBookingDetailsEvent event) {
         BookingDetailsDialog_.builder()
-                .bookingKey(event.getBooking().getKey())
+                .bookingKey(event.getBooking().key)
                 .build()
                 .show(getFragmentManager(), "BookingDetailsDialog");
     }
@@ -123,28 +123,28 @@ public class CalendarFragment extends Fragment {
     public void cancelBooking(CancelBookingEvent event) {
         Booking booking = event.getBooking();
         if (booking == null) {
-            Snackbar.make(getView(), R.string.msg_booking_failed, Snackbar.LENGTH_LONG).show();
+            Snackbar.make(getView(), R.string.msg_booking_cancel_failed, Snackbar.LENGTH_LONG).show();
             return;
         }
 
         // Shouldn't cancel
-        if (booking.getStatus() < 0 || booking.getTo() <= new Date().getTime())
+        if (booking.getStatus() < 0 || booking.to <= new Date().getTime())
             return;
 
-        booking.setStatus(BookingStatus.USER_CANCELED);
+        booking.status = BookingStatus.USER_CANCELED;
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        String key = booking.getKey();
+        String key = booking.key;
         Map<String, Object> bookingValues = booking.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/bookings/" + booking.getProviderId() + "/" + key, bookingValues);
+        childUpdates.put("/bookings/" + booking.providerId + "/" + key, bookingValues);
         childUpdates.put("/users/" + Utils.getMyUid() + "/bookings/" + key, bookingValues);
         reference.updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                 if (databaseError != null)
-                    Snackbar.make(getView(), R.string.msg_booking_failed, Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(getView(), R.string.msg_booking_cancel_failed, Snackbar.LENGTH_LONG).show();
             }
         });
     }
@@ -218,7 +218,7 @@ public class CalendarFragment extends Fragment {
                 query) {
             @Override
             protected void populateViewHolder(final BookingViewHolder viewHolder, final Booking model, final int position) {
-                model.setKey(getRef(position).getKey());
+                model.key = getRef(position).getKey();
                 viewHolder.bind(getContext(), model);
             }
         };
@@ -257,24 +257,24 @@ public class CalendarFragment extends Fragment {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
             Booking booking = dataSnapshot.getValue(Booking.class);
-            booking.setKey(dataSnapshot.getKey());
-            int color = booking.getStatus() >= 0 && booking.getTo() > new Date().getTime() ? eventActive : eventInactive;
-            calendarView.addEvent(new Event(color, booking.getFrom(), booking), true);
+            booking.key = dataSnapshot.getKey();
+            int color = booking.getStatus() >= 0 && booking.to > new Date().getTime() ? eventActive : eventInactive;
+            calendarView.addEvent(new Event(color, booking.from, booking), true);
         }
 
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
             Booking booking = dataSnapshot.getValue(Booking.class);
-            booking.setKey(dataSnapshot.getKey());
+            booking.key = dataSnapshot.getKey();
             removeBookingFromCalendar(booking);
-            int color = booking.getStatus() > 0 && booking.getTo() > new Date().getTime() ? eventActive : eventInactive;
-            calendarView.addEvent(new Event(color, booking.getFrom(), booking), true);
+            int color = booking.getStatus() > 0 && booking.to > new Date().getTime() ? eventActive : eventInactive;
+            calendarView.addEvent(new Event(color, booking.from, booking), true);
         }
 
         @Override
         public void onChildRemoved(DataSnapshot dataSnapshot) {
             Booking booking = dataSnapshot.getValue(Booking.class);
-            booking.setKey(dataSnapshot.getKey());
+            booking.key = dataSnapshot.getKey();
             removeBookingFromCalendar(booking);
         }
 
@@ -292,7 +292,7 @@ public class CalendarFragment extends Fragment {
             List<Event> events = calendarView.getEventsForMonth(calendarView.getFirstDayOfCurrentMonth());
             for (Event event : events) {
                 Booking oldBooking = (Booking) event.getData();
-                if (oldBooking.equals(booking)) calendarView.removeEvent(event, true);
+                if (booking.equals(oldBooking)) calendarView.removeEvent(event, true);
             }
         }
     }

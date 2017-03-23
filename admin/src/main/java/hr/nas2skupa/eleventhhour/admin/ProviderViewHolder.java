@@ -21,6 +21,6 @@ class ProviderViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bindToProvider(Provider provider) {
-        titleView.setText(provider.getName());
+        titleView.setText(provider.name);
     }
 }

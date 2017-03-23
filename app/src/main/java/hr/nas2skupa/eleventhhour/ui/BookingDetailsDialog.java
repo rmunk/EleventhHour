@@ -1,6 +1,7 @@
 package hr.nas2skupa.eleventhhour.ui;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
@@ -14,10 +15,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.firebase.geofire.GeoFire;
-import com.firebase.geofire.GeoLocation;
-import com.firebase.geofire.LocationCallback;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
@@ -73,7 +72,6 @@ public class BookingDetailsDialog extends DialogFragment implements OnMapReadyCa
     private ValueEventListener bookingListener;
     private GoogleMap map;
     private Marker marker;
-    private GeoFire geoFire;
     private Booking booking;
 
     @Override
@@ -121,6 +119,7 @@ public class BookingDetailsDialog extends DialogFragment implements OnMapReadyCa
 
     @NonNull
     @Override
+    @SuppressLint("InflateParams")
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         final LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -162,14 +161,14 @@ public class BookingDetailsDialog extends DialogFragment implements OnMapReadyCa
             booking = dataSnapshot.getValue(Booking.class);
 
             if (booking != null) {
-                booking.setKey(dataSnapshot.getKey());
-                txtBookingService.setText(booking.getServiceName());
-                txtBookingProvider.setText(booking.getProviderName());
+                booking.key = dataSnapshot.getKey();
+                txtBookingService.setText(booking.serviceName);
+                txtBookingProvider.setText(booking.providerName);
                 txtBookingTime.setText(booking.getTime());
                 txtBookingStatus.setText(StringUtils.printBookingStatus(getContext(), booking.getStatus()));
-                txtBookingPrice.setText(booking.getPrice());
-                txtBookingNote.setText(booking.getNote());
-                txtBookingNote.setVisibility(booking.getNote().isEmpty() ? View.GONE : View.VISIBLE);
+                txtBookingPrice.setText(booking.price);
+                txtBookingNote.setText(booking.note);
+                txtBookingNote.setVisibility(booking.note.isEmpty() ? View.GONE : View.VISIBLE);
 
                 if (booking.getStatus() == BookingStatus.PENDING || booking.getStatus() == BookingStatus.PROVIDER_ACCEPTED)
                     ((AlertDialog) getDialog()).getButton(DialogInterface.BUTTON_POSITIVE)
@@ -178,44 +177,26 @@ public class BookingDetailsDialog extends DialogFragment implements OnMapReadyCa
                         .setVisibility(View.GONE);
 
 
-                FirebaseDatabase.getInstance().getReference("providers").child(booking.getProviderId())
+                FirebaseDatabase.getInstance().getReference("providers").child(booking.providerId)
                         .addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                if (dataSnapshot != null) {
+                                if (dataSnapshot != null && getActivity() != null) {
                                     Provider provider = dataSnapshot.getValue(Provider.class);
-                                    DatabaseReference ref = FirebaseDatabase.getInstance()
-                                            .getReference("geofire/providers")
-                                            .child(provider.getCategory())
-                                            .child(provider.getSubcategory());
-                                    geoFire = new GeoFire(ref);
-                                    geoFire.getLocation(booking.getProviderId(), new LocationCallback() {
-                                        @Override
-                                        public void onLocationResult(String key, GeoLocation location) {
-                                            if (getActivity() == null) return;
-
-                                            if (location != null) {
-                                                LatLng target = new LatLng(location.latitude, location.longitude);
-                                                marker = map.addMarker(new MarkerOptions()
-                                                        .position(target)
-                                                        .title(booking.getProviderName()));
-                                                map.moveCamera(CameraUpdateFactory.newLatLng(target));
-                                                marker.showInfoWindow();
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-
-                                        }
-                                    });
-
+                                    if (provider.location != null) {
+                                        final LatLng target = provider.location.toLatLng();
+                                        marker = map.addMarker(new MarkerOptions()
+                                                .position(target)
+                                                .title(booking.providerName));
+                                        map.moveCamera(CameraUpdateFactory.newLatLng(target));
+                                        marker.showInfoWindow();
+                                    } else onCancelled(null);
                                 }
                             }
 
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
-
+                                Toast.makeText(getContext(), String.format(getString(R.string.booking_provider_error), booking.providerName), Toast.LENGTH_SHORT).show();
                             }
                         });
             }

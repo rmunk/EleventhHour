@@ -1,6 +1,7 @@
 package hr.nas2skupa.eleventhhour.model;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.Exclude;
 
 /**
  * Created by nas2skupa on 12/03/2017.
@@ -22,6 +23,12 @@ public class Location {
         longitude = latLng.longitude;
     }
 
+    @Exclude
+    public LatLng toLatLng() {
+        return new LatLng(latitude, longitude);
+    }
+
+    @Exclude
     @Override
     public String toString() {
         String output, degrees, minutes, seconds, direction;

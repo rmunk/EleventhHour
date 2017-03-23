@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity
                             startActivity(new Intent(MainActivity.this, SignInActivity.class));
                             finish();
                         } else {
-                            Toast.makeText(MainActivity.this, R.string.sign_out_failed, Toast.LENGTH_LONG);
+                            Toast.makeText(MainActivity.this, R.string.sign_out_failed, Toast.LENGTH_LONG).show();
                         }
                     }
                 });
@@ -259,25 +259,25 @@ public class MainActivity extends AppCompatActivity
     @NonNull
     private MyWeekViewEvent getWeekViewEvent(Booking booking) {
         GregorianCalendar from = new GregorianCalendar();
-        from.setTime(new Date(booking.getFrom()));
+        from.setTime(new Date(booking.from));
         GregorianCalendar to = new GregorianCalendar();
-        to.setTime(new Date(booking.getTo()));
+        to.setTime(new Date(booking.to));
         String status = StringUtils.printBookingStatus(this, booking.getStatus());
         status = booking.getStatus() != BookingStatus.FINISHED ? status.substring(status.length() - 2) : "";
         MyWeekViewEvent event = new MyWeekViewEvent(
-                booking.getKey().hashCode(),
-                booking.getServiceName(),
+                booking.key.hashCode(),
+                booking.serviceName,
                 status,
                 from,
                 to,
-                booking.getKey()
+                booking.key
         );
         float saturation = booking.getStatus() == BookingStatus.PENDING ? 1f : 0.6f;
         float value = 0.85f;
         float alpha = booking.getStatus() == BookingStatus.PENDING ? 1f :
                 booking.getStatus() == BookingStatus.FINISHED ? 0.5f
                         : booking.getStatus() == BookingStatus.PROVIDER_ACCEPTED ? 0.7f : 0.25f;
-        int color = ColorGenerator.getHsvColor(booking.getServiceId(), saturation, value, alpha);
+        int color = ColorGenerator.getHsvColor(booking.serviceId, saturation, value, alpha);
         event.setColor(color);
         return event;
     }
@@ -293,7 +293,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
         Booking booking = dataSnapshot.getValue(Booking.class);
-        booking.setKey(dataSnapshot.getKey());
+        booking.key = dataSnapshot.getKey();
         if (showCancelled || (booking.getStatus() != BookingStatus.PROVIDER_REJECTED
                 && booking.getStatus() != BookingStatus.PROVIDER_CANCELED
                 && booking.getStatus() != BookingStatus.USER_CANCELED)) {
@@ -306,7 +306,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
         Booking booking = dataSnapshot.getValue(Booking.class);
-        booking.setKey(dataSnapshot.getKey());
+        booking.key = dataSnapshot.getKey();
         MyWeekViewEvent event = getWeekViewEvent(booking);
         if (events.remove(event)) {
             if (booking.getStatus() != BookingStatus.PROVIDER_REJECTED
@@ -321,7 +321,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onChildRemoved(DataSnapshot dataSnapshot) {
         Booking booking = dataSnapshot.getValue(Booking.class);
-        booking.setKey(dataSnapshot.getKey());
+        booking.key = dataSnapshot.getKey();
         MyWeekViewEvent event = getWeekViewEvent(booking);
         if (events.remove(event)) {
             weekView.notifyDatasetChanged();
@@ -341,17 +341,13 @@ public class MainActivity extends AppCompatActivity
     private class MyWeekViewEvent extends WeekViewEvent {
         private String bookingKey;
 
-        public MyWeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime, String bookingKey) {
+        MyWeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime, String bookingKey) {
             super(id, name, location, startTime, endTime);
             this.bookingKey = bookingKey;
         }
 
-        public String getBookingKey() {
+        String getBookingKey() {
             return bookingKey;
-        }
-
-        public void setBookingKey(String bookingKey) {
-            this.bookingKey = bookingKey;
         }
     }
 }
