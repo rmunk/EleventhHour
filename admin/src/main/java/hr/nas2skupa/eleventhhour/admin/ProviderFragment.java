@@ -375,8 +375,7 @@ public class ProviderFragment extends Fragment {
                             String subcategory = child.getKey();
                             boolean isInSubcategory = provider.subcategories.containsKey(subcategory);
                             childUpdates.put(
-                                    String.format("/subcategories/%s/%s/providers/%s",
-                                            provider.category,
+                                    String.format("/subcategoryProviders/%s/%s",
                                             subcategory,
                                             providerKey),
                                     isInSubcategory ? true : null);
