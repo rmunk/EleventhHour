@@ -432,7 +432,7 @@ public class ProviderFragment extends Fragment {
             layoutAddress.setError(getString(R.string.provider_error_address));
             valid = false;
         }
-        if (txtCity.getText().toString().isEmpty()) {
+        if (provider.city == null) {
             layoutCity.setError(getString(R.string.provider_error_city));
             valid = false;
         }
@@ -440,10 +440,7 @@ public class ProviderFragment extends Fragment {
     }
 
     public void saveProvider(final SaveProviderListener listener) {
-        if (!validate()) {
-            listener.onProviderSavedListener(providerKey, false);
-            return;
-        }
+        if (!validate()) return;
 
         provider.name = txtName.getText().toString();
         provider.address = txtAddress.getText().toString();
