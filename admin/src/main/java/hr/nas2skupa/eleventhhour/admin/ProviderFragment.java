@@ -404,7 +404,7 @@ public class ProviderFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
                 int position = cityNames.indexOf(s.toString());
-                if (position < 0) provider.city = null;
+                if (position < 0 || arrayAdapter.isEmpty()) provider.city = null;
                 else provider.city = arrayAdapter.getItem(0).key;
             }
         });
