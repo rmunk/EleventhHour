@@ -1,16 +1,9 @@
 package hr.nas2skupa.eleventhhour.admin;
 
 
-import android.os.Build;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.transition.Fade;
-import android.transition.Slide;
-import android.view.Gravity;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
 
@@ -19,6 +12,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
@@ -31,7 +26,7 @@ import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 /**
  * A simple {@link Fragment} subclass.
  */
-@EFragment(R.layout.fragment_recycler_view)
+@EFragment(R.layout.fragment_subcategories)
 public class SubcategoriesFragment extends Fragment {
     @FragmentArg String categoryKey;
 
@@ -44,61 +39,55 @@ public class SubcategoriesFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) setTransitions();
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        LinearLayoutManager manager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(manager);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setItemAnimator(new SlideInUpAnimator(new OvershootInterpolator(0.1f)));
-        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
-
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        Query query = database.child("subcategories").child(categoryKey).orderByChild("name/" + Utils.getLanguageIso());
-        adapter = new FirebaseRecyclerAdapter<Subcategory, SubcategoryViewHolder>(
-                Subcategory.class,
-                R.layout.item_subcategory,
-                SubcategoryViewHolder.class,
-                query) {
-            @Override
-            protected void populateViewHolder(final SubcategoryViewHolder viewHolder, Subcategory model, int position) {
-                final DatabaseReference categoryRef = getRef(position);
-                final String subcategoryKey = categoryRef.getKey();
-
-                viewHolder.bindToSubcategory(model);
-                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                    }
-                });
-            }
-        };
-        recyclerView.setAdapter(adapter);
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
 
         if (adapter != null) adapter.cleanup();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void setTransitions() {
-        setAllowEnterTransitionOverlap(false);
-        setAllowReturnTransitionOverlap(false);
+    @AfterViews
+    public void init() {
+        LinearLayoutManager manager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(manager);
+        recyclerView.setItemAnimator(new SlideInUpAnimator(new OvershootInterpolator(0.1f)));
+        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
 
-        setEnterTransition(new Fade());
-        setReenterTransition(new Fade());
-        setExitTransition(new Slide(Gravity.TOP));
-        setReturnTransition(new Slide(Gravity.TOP));
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        Query query = database.child("subcategories").child(categoryKey).orderByChild("name/" + Utils.getLanguageIso());
+        adapter = new SubcategoriesAdapter(Subcategory.class, R.layout.item_subcategory, SubcategoryViewHolder.class, query);
+        recyclerView.setAdapter(adapter);
+    }
+
+    @Click(R.id.fab_add_subcategory)
+    void addSubcategory() {
+        SubcategoryDialog_.builder()
+                .categoryKey(categoryKey)
+                .subcategoryKey(null)
+                .build()
+                .show(getFragmentManager(), "SubcategoryDialog");
+    }
+
+
+    private class SubcategoriesAdapter extends FirebaseRecyclerAdapter<Subcategory, SubcategoryViewHolder> {
+
+        public SubcategoriesAdapter(Class<Subcategory> modelClass, int modelLayout, Class<SubcategoryViewHolder> viewHolderClass, Query ref) {
+            super(modelClass, modelLayout, viewHolderClass, ref);
+        }
+
+        @Override
+        protected void populateViewHolder(SubcategoryViewHolder viewHolder, final Subcategory model, int position) {
+            viewHolder.bindToSubcategory(model);
+            model.key = getRef(position).getKey();
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    SubcategoryDialog_.builder()
+                            .categoryKey(categoryKey)
+                            .subcategoryKey(model.key)
+                            .build()
+                            .show(getFragmentManager(), "SubcategoryDialog");
+                }
+            });
+        }
     }
 }

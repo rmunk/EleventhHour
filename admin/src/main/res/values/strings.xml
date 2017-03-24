@@ -45,10 +45,15 @@
     <string name="service_sale">On sale</string>
     <string name="service_error_name">Service must have a name</string>
     <string name="service_error_duration">Please enter duration of service in minutes</string>
-    <string name="service_error_price">Please enter price in correct format ($1,299.99 or 150 kn).</string>
+    <string name="service_error_price">Please enter price in correct format ($1,299.99 or 150 kn)</string>
     <string name="menu_providers">Providers</string>
     <string name="menu_categories">Categories</string>
     <string name="menu_users">Users</string>
     <string name="menu_sign_out">Sign out</string>
+
+    <!-- SubcategoryDialog -->
+    <string name="subcategory_error_name">Subcategory name is required</string>
+    <string name="subcategory_name_usa">English (United States)</string>
+    <string name="subcategory_name_hrv">Croatian</string>
 
 </resources>
