@@ -22,6 +22,7 @@ public class Provider {
     public Location location;
     public String description;
     public String phone;
+    public String city;
     public String address;
     public String web;
     public String email;
@@ -45,6 +46,7 @@ public class Provider {
 
         map.put("name", name);
         map.put("location", location);
+        map.put("city", city);
         map.put("address", address);
         map.put("description", description);
         map.put("phone", phone);

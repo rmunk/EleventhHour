@@ -15,6 +15,7 @@
     <string name="provider_category">Category</string>
     <string name="provider_subcategories">Subcategories</string>
     <string name="provider_location">Location</string>
+    <string name="provider_city">City</string>
     <string name="provider_address">Address</string>
     <string name="provider_description">Description</string>
     <string name="provider_phone">Phone</string>
@@ -25,6 +26,7 @@
     <string name="provider_error_category">You must pick a category</string>
     <string name="provider_error_subcategory">You must pick at least one subcategory</string>
     <string name="provider_error_location">You must set your location</string>
+    <string name="provider_error_city">You must pick a city from the list</string>
     <string name="provider_error_address">You must enter your address</string>
     <string name="msg_provider_location_selected">Selected location:\n%s</string>
     <string name="msg_provider_starting_location_picker">Starting location picker</string>

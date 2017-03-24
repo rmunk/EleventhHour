@@ -7,9 +7,17 @@ import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.core.GeoHash;
@@ -18,6 +26,7 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -30,11 +39,14 @@ import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.Touch;
 import org.androidannotations.annotations.ViewById;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import hr.nas2skupa.eleventhhour.model.Category;
+import hr.nas2skupa.eleventhhour.model.City;
 import hr.nas2skupa.eleventhhour.model.Location;
 import hr.nas2skupa.eleventhhour.model.Provider;
 import hr.nas2skupa.eleventhhour.model.Subcategory;
@@ -56,22 +68,24 @@ public class ProviderFragment extends Fragment {
     @FragmentArg String providerKey;
     @FragmentArg Boolean editable;
 
-    @ViewById(R.id.txt_name) EditText txtName;
-    @ViewById(R.id.txt_category) EditText txtCategory;
-    @ViewById(R.id.txt_subcategories) EditText txtSubcategories;
-    @ViewById(R.id.txt_location) EditText txtLocation;
-    @ViewById(R.id.txt_address) EditText txtAddress;
-    @ViewById(R.id.txt_description) EditText txtDescription;
-    @ViewById(R.id.txt_phone) EditText txtPhone;
-    @ViewById(R.id.txt_web) EditText txtWeb;
-    @ViewById(R.id.txt_email) EditText txtEmail;
-    @ViewById(R.id.txt_hours) EditText txtHours;
+    @ViewById EditText txtName;
+    @ViewById EditText txtCategory;
+    @ViewById EditText txtSubcategories;
+    @ViewById EditText txtLocation;
+    @ViewById AutoCompleteTextView txtCity;
+    @ViewById EditText txtAddress;
+    @ViewById EditText txtDescription;
+    @ViewById EditText txtPhone;
+    @ViewById EditText txtWeb;
+    @ViewById EditText txtEmail;
+    @ViewById EditText txtHours;
 
-    @ViewById(R.id.layout_name) TextInputLayout layoutName;
-    @ViewById(R.id.layout_category) TextInputLayout layoutCategory;
-    @ViewById(R.id.layout_subcategories) TextInputLayout layoutSubcategories;
-    @ViewById(R.id.layout_location) TextInputLayout layoutLocation;
-    @ViewById(R.id.layout_address) TextInputLayout layoutAddress;
+    @ViewById TextInputLayout layoutName;
+    @ViewById TextInputLayout layoutCategory;
+    @ViewById TextInputLayout layoutSubcategories;
+    @ViewById TextInputLayout layoutLocation;
+    @ViewById TextInputLayout layoutCity;
+    @ViewById TextInputLayout layoutAddress;
 
     private boolean locationPickerStarted;
     private boolean pickingCategory;
@@ -92,6 +106,7 @@ public class ProviderFragment extends Fragment {
                 providersReference.child(providerKey).addValueEventListener(new ProviderChangedListener());
             }
         }
+        setupCityPicker();
     }
 
     @Touch(R.id.editing_shroud)
@@ -309,6 +324,92 @@ public class ProviderFragment extends Fragment {
         }
     }
 
+    private void setupCityPicker() {
+        final List<String> cityNames = new ArrayList<>();
+        final ArrayAdapter<City> arrayAdapter = new ArrayAdapter<>(
+                getActivity(), android.R.layout.simple_list_item_1,
+                new ArrayList<City>());
+
+        FirebaseDatabase.getInstance().getReference()
+                .child("cities")
+                .child("hrv")
+                .addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        final City city = dataSnapshot.getValue(City.class);
+                        city.key = dataSnapshot.getKey();
+                        arrayAdapter.add(city);
+                        cityNames.add(city.getLocalName());
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+        txtCity.setAdapter(arrayAdapter);
+        txtCity.setThreshold(0);
+        txtCity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View arg0) {
+                txtCity.showDropDown();
+            }
+        });
+        txtCity.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                provider.city = arrayAdapter.getItem(position).key;
+                txtCity.onEditorAction(EditorInfo.IME_ACTION_NEXT);
+            }
+        });
+        txtCity.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                txtCity.dismissDropDown();
+                if (provider.city == null) {
+                    layoutCity.setError(getString(R.string.provider_error_city));
+                    layoutCity.setErrorEnabled(true);
+                    return true;
+                } else {
+                    layoutCity.setError(null);
+                    layoutCity.setErrorEnabled(false);
+                    return false;
+                }
+            }
+        });
+        txtCity.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                int position = cityNames.indexOf(s.toString());
+                if (position < 0) provider.city = null;
+                else provider.city = arrayAdapter.getItem(0).key;
+            }
+        });
+    }
+
     private boolean validate() {
         boolean valid = true;
         if (txtName.getText().toString().isEmpty()) {
@@ -329,6 +430,10 @@ public class ProviderFragment extends Fragment {
         }
         if (txtAddress.getText().toString().isEmpty()) {
             layoutAddress.setError(getString(R.string.provider_error_address));
+            valid = false;
+        }
+        if (txtCity.getText().toString().isEmpty()) {
+            layoutCity.setError(getString(R.string.provider_error_city));
             valid = false;
         }
         return valid;
@@ -459,6 +564,27 @@ public class ProviderFragment extends Fragment {
                                 }
                             }
                             if (isAdded()) txtSubcategories.setText(subcategories);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+        }
+
+        if (provider.city != null) {
+            FirebaseDatabase.getInstance().getReference()
+                    .child("cities")
+                    .child("hrv")
+                    .child(provider.city)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            City city = dataSnapshot.getValue(City.class);
+                            if (isAdded() && city != null) {
+                                txtCity.setText(city.getLocalName());
+                            }
                         }
 
                         @Override
