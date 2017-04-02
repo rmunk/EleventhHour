@@ -16,7 +16,6 @@ import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.ui.helpers.DrawerActivity;
 
 @EActivity(R.layout.activity_main)
 @OptionsMenu(R.menu.main)

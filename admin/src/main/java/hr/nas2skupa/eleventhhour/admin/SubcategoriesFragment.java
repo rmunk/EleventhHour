@@ -18,9 +18,9 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
 
-import hr.nas2skupa.eleventhhour.model.Subcategory;
-import hr.nas2skupa.eleventhhour.ui.helpers.SimpleDividerItemDecoration;
-import hr.nas2skupa.eleventhhour.utils.Utils;
+import hr.nas2skupa.eleventhhour.common.model.Subcategory;
+import hr.nas2skupa.eleventhhour.common.ui.helpers.SimpleDividerItemDecoration;
+import hr.nas2skupa.eleventhhour.common.utils.Utils;
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 /**

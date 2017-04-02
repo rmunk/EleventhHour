@@ -33,11 +33,10 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.common.model.Category;
+import hr.nas2skupa.eleventhhour.common.model.Subcategory;
 import hr.nas2skupa.eleventhhour.events.ProviderSelectedEvent;
 import hr.nas2skupa.eleventhhour.events.SubcategorySelectedEvent;
-import hr.nas2skupa.eleventhhour.model.Category;
-import hr.nas2skupa.eleventhhour.model.Subcategory;
-import hr.nas2skupa.eleventhhour.ui.helpers.DrawerActivity;
 
 
 @EActivity(R.layout.activity_category)

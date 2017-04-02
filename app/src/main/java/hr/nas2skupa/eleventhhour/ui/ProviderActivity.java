@@ -49,9 +49,8 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.model.Provider;
-import hr.nas2skupa.eleventhhour.ui.helpers.DrawerActivity;
-import hr.nas2skupa.eleventhhour.utils.Utils;
+import hr.nas2skupa.eleventhhour.common.model.Provider;
+import hr.nas2skupa.eleventhhour.common.utils.Utils;
 
 @EActivity(R.layout.activity_provider)
 @OptionsMenu(R.menu.main)

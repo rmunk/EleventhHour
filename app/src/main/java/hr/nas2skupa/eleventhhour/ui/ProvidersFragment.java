@@ -44,10 +44,10 @@ import org.androidannotations.annotations.ViewById;
 import java.util.HashMap;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.model.Provider;
-import hr.nas2skupa.eleventhhour.ui.helpers.VerticalSpaceItemDecoration;
+import hr.nas2skupa.eleventhhour.common.model.Provider;
+import hr.nas2skupa.eleventhhour.common.ui.helpers.VerticalSpaceItemDecoration;
+import hr.nas2skupa.eleventhhour.common.utils.Utils;
 import hr.nas2skupa.eleventhhour.ui.viewholders.ProviderViewHolder;
-import hr.nas2skupa.eleventhhour.utils.Utils;
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 

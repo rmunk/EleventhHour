@@ -9,7 +9,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.model.Provider;
+import hr.nas2skupa.eleventhhour.common.model.Provider;
 
 /**
  * Created by nas2skupa on 18/09/16.

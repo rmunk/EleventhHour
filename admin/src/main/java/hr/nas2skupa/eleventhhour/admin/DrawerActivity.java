@@ -10,7 +10,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import hr.nas2skupa.eleventhhour.auth.SignInActivity;
-import hr.nas2skupa.eleventhhour.ui.helpers.AbstractDrawerActivity;
+import hr.nas2skupa.eleventhhour.common.ui.helpers.AbstractDrawerActivity;
 
 /**
  * Created by nas2skupa on 05/11/2016.

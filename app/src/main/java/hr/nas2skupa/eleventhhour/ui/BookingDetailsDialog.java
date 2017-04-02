@@ -39,12 +39,12 @@ import org.androidannotations.annotations.ViewById;
 import org.greenrobot.eventbus.EventBus;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.common.model.Booking;
+import hr.nas2skupa.eleventhhour.common.model.BookingStatus;
+import hr.nas2skupa.eleventhhour.common.model.Provider;
+import hr.nas2skupa.eleventhhour.common.utils.StringUtils;
+import hr.nas2skupa.eleventhhour.common.utils.Utils;
 import hr.nas2skupa.eleventhhour.events.CancelBookingEvent;
-import hr.nas2skupa.eleventhhour.model.Booking;
-import hr.nas2skupa.eleventhhour.model.BookingStatus;
-import hr.nas2skupa.eleventhhour.model.Provider;
-import hr.nas2skupa.eleventhhour.utils.StringUtils;
-import hr.nas2skupa.eleventhhour.utils.Utils;
 
 /**
  * Created by nas2skupa on 03/11/2016.

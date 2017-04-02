@@ -20,7 +20,7 @@ import com.google.firebase.database.Query;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
-import hr.nas2skupa.eleventhhour.model.Category;
+import hr.nas2skupa.eleventhhour.common.model.Category;
 import jp.wasabeef.recyclerview.animators.LandingAnimator;
 
 @EFragment(R.layout.fragment_categories)

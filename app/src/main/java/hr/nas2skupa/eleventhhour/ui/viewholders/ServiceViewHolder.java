@@ -6,7 +6,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.model.Service;
+import hr.nas2skupa.eleventhhour.common.model.Service;
 
 /**
  * Created by nas2skupa on 19/10/2016.

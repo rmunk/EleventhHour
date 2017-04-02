@@ -30,8 +30,8 @@ import org.androidannotations.annotations.ViewById;
 import java.util.Locale;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.model.Provider;
-import hr.nas2skupa.eleventhhour.utils.Utils;
+import hr.nas2skupa.eleventhhour.common.model.Provider;
+import hr.nas2skupa.eleventhhour.common.utils.Utils;
 
 /**
  * A simple {@link Fragment} subclass.

@@ -34,10 +34,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import hr.nas2skupa.eleventhhour.model.Booking;
-import hr.nas2skupa.eleventhhour.model.BookingStatus;
-import hr.nas2skupa.eleventhhour.utils.ColorGenerator;
-import hr.nas2skupa.eleventhhour.utils.StringUtils;
+import hr.nas2skupa.eleventhhour.common.model.Booking;
+import hr.nas2skupa.eleventhhour.common.model.BookingStatus;
+import hr.nas2skupa.eleventhhour.common.utils.ColorGenerator;
+import hr.nas2skupa.eleventhhour.common.utils.StringUtils;
 
 
 /**

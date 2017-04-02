@@ -24,7 +24,7 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
-import hr.nas2skupa.eleventhhour.model.Category;
+import hr.nas2skupa.eleventhhour.common.model.Category;
 
 
 @EActivity(R.layout.activity_category)

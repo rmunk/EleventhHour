@@ -4,7 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import hr.nas2skupa.eleventhhour.model.Provider;
+import hr.nas2skupa.eleventhhour.common.model.Provider;
 
 /**
  * Created by nas2skupa on 28/02/2017.

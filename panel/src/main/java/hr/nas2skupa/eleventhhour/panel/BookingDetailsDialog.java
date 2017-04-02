@@ -28,9 +28,9 @@ import org.androidannotations.annotations.ViewById;
 import java.util.HashMap;
 import java.util.Map;
 
-import hr.nas2skupa.eleventhhour.model.Booking;
-import hr.nas2skupa.eleventhhour.model.BookingStatus;
-import hr.nas2skupa.eleventhhour.utils.StringUtils;
+import hr.nas2skupa.eleventhhour.common.model.Booking;
+import hr.nas2skupa.eleventhhour.common.model.BookingStatus;
+import hr.nas2skupa.eleventhhour.common.utils.StringUtils;
 
 /**
  * Created by nas2skupa on 03/11/2016.

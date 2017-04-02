@@ -38,12 +38,12 @@ import java.util.List;
 import java.util.Map;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.common.model.Booking;
+import hr.nas2skupa.eleventhhour.common.model.BookingStatus;
+import hr.nas2skupa.eleventhhour.common.utils.Utils;
 import hr.nas2skupa.eleventhhour.events.CancelBookingEvent;
 import hr.nas2skupa.eleventhhour.events.ShowBookingDetailsEvent;
-import hr.nas2skupa.eleventhhour.model.Booking;
-import hr.nas2skupa.eleventhhour.model.BookingStatus;
 import hr.nas2skupa.eleventhhour.ui.viewholders.BookingViewHolder;
-import hr.nas2skupa.eleventhhour.utils.Utils;
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 /**

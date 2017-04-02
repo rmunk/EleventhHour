@@ -5,7 +5,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.model.Subcategory;
+import hr.nas2skupa.eleventhhour.common.model.Subcategory;
 
 /**
  * Created by nas2skupa on 18/09/16.

@@ -21,7 +21,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import hr.nas2skupa.eleventhhour.auth.SignInActivity;
-import hr.nas2skupa.eleventhhour.ui.helpers.DelayedProgressDialog;
+import hr.nas2skupa.eleventhhour.common.ui.helpers.DelayedProgressDialog;
 
 /**
  * Created by nas2skupa on 15/03/2017.

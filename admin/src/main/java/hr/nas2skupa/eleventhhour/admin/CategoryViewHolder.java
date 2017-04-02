@@ -10,7 +10,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
-import hr.nas2skupa.eleventhhour.model.Category;
+import hr.nas2skupa.eleventhhour.common.model.Category;
 
 /**
  * Created by nas2skupa on 18/09/16.

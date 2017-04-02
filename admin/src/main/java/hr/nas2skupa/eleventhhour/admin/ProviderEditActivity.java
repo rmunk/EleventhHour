@@ -12,6 +12,9 @@ import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.ViewById;
 
+import hr.nas2skupa.eleventhhour.common.ui.provider.ProviderFragment;
+import hr.nas2skupa.eleventhhour.common.ui.provider.ProviderFragment_;
+
 @EActivity(R.layout.activity_provider_edit)
 public class ProviderEditActivity extends AppCompatActivity {
     @Extra String providerKey;

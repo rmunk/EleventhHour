@@ -26,9 +26,9 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.common.model.Booking;
+import hr.nas2skupa.eleventhhour.common.utils.Utils;
 import hr.nas2skupa.eleventhhour.events.MakeNewBookingEvent;
-import hr.nas2skupa.eleventhhour.model.Booking;
-import hr.nas2skupa.eleventhhour.utils.Utils;
 
 /**
  * Dialog for booking a service.

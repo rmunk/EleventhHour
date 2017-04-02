@@ -39,13 +39,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.common.model.Booking;
+import hr.nas2skupa.eleventhhour.common.model.Provider;
+import hr.nas2skupa.eleventhhour.common.model.Service;
+import hr.nas2skupa.eleventhhour.common.ui.helpers.SimpleDividerItemDecoration;
+import hr.nas2skupa.eleventhhour.common.utils.Utils;
 import hr.nas2skupa.eleventhhour.events.MakeNewBookingEvent;
-import hr.nas2skupa.eleventhhour.model.Booking;
-import hr.nas2skupa.eleventhhour.model.Provider;
-import hr.nas2skupa.eleventhhour.model.Service;
-import hr.nas2skupa.eleventhhour.ui.helpers.SimpleDividerItemDecoration;
 import hr.nas2skupa.eleventhhour.ui.viewholders.ServiceViewHolder;
-import hr.nas2skupa.eleventhhour.utils.Utils;
 
 /**
  * A simple {@link Fragment} subclass.

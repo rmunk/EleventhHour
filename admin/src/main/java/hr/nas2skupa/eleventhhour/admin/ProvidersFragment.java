@@ -18,8 +18,8 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
-import hr.nas2skupa.eleventhhour.model.Provider;
-import hr.nas2skupa.eleventhhour.ui.helpers.SimpleDividerItemDecoration;
+import hr.nas2skupa.eleventhhour.common.model.Provider;
+import hr.nas2skupa.eleventhhour.common.ui.helpers.SimpleDividerItemDecoration;
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 

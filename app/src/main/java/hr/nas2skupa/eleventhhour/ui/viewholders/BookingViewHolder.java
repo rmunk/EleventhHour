@@ -9,9 +9,9 @@ import android.widget.TextView;
 import org.greenrobot.eventbus.EventBus;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.common.model.Booking;
+import hr.nas2skupa.eleventhhour.common.utils.StringUtils;
 import hr.nas2skupa.eleventhhour.events.ShowBookingDetailsEvent;
-import hr.nas2skupa.eleventhhour.model.Booking;
-import hr.nas2skupa.eleventhhour.utils.StringUtils;
 
 /**
  * Created by nas2skupa on 18/09/16.

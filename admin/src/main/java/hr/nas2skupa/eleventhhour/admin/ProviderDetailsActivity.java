@@ -41,7 +41,11 @@ import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.DimensionPixelOffsetRes;
 
-import hr.nas2skupa.eleventhhour.model.Provider;
+import hr.nas2skupa.eleventhhour.common.model.Provider;
+import hr.nas2skupa.eleventhhour.common.ui.provider.ProviderFragment;
+import hr.nas2skupa.eleventhhour.common.ui.provider.ProviderFragment_;
+import hr.nas2skupa.eleventhhour.common.ui.provider.ServicesFragment;
+import hr.nas2skupa.eleventhhour.common.ui.provider.ServicesFragment_;
 
 @EActivity(R.layout.activity_provider_details)
 @OptionsMenu(R.menu.menu_provider_details)
