@@ -19,7 +19,6 @@
     <string name="menu_home">Početna</string>
     <string name="menu_notifications">Obavijesti</string>
     <string name="menu_top">Top ponude</string>
-    <string name="menu_sign_out">Odjavi se</string>
     <string name="msg_booking_cancel_failed">Ovaj termin trenutno ne može biti otkazan. Molimo pokušajte kasnije.</string>
     <string name="msg_booking_failed">Nažalost, zahtjev za terminom nije uspio. Molimo pokušajte kasnije.</string>
     <string name="navigation_drawer_close">Zatvori ladicu</string>
@@ -29,7 +28,6 @@
     <string name="title_fragment_calendar">Moji termini</string>
     <string name="title_fragment_home">Početna</string>
     <string name="menu_profile">Moj profil</string>
-    <string name="menu_help">Pomoć</string>
     <string name="menu_sale">Akcija</string>
     <string name="title_activity_map">Karta</string>
     <string name="title_fragment_top">Top ponude</string>

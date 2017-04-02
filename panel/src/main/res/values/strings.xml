@@ -1,14 +1,21 @@
 <resources>
     <string name="app_name">Eleventh Hour Panel</string>
+    <string name="help_page" translatable="false">http://nas2skupa.com/</string>
+
+    <!-- Activity and fragment titles -->
+    <string name="title_fragment_planer">Planer</string>
 
     <!-- Actions -->
-    <string name="action_sign_out">Sign out</string>
     <string name="action_display_range">Display range</string>
     <string name="action_show_one_day">1 day</string>
     <string name="action_show_three_days">3 days</string>
     <string name="action_show_week">Week</string>
     <string name="action_today">Today</string>
     <string name="action_show_cancelled">Show cancelled bookings</string>
+
+    <!-- Navigation drawer -->
+    <string name="menu_planer">Planer</string>
+    <string name="menu_profile">Company profile</string>
 
     <!-- BookingDetailsDialog -->
     <string name="reject_booking">Reject</string>
