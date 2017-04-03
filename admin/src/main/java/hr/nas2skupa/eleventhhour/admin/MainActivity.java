@@ -44,14 +44,14 @@ public class MainActivity extends DrawerActivity {
         switch (action) {
             case ACTION_PROVIDERS:
                 toolbar.setTitle(R.string.title_fragment_providers);
-                if (getSupportFragmentManager().findFragmentByTag("HomeFragment") == null)
+                if (getSupportFragmentManager().findFragmentByTag("ProvidersFragment") == null)
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, ProvidersFragment_.builder().build(), "ProvidersFragment")
                             .commit();
                 break;
             case ACTION_CATEGORIES:
                 toolbar.setTitle(R.string.title_fragment_categories);
-                if (getSupportFragmentManager().findFragmentByTag("CalendarFragment") == null)
+                if (getSupportFragmentManager().findFragmentByTag("CategoriesFragment") == null)
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, CategoriesFragment_.builder().build(), "CategoriesFragment")
                             .commit();
