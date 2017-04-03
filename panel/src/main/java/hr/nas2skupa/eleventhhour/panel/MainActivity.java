@@ -18,6 +18,9 @@ public class MainActivity extends DrawerActivity {
     public static final String ACTION_PROFILE = "hr.nas2skupa.eleventhhour.panel.ACTION_PROFILE";
     public static final String ACTION_HELP = "hr.nas2skupa.eleventhhour.panel.ACTION_HELP";
 
+    // TODO: Remove this
+    String providerKey = "-KSBW7RtYqbssM7q1Gdl";
+
     @ViewById Toolbar toolbar;
 
     @Override
@@ -47,19 +50,15 @@ public class MainActivity extends DrawerActivity {
         switch (action) {
             case ACTION_PLANER:
                 toolbar.setTitle(R.string.title_fragment_planer);
-                if (getSupportFragmentManager().findFragmentByTag("HomeFragment") == null) {
-                    PlanerFragment planerFragment = PlanerFragment_.builder().providerKey("-KSBW7RtYqbssM7q1Gdl").build();
+                if (getSupportFragmentManager().findFragmentByTag("PlanerFragment") == null) {
+                    PlanerFragment planerFragment = PlanerFragment_.builder().providerKey(providerKey).build();
                     getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, planerFragment, "ProvidersFragment")
+                            .replace(R.id.fragment_container, planerFragment, "PlanerFragment")
                             .commit();
                 }
                 break;
             case ACTION_PROFILE:
-//                toolbar.setTitle(R.string.title_fragment_profile);
-//                if (getSupportFragmentManager().findFragmentByTag("ProfileFragment") == null)
-//                    getSupportFragmentManager().beginTransaction()
-//                            .replace(R.id.fragment_container, ProfileFragment_.builder().build(), "ProfileFragment")
-//                            .commit();
+                ProviderDetailsActivity_.intent(this).providerKey(providerKey).start();
                 break;
             case ACTION_HELP:
                 try {

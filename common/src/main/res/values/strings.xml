@@ -10,7 +10,7 @@
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
     <string name="action_delete_title">Delete %s</string>
-    <string name="action_delete_message">Are you sure you want to delete %s</string>
+    <string name="action_delete_message">Are you sure you want to delete %s? This action cannot be reversed.</string>
 
     <!-- Navigation drawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
