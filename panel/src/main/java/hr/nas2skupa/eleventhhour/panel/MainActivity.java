@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_main)
@@ -18,8 +19,8 @@ public class MainActivity extends DrawerActivity {
     public static final String ACTION_PROFILE = "hr.nas2skupa.eleventhhour.panel.ACTION_PROFILE";
     public static final String ACTION_HELP = "hr.nas2skupa.eleventhhour.panel.ACTION_HELP";
 
-    // TODO: Remove this
-    String providerKey = "-KSBW7RtYqbssM7q1Gdl";
+    @Extra
+    public static String providerKey;
 
     @ViewById Toolbar toolbar;
 

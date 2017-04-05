@@ -17,6 +17,10 @@
     <string name="menu_planer">Planer</string>
     <string name="menu_profile">Company profile</string>
 
+    <!-- AuthActivity -->
+    <string name="user_without_providers">%s is not associated with any of providers registered with us.</string>
+    <string name="checking_permissions">Checking permissions</string>
+
     <!-- BookingDetailsDialog -->
     <string name="reject_booking">Reject</string>
     <string name="cancel_booking">Cancel booking</string>
