@@ -5,6 +5,9 @@
     "stylers": [
       {
         "color": "#adbb00"
+      },
+      {
+        "lightness": "0"
       }
     ]
   },
@@ -22,28 +25,16 @@
   },
   {
     "featureType": "road",
-    "elementType": "geometry.fill",
+    "elementType": "geometry",
     "stylers": [
       {
         "lightness": "50"
       },
       {
-        "saturation": "0"
-      }
-    ]
-  },
-  {
-    "featureType": "road",
-    "elementType": "geometry.stroke",
-    "stylers": [
-      {
-        "lightness": "-25"
+        "saturation": "-25"
       },
       {
-        "saturation": "0"
-      },
-      {
-        "gamma": "1"
+        "visibility": "simplified"
       }
     ]
   },
