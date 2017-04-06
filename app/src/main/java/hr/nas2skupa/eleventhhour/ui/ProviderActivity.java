@@ -35,6 +35,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import org.androidannotations.annotations.AfterViews;
@@ -45,7 +47,6 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
-import java.util.HashMap;
 import java.util.Locale;
 
 import hr.nas2skupa.eleventhhour.R;
@@ -89,6 +90,7 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
     private ValueEventListener ratingListener;
     private boolean showDetails = false;
     private Provider provider;
+    private float userRating;
 
     private GoogleMap map;
 
@@ -278,32 +280,54 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
     }
 
     @Override
-    public void onRatingChanged(RatingBar ratingBar, float newUserRating, boolean fromUser) {
+    public void onRatingChanged(final RatingBar ratingBar, final float newUserRating, boolean fromUser) {
         if (!fromUser) return;
 
-        HashMap<String, Object> ratingUpdate = new HashMap<>();
-        float oldUserRating = provider.userRating;
-        int oldRatingsCnt = provider.ratings;
-
-        boolean alreadyRated = oldUserRating > 0;
-        int newRatingsCnt = !alreadyRated ? oldRatingsCnt + 1
-                : newUserRating > 0 ? oldRatingsCnt
-                : oldRatingsCnt - 1;
-        float newRating = (oldRatingsCnt * provider.rating - oldUserRating + newUserRating) / newRatingsCnt;
-        ratingUpdate.put("rating", newRating);
-        ratingUpdate.put("ratings", newRatingsCnt);
-        ratingUpdate.put(".priority", 5 - newRating);
+        ratingBar.setEnabled(false);
         DatabaseReference providers = FirebaseDatabase.getInstance().getReference()
                 .child("providers")
                 .child(providerKey);
-        providers.updateChildren(ratingUpdate);
+        providers.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Provider provider = mutableData.getValue(Provider.class);
 
-        FirebaseDatabase.getInstance().getReference()
-                .child("users")
-                .child(Utils.getMyUid())
-                .child("ratings")
-                .child(providerKey)
-                .setValue(newUserRating > 0 ? newUserRating : null);
+                if (provider == null) {
+                    return Transaction.success(mutableData);
+                }
+
+                int oldRatingsCnt = provider.ratings;
+                float oldRating = oldRatingsCnt > 0 ? provider.rating : 0;
+                float oldUserRating = oldRatingsCnt > 0 ? userRating : 0;
+
+                boolean alreadyRated = oldUserRating > 0;
+                int newRatingsCnt = !alreadyRated ? oldRatingsCnt + 1
+                        : newUserRating > 0 ? oldRatingsCnt
+                        : oldRatingsCnt - 1;
+                float newRating = newRatingsCnt > 0
+                        ? (oldRatingsCnt * oldRating - oldUserRating + newUserRating) / newRatingsCnt
+                        : 0;
+
+                provider.rating = newRating;
+                provider.ratings = newRatingsCnt;
+
+                mutableData.setValue(provider);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                userRating = newUserRating;
+                FirebaseDatabase.getInstance().getReference()
+                        .child("users")
+                        .child(Utils.getMyUid())
+                        .child("ratings")
+                        .child(providerKey)
+                        .setValue(newUserRating > 0 ? newUserRating : null);
+                ratingBar.setEnabled(true);
+            }
+        });
+
     }
 
     @Override
@@ -367,8 +391,7 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             Float value = dataSnapshot.getValue(Float.class);
-            float userRating = value != null ? value : 0;
-            provider.userRating = userRating;
+            userRating = provider.ratings > 0 && value != null ? value : 0;
             ratingBar.setRating(userRating);
         }
 
