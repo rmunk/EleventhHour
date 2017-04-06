@@ -45,6 +45,7 @@ dependencies {
 
     compile 'com.mikepenz:materialize:1.0.0@aar'
     compile 'jp.wasabeef:recyclerview-animators:2.2.4'
+    compile 'com.jakewharton.timber:timber:4.5.1'
 
     compile 'org.androidannotations:androidannotations-api:4.1.0'
     apt 'org.androidannotations:androidannotations:4.1.0'

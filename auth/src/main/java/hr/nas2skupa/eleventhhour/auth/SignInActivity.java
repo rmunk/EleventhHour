@@ -15,6 +15,8 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Arrays;
 
+import timber.log.Timber;
+
 public class SignInActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 123;
 
@@ -71,10 +73,12 @@ public class SignInActivity extends AppCompatActivity {
                 }
 
                 if (response.getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
+                    Timber.e("Login failed (UNKNOWN_ERROR)");
                     Toast.makeText(this, R.string.unknown_error, Toast.LENGTH_LONG).show();
                     return;
                 }
             }
+            Timber.e("Login failed (No error code)");
             Toast.makeText(this, R.string.unknown_error, Toast.LENGTH_LONG).show();
         }
     }
@@ -92,6 +96,7 @@ public class SignInActivity extends AppCompatActivity {
                 throw new IllegalStateException("You must configure <meta-data android:name=\\\"app_entry_point\\\" android:value=\\\" main entry intent action\\\"/> in your AndroidManifest.xml file.\"");
             }
         } catch (Exception e) {
+            Timber.e("Login failed (Could not start main app)", e);
             Toast.makeText(this, R.string.unknown_error, Toast.LENGTH_LONG).show();
         }
     }

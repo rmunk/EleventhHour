@@ -10,6 +10,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
+import com.google.firebase.database.FirebaseDatabase;
+
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsMenu;
@@ -27,6 +29,10 @@ public class MainActivity extends DrawerActivity
     public static final String ACTION_FAVORITES = "hr.nas2skupa.eleventhhour.ACTION_FAVORITES";
     public static final String ACTION_TOP = "hr.nas2skupa.eleventhhour.ACTION_TOP";
     public static final String ACTION_HELP = "hr.nas2skupa.eleventhhour.ACTION_HELP";
+
+    static {
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+    }
 
     @ViewById(R.id.toolbar)
     Toolbar toolbar;
