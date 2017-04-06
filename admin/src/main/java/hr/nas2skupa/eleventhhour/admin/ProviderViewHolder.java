@@ -10,7 +10,7 @@ import hr.nas2skupa.eleventhhour.common.model.Provider;
  * Created by nas2skupa on 28/02/2017.
  */
 
-class ProviderViewHolder extends RecyclerView.ViewHolder {
+public class ProviderViewHolder extends RecyclerView.ViewHolder {
     private TextView titleView;
 
 
