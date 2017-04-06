@@ -158,8 +158,9 @@ public class BookingDetailsDialog extends DialogFragment implements OnMapReadyCa
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            booking = dataSnapshot.getValue(Booking.class);
+            if (getDialog() == null) return;
 
+            booking = dataSnapshot.getValue(Booking.class);
             if (booking != null) {
                 booking.key = dataSnapshot.getKey();
                 txtBookingService.setText(booking.serviceName);
