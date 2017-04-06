@@ -1,6 +1,10 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 apply from: 'constants.gradle'
 
+def keystorePropertiesFile = rootProject.file("app/keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 buildscript {
     repositories {
         jcenter()
@@ -19,6 +23,36 @@ allprojects {
     repositories {
         jcenter()
         maven { url 'https://maven.fabric.io/public' }
+    }
+}
+
+subprojects {
+    afterEvaluate {
+        def isAndroidProject = project.plugins.hasPlugin('android')
+        android {
+            dexOptions {
+                maxProcessCount 2
+                javaMaxHeapSize "2g"
+            }
+            if (isAndroidProject) {
+                signingConfigs {
+                    release {
+                        keyAlias keystoreProperties['keyAlias']
+                        keyPassword keystoreProperties['keyPassword']
+                        storeFile file(keystoreProperties['storeFile'])
+                        storePassword keystoreProperties['storePassword']
+                    }
+                }
+                buildTypes {
+                    release {
+                        signingConfig signingConfigs.release
+                        lintOptions {
+                            disable 'MissingTranslation'
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
