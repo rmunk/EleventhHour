@@ -514,6 +514,8 @@ public class ProviderFragment extends Fragment {
     }
 
     private void bindToProvider(final Provider provider) {
+        if (!isAdded()) return;
+
         txtName.setText(provider.name);
         if (provider.location != null) txtLocation.setText(provider.location.toString());
         txtAddress.setText(provider.address);
