@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.firebase.FirebaseException;
 import com.google.firebase.crash.FirebaseCrash;
+import com.google.firebase.database.FirebaseDatabase;
 
 import timber.log.Timber;
 
@@ -16,6 +17,8 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
