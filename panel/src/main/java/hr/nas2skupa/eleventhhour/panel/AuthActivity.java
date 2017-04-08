@@ -19,6 +19,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,8 +68,18 @@ public class AuthActivity extends AppCompatActivity {
                                     })
                                     .show();
                         } else {
+                            String providerKey = providersKeys.get(0);
+
+                            String token = FirebaseInstanceId.getInstance().getToken();
+                            FirebaseDatabase.getInstance().getReference()
+                                    .child("notificationTokens")
+                                    .child("panel")
+                                    .child(providerKey)
+                                    .child(token)
+                                    .setValue(true);
+
                             MainActivity_.intent(AuthActivity.this)
-                                    .providerKey(providersKeys.get(0))
+                                    .providerKey(providerKey)
                                     .flags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK).start();
                         }
                     }

@@ -20,9 +20,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.auth.SignInActivity;
+import hr.nas2skupa.eleventhhour.common.utils.Utils;
 
 /**
  * Created by nas2skupa on 05/11/2016.
@@ -108,6 +112,16 @@ public class DrawerActivity extends AppCompatActivity
                 break;
 
             case R.id.nav_sign_out:
+                String token = FirebaseInstanceId.getInstance().getToken();
+                final DatabaseReference tokenReference = FirebaseDatabase.getInstance().getReference()
+                        .child("notificationTokens")
+                        .child("client")
+                        .child(Utils.getMyUid())
+                        .child(token);
+
+                // Remove notifications token
+                tokenReference.removeValue();
+
                 AuthUI.getInstance()
                         .signOut(this)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -119,6 +133,9 @@ public class DrawerActivity extends AppCompatActivity
                                     startActivity(intent);
                                     finish();
                                 } else {
+                                    // Restore notifications token
+                                    tokenReference.setValue(true);
+
                                     Toast.makeText(DrawerActivity.this, R.string.sign_out_failed, Toast.LENGTH_LONG);
                                 }
                             }
