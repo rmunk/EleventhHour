@@ -45,6 +45,19 @@
                 android:value=".ProviderDetailsActivity"/>
         </activity>
 
+        <service
+            android:name=".PanelFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+        <service
+            android:name="hr.nas2skupa.eleventhhour.panel.PanelFirebaseInstanceIdService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
+
         <meta-data
             android:name="app_entry_point"
             android:value="hr.nas2skupa.eleventhhour.panel.MAIN" />
