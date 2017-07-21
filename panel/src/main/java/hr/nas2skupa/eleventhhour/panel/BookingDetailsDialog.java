@@ -70,7 +70,7 @@ public class BookingDetailsDialog extends DialogFragment {
 
         bookingReference = FirebaseDatabase.getInstance().getReference()
                 .child("bookings")
-                .child("-KSBW7RtYqbssM7q1Gdl")
+                .child(MainActivity.providerKey)
                 .child(bookingKey);
 
         bookingListener = new BookingListener();
