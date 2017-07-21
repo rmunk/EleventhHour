@@ -4,7 +4,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
@@ -47,6 +46,10 @@ public class PanelFirebaseMessagingService extends FirebaseMessagingService {
                 && remoteMessage.getData().containsKey("providerUid")) {
             String bookingKey = remoteMessage.getData().get("bookingUid");
             String providerKey = remoteMessage.getData().get("providerUid");
+
+            // Not for this provider
+            if (!providerKey.equals(MainActivity.providerKey)) return;
+
             DatabaseReference bookingReference = FirebaseDatabase.getInstance().getReference()
                     .child("bookings")
                     .child(providerKey)
@@ -76,6 +79,7 @@ public class PanelFirebaseMessagingService extends FirebaseMessagingService {
         final String when = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT).format(new Date(booking.from));
 
         Intent intent = new Intent(this, MainActivity_.class);
+        intent.setAction(MainActivity.ACTION_PLANER);
         intent.putExtra("bookingKey", booking.key);
         intent.putExtra("providerKey", booking.providerId);
         intent.putExtra("userKey", booking.userId);
@@ -85,14 +89,13 @@ public class PanelFirebaseMessagingService extends FirebaseMessagingService {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_icon_panel)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_icon_panel))
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
 
         switch (booking.getStatus()) {
             case BookingStatus.PENDING:
-                Intent serviceIntent = new Intent(this, BookingService.class)
+                Intent serviceIntent = new Intent(this, PanelBookingService.class)
                         .putExtra("bookingKey", booking.key)
                         .putExtra("providerKey", booking.providerId)
                         .putExtra("userKey", booking.userId);

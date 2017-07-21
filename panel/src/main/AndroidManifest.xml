@@ -45,7 +45,7 @@
                 android:value=".ProviderDetailsActivity"/>
         </activity>
 
-        <service android:name=".BookingService"/>
+        <service android:name=".PanelBookingService"/>
         <service
             android:name=".PanelFirebaseMessagingService">
             <intent-filter>
@@ -53,7 +53,7 @@
             </intent-filter>
         </service>
         <service
-            android:name="hr.nas2skupa.eleventhhour.panel.PanelFirebaseInstanceIdService">
+            android:name=".PanelFirebaseInstanceIdService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>

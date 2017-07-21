@@ -29,10 +29,14 @@
 
     <!-- PanelFirebaseMessagingService -->
     <string name="notification_title_new">You have a new appointment</string>
-    <string name="notification_title_cancelled">Appointment cancelled</string>
     <string name="notification_text_new">%1$s wants to make appointment for %2$s on %3$s</string>
+    <string name="notification_title_cancelled">Appointment cancelled</string>
     <string name="notification_text_cancelled">%1$s cancelled appointment for %2$s on %3$s</string>
     <string name="notification_action_reject">Reject</string>
     <string name="notification_action_confirm">Confirm</string>
+
+    <!-- PanelBookingService -->
+    <string name="notification_confirmation_error">Sorry, appointment could not be confirmed.</string>
+    <string name="notification_rejection_error">Sorry, appointment could not be rejected.</string>
 
 </resources>

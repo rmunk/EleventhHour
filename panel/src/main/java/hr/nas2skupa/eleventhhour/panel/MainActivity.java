@@ -69,7 +69,7 @@ public class MainActivity extends DrawerActivity {
             String bookingKey = intent.getStringExtra("bookingKey");
             String providerKey = intent.getStringExtra("providerKey");
 
-            if (!providerKey.equals(providerKey)) return;
+            if (!providerKey.equals(MainActivity.providerKey)) return;
 
             BookingDetailsDialog_.builder()
                     .bookingKey(bookingKey)

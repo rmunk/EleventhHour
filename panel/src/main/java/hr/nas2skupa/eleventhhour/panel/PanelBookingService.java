@@ -23,7 +23,7 @@ import timber.log.Timber;
  * Created by nas2skupa on 11/04/2017.
  */
 
-public class BookingService extends Service {
+public class PanelBookingService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
@@ -61,7 +61,11 @@ public class BookingService extends Service {
         reference.updateChildren(childUpdates).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(BookingService.this, String.format("Appointment could not be %s.", confirm ? "confirmed" : "rejected"), Toast.LENGTH_SHORT).show();
+                if (confirm) {
+                    Toast.makeText(PanelBookingService.this, R.string.notification_confirmation_error, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(PanelBookingService.this, R.string.notification_rejection_error, Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
