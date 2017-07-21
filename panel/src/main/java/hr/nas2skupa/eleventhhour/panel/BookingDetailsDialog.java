@@ -40,6 +40,8 @@ public class BookingDetailsDialog extends DialogFragment {
     @FragmentArg
     String bookingKey;
 
+    @ViewById(R.id.txt_booking_date)
+    TextView txtBookingDate;
     @ViewById(R.id.txt_booking_service)
     TextView txtBookingService;
     @ViewById(R.id.txt_booking_user)
@@ -154,6 +156,7 @@ public class BookingDetailsDialog extends DialogFragment {
 
             if (booking != null) {
                 booking.key = dataSnapshot.getKey();
+                txtBookingDate.setText(booking.getDate());
                 txtBookingService.setText(booking.serviceName);
                 txtBookingUser.setText(booking.userName);
                 txtBookingTime.setText(booking.getTime());

@@ -36,6 +36,8 @@ public class MainActivity extends DrawerActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        handleIntent(getIntent());
     }
 
     @Override
@@ -56,6 +58,24 @@ public class MainActivity extends DrawerActivity {
         super.onNewIntent(intent);
 
         setPage(intent.getAction());
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+        if (intent == null) return;
+
+        if (intent.hasExtra("bookingKey") && intent.hasExtra("providerKey")) {
+
+            String bookingKey = intent.getStringExtra("bookingKey");
+            String providerKey = intent.getStringExtra("providerKey");
+
+            if (!providerKey.equals(providerKey)) return;
+
+            BookingDetailsDialog_.builder()
+                    .bookingKey(bookingKey)
+                    .build()
+                    .show(getSupportFragmentManager(), "BookingDetailsDialog");
+        }
     }
 
     void initToolbar(@ViewById(R.id.toolbar) Toolbar toolbar) {

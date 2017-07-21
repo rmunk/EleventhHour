@@ -2,6 +2,7 @@ package hr.nas2skupa.eleventhhour.common.model;
 
 import com.google.firebase.database.Exclude;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -51,6 +52,11 @@ public class Booking {
     public String getTime() {
         SimpleDateFormat format = new SimpleDateFormat("HH:mm", Locale.getDefault());
         return String.format(Locale.getDefault(), "%s - %s", format.format(from), format.format(to));
+    }
+
+    @Exclude
+    public String getDate() {
+        return DateFormat.getDateInstance(DateFormat.FULL).format(from);
     }
 
     @Exclude
