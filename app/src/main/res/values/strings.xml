@@ -50,4 +50,12 @@
     <!-- ProviderActivity -->
     <string name="provider_removed">Provider %s is no longer available!</string>
 
+    <!-- ClientFirebaseMessagingService -->
+    <string name="notification_title_accepted">Appointment accepted</string>
+    <string name="notification_text_accepted">%1$s accepted appointment for %2$s on %3$s</string>
+    <string name="notification_title_rejected">Appointment rejected</string>
+    <string name="notification_text_rejected">%1$s rejected appointment for %2$s on %3$s</string>
+    <string name="notification_title_cancelled">Appointment cancelled</string>
+    <string name="notification_text_cancelled">%1$s cancelled appointment for %2$s on %3$s</string>
+
 </resources>

@@ -16,6 +16,7 @@ import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.common.utils.Utils;
 
 @EActivity(R.layout.activity_main)
 @OptionsMenu(R.menu.main)
@@ -36,6 +37,7 @@ public class MainActivity extends DrawerActivity
         super.onNewIntent(intent);
 
         setPage(intent.getAction());
+        handleIntent(intent);
     }
 
     @Override
@@ -59,6 +61,7 @@ public class MainActivity extends DrawerActivity
     @AfterViews
     public void afterViews() {
         setPage(getIntent().getAction());
+        handleIntent(getIntent());
     }
 
     private void setPage(@NonNull String action) {
@@ -101,6 +104,23 @@ public class MainActivity extends DrawerActivity
                 break;
             default:
                 setPage(ACTION_HOME);
+        }
+    }
+
+    private void handleIntent(Intent intent) {
+        if (intent == null) return;
+
+        if (intent.hasExtra("bookingKey") && intent.hasExtra("userKey")) {
+
+            String bookingKey = intent.getStringExtra("bookingKey");
+            String userKey = intent.getStringExtra("userKey");
+
+            if (!userKey.equals(Utils.getMyUid())) return;
+
+            BookingDetailsDialog_.builder()
+                    .bookingKey(bookingKey)
+                    .build()
+                    .show(getSupportFragmentManager(), "BookingDetailsDialog");
         }
     }
 }

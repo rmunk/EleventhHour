@@ -54,6 +54,8 @@ public class BookingDetailsDialog extends DialogFragment implements OnMapReadyCa
     @FragmentArg
     String bookingKey;
 
+    @ViewById(R.id.txt_booking_date)
+    TextView txtBookingDate;
     @ViewById(R.id.txt_booking_service)
     TextView txtBookingService;
     @ViewById(R.id.txt_booking_provider)
@@ -163,6 +165,7 @@ public class BookingDetailsDialog extends DialogFragment implements OnMapReadyCa
             booking = dataSnapshot.getValue(Booking.class);
             if (booking != null) {
                 booking.key = dataSnapshot.getKey();
+                txtBookingDate.setText(booking.getDate());
                 txtBookingService.setText(booking.serviceName);
                 txtBookingProvider.setText(booking.providerName);
                 txtBookingTime.setText(booking.getTime());

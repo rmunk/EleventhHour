@@ -57,6 +57,19 @@
             android:screenOrientation="portrait"
             android:theme="@style/MaterialTheme.Light.TranslucentStatus"/>
 
+        <service
+            android:name=".ClientFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+        <service
+            android:name=".ClientFirebaseInstanceIdService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
+
         <meta-data
             android:name="app_entry_point"
             android:value="hr.nas2skupa.eleventhhour.MAIN"/>
