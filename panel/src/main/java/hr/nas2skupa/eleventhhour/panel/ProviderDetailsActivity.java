@@ -144,6 +144,7 @@ public class ProviderDetailsActivity extends DrawerActivity implements OnMapRead
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("");
     }
 
     void setAppBar(@ViewById(R.id.app_bar) AppBarLayout appBar) {

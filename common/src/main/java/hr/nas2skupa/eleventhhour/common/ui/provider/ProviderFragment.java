@@ -152,7 +152,7 @@ public class ProviderFragment extends Fragment {
                                 progressDialog.cancel();
 
                                 new AlertDialog.Builder(getContext())
-                                        .setTitle("Pick category")
+                                        .setTitle(R.string.provider_pick_category_title)
                                         .setSingleChoiceItems(names, selected[0],
                                                 new DialogInterface.OnClickListener() {
                                                     @Override
@@ -160,7 +160,7 @@ public class ProviderFragment extends Fragment {
                                                         selected[0] = which;
                                                     }
                                                 })
-                                        .setPositiveButton("Pick", new DialogInterface.OnClickListener() {
+                                        .setPositiveButton(R.string.action_pick, new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
                                                 pickingCategory = false;
@@ -171,7 +171,7 @@ public class ProviderFragment extends Fragment {
                                                 txtSubcategories.setText(null);
                                             }
                                         })
-                                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                        .setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
                                                 pickingCategory = false;
@@ -230,7 +230,7 @@ public class ProviderFragment extends Fragment {
                                 progressDialog.cancel();
 
                                 new AlertDialog.Builder(getContext())
-                                        .setTitle("Pick subcategory")
+                                        .setTitle(R.string.provider_pick_subcategory_title)
                                         .setMultiChoiceItems(names, checked,
                                                 new DialogInterface.OnMultiChoiceClickListener() {
                                                     @Override
@@ -238,7 +238,7 @@ public class ProviderFragment extends Fragment {
                                                         checked[which] = isChecked;
                                                     }
                                                 })
-                                        .setPositiveButton("Pick", new DialogInterface.OnClickListener() {
+                                        .setPositiveButton(R.string.action_pick, new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
                                                 pickingSubcategory = false;
@@ -257,7 +257,7 @@ public class ProviderFragment extends Fragment {
                                                 }
                                             }
                                         })
-                                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                        .setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
                                                 pickingSubcategory = false;
@@ -329,7 +329,7 @@ public class ProviderFragment extends Fragment {
 
     private void setupCityPicker() {
         final List<String> cityNames = new ArrayList<>();
-        final ArrayAdapter<City> arrayAdapter = new ArrayAdapter<>(
+        final ArrayAdapter<City> cityArrayAdapter = new ArrayAdapter<>(
                 getActivity(), android.R.layout.simple_list_item_1,
                 new ArrayList<City>());
 
@@ -341,7 +341,7 @@ public class ProviderFragment extends Fragment {
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         final City city = dataSnapshot.getValue(City.class);
                         city.key = dataSnapshot.getKey();
-                        arrayAdapter.add(city);
+                        cityArrayAdapter.add(city);
                         cityNames.add(city.getLocalName());
                     }
 
@@ -365,7 +365,24 @@ public class ProviderFragment extends Fragment {
 
                     }
                 });
-        txtCity.setAdapter(arrayAdapter);
+        FirebaseDatabase.getInstance().getReference()
+                .child("cities")
+                .child("hrv")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        setCityListeners(cityNames, cityArrayAdapter);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+    }
+
+    private void setCityListeners(final List<String> cityNames, final ArrayAdapter<City> cityArrayAdapter) {
+        txtCity.setAdapter(cityArrayAdapter);
         txtCity.setThreshold(0);
         txtCity.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -376,7 +393,7 @@ public class ProviderFragment extends Fragment {
         txtCity.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                provider.city = arrayAdapter.getItem(position).key;
+                provider.city = cityArrayAdapter.getItem(position).key;
                 txtCity.onEditorAction(EditorInfo.IME_ACTION_NEXT);
             }
         });
@@ -407,8 +424,8 @@ public class ProviderFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
                 int position = cityNames.indexOf(s.toString());
-                if (position < 0 || arrayAdapter.isEmpty()) provider.city = null;
-                else provider.city = arrayAdapter.getItem(0).key;
+                if (position < 0 || cityArrayAdapter.getCount() <= position) provider.city = null;
+                else provider.city = cityArrayAdapter.getItem(position).key;
             }
         });
     }
