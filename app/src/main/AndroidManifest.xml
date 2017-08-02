@@ -56,6 +56,18 @@
             android:label="@string/title_activity_map"
             android:screenOrientation="portrait"
             android:theme="@style/MaterialTheme.Light.TranslucentStatus"/>
+        <activity
+            android:name=".ui.UserDetailsActivity_"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.UserEditActivity_"
+            android:parentActivityName=".ui.UserDetailsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/MaterialTheme.Light.DarkToolbar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.UserDetailsActivity"/>
+        </activity>
 
         <service
             android:name=".ClientFirebaseMessagingService">

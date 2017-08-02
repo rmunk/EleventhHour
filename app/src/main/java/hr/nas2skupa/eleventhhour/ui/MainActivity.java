@@ -27,6 +27,7 @@ public class MainActivity extends DrawerActivity
     public static final String ACTION_CALENDAR = "hr.nas2skupa.eleventhhour.ACTION_CALENDAR";
     public static final String ACTION_FAVORITES = "hr.nas2skupa.eleventhhour.ACTION_FAVORITES";
     public static final String ACTION_TOP = "hr.nas2skupa.eleventhhour.ACTION_TOP";
+    public static final String ACTION_PROFILE = "hr.nas2skupa.eleventhhour.ACTION_PROFILE";
     public static final String ACTION_HELP = "hr.nas2skupa.eleventhhour.ACTION_HELP";
 
     @ViewById(R.id.toolbar)
@@ -93,6 +94,10 @@ public class MainActivity extends DrawerActivity
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, TopProvidersFragment_.builder().build(), "TopProvidersFragment")
                             .commit();
+                break;
+
+            case ACTION_PROFILE:
+                UserDetailsActivity_.intent(this).extra("userKey", Utils.getMyUid()).start();
                 break;
             case ACTION_HELP:
                 try {

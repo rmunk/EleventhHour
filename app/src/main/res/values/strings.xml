@@ -58,4 +58,6 @@
     <string name="notification_title_cancelled">Appointment cancelled</string>
     <string name="notification_text_cancelled">%1$s cancelled appointment for %2$s on %3$s</string>
 
+    <!-- UserEditActivity -->
+    <string name="msg_user_save_failed">We couldn\'t save your changes. Please try again later.</string>
 </resources>
