@@ -37,7 +37,6 @@ import java.util.Map;
 import hr.nas2skupa.eleventhhour.common.model.Booking;
 import hr.nas2skupa.eleventhhour.common.model.BookingStatus;
 import hr.nas2skupa.eleventhhour.common.utils.ColorGenerator;
-import hr.nas2skupa.eleventhhour.common.utils.StringUtils;
 
 
 /**
@@ -234,21 +233,20 @@ public class PlanerFragment extends Fragment
         from.setTime(new Date(booking.from));
         GregorianCalendar to = new GregorianCalendar();
         to.setTime(new Date(booking.to));
-        String status = StringUtils.printBookingStatus(getContext(), booking.getStatus());
-        status = booking.getStatus() != BookingStatus.FINISHED ? status.substring(status.length() - 2) : "";
+        String status = booking.getStatus() == BookingStatus.PENDING ? "⚠️" :
+                booking.getStatus() < 0 ? "\uD83D\uDEAB" : "";
         MyWeekViewEvent event = new MyWeekViewEvent(
                 booking.key.hashCode(),
-                booking.serviceName,
                 status,
+                booking.serviceName,
                 from,
                 to,
                 booking.key
         );
-        float saturation = booking.getStatus() == BookingStatus.PENDING ? 1f : 0.6f;
+        float saturation = booking.getStatus() == BookingStatus.PENDING ? 1f :
+                booking.getStatus() == BookingStatus.PROVIDER_ACCEPTED ? 0.4f : 0f;
         float value = 0.85f;
-        float alpha = booking.getStatus() == BookingStatus.PENDING ? 1f :
-                booking.getStatus() == BookingStatus.FINISHED ? 0.5f
-                        : booking.getStatus() == BookingStatus.PROVIDER_ACCEPTED ? 0.7f : 0.25f;
+        float alpha = booking.getStatus() == BookingStatus.PENDING ? 1f : 0.75f;
         int color = ColorGenerator.getHsvColor(booking.serviceId, saturation, value, alpha);
         event.setColor(color);
         return event;

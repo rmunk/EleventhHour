@@ -21,7 +21,8 @@
     <string name="booking_status_pending">Waiting confirmation</string>
     <string name="booking_status_confirmed">Confirmed︎</string>
     <string name="booking_status_rejected">Rejected</string>
-    <string name="booking_status_canceled">Canceled</string>
+    <string name="booking_status_user_canceled">Canceled by user</string>
+    <string name="booking_status_provider_canceled">Canceled by provider</string>
     <string name="booking_status_finished">Finished</string>
     <string name="booking_status_unknown">Unknown</string>
 

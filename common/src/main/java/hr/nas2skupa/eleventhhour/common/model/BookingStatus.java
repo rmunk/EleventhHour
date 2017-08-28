@@ -46,5 +46,5 @@ public @interface BookingStatus {
     /***
      * Booking has already finished.
      */
-    int FINISHED = -4;
+    int FINISHED = 2;
 }

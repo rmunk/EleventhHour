@@ -62,8 +62,11 @@ public class Booking {
     @Exclude
     @BookingStatus
     public int getStatus() {
-        if (to > new Date().getTime()) return status;
-        else return BookingStatus.FINISHED;
+        if (to <= new Date().getTime()) {
+            if (status == BookingStatus.PROVIDER_ACCEPTED) return BookingStatus.FINISHED;
+            else if (status == BookingStatus.PENDING) return BookingStatus.PROVIDER_REJECTED;
+            else return status;
+        } else return status;
     }
 
     @Exclude
