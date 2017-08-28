@@ -1,4 +1,7 @@
 project.ext {
+    unifiedVersionCode = 10
+    unifiedVersionName = '0.5.0'
+
     compileSdk = 25
     targetSdk = 25
     minSdk = 16
