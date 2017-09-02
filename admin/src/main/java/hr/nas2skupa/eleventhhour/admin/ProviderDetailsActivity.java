@@ -43,6 +43,7 @@ import org.androidannotations.annotations.res.DimensionPixelOffsetRes;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
 import hr.nas2skupa.eleventhhour.common.ui.provider.ProviderFragment;
 import hr.nas2skupa.eleventhhour.common.ui.provider.ProviderFragment_;
+import hr.nas2skupa.eleventhhour.common.ui.provider.ServiceDialog_;
 import hr.nas2skupa.eleventhhour.common.ui.provider.ServicesFragment;
 import hr.nas2skupa.eleventhhour.common.ui.provider.ServicesFragment_;
 
