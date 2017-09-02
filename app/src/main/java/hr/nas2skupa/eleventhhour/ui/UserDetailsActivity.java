@@ -1,7 +1,6 @@
 package hr.nas2skupa.eleventhhour.ui;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -87,10 +86,8 @@ public class UserDetailsActivity extends DrawerActivity {
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             appBar.setExpanded(true);
             nestedScroll.setNestedScrollingEnabled(true);
-            super.onBackPressed();
-        } else {
-            MainActivity_.intent(this).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK).start();
         }
+        super.onBackPressed();
     }
 
     @OptionsItem(android.R.id.home)
