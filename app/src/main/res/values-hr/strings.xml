@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">5do12</string>
     <string name="action_settings">Postavke</string>
-    <string name="booking_status_canceled">Otkazano</string>
     <string name="booking_status_confirmed">Potvrđeno</string>
     <string name="booking_status_pending">Čeka potvrdu</string>
     <string name="booking_status_rejected">Odbijeno</string>

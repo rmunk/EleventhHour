@@ -13,7 +13,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
@@ -33,6 +32,7 @@ public class ServicesFragment extends Fragment {
     @ViewById RecyclerView recyclerView;
 
     private FirebaseRecyclerAdapter<Service, ServiceViewHolder> adapter;
+    private OnServiceClickListener listener;
 
     public ServicesFragment() {
         // Required empty public constructor
@@ -58,13 +58,8 @@ public class ServicesFragment extends Fragment {
         recyclerView.setAdapter(adapter);
     }
 
-    @Click(resName = "fab_add_service")
-    void addService() {
-        ServiceDialog_.builder()
-                .providerKey(providerKey)
-                .serviceKey(null)
-                .build()
-                .show(getFragmentManager(), "ServiceDialog");
+    public void setOnServiceClickListener(OnServiceClickListener listener) {
+        this.listener = listener;
     }
 
     private class ServicesAdapter extends FirebaseRecyclerAdapter<Service, ServiceViewHolder> {
@@ -79,13 +74,13 @@ public class ServicesFragment extends Fragment {
             viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ServiceDialog_.builder()
-                            .providerKey(providerKey)
-                            .serviceKey(model.key)
-                            .build()
-                            .show(getFragmentManager(), "ServiceDialog");
+                    if (listener != null) listener.onServiceClick(view, providerKey, model.key);
                 }
             });
         }
+    }
+
+    public interface OnServiceClickListener {
+        void onServiceClick(View view, String providerKey, String serviceKey);
     }
 }
