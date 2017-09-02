@@ -33,11 +33,10 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.common.model.Category;
+import hr.nas2skupa.eleventhhour.common.model.Subcategory;
 import hr.nas2skupa.eleventhhour.events.ProviderSelectedEvent;
 import hr.nas2skupa.eleventhhour.events.SubcategorySelectedEvent;
-import hr.nas2skupa.eleventhhour.model.Category;
-import hr.nas2skupa.eleventhhour.model.Subcategory;
-import hr.nas2skupa.eleventhhour.ui.helpers.DrawerActivity;
 
 
 @EActivity(R.layout.activity_category)
@@ -120,15 +119,15 @@ public class CategoryActivity extends DrawerActivity {
 
                 int color;
                 try {
-                    color = Color.parseColor(category.getColor());
+                    color = Color.parseColor(category.color);
                 } catch (Exception e) {
                     color = ContextCompat.getColor(CategoryActivity.this, R.color.colorPrimary);
                 }
 
-                txtCategoryName.setText(category.getName());
+                txtCategoryName.setText(category.getLocalName());
                 appBar.setBackgroundColor(color);
                 getDrawer().setStatusBarBackgroundColor(color);
-                Picasso.with(CategoryActivity.this).load(category.getIcon()).fit().into(imgCategoryIcon);
+                Picasso.with(CategoryActivity.this).load(category.icon).fit().into(imgCategoryIcon);
                 categoryBackground.setBackgroundColor(color);
             }
 
@@ -186,7 +185,7 @@ public class CategoryActivity extends DrawerActivity {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         Subcategory subcategory = dataSnapshot.getValue(Subcategory.class);
                         if (subcategory == null) return;
-                        txtSubcategoryName.setText(subcategory.getName());
+                        txtSubcategoryName.setText(subcategory.getLocalName());
                     }
 
                     @Override

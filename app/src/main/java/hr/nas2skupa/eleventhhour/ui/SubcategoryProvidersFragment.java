@@ -15,9 +15,7 @@ public class SubcategoryProvidersFragment extends ProvidersFragment {
     @Override
     public Query getKeyRef() {
         return FirebaseDatabase.getInstance().getReference()
-                .child("subcategories")
-                .child(categoryKey)
-                .child(subcategoryKey)
-                .child("providers");
+                .child("subcategoryProviders")
+                .child(subcategoryKey);
     }
 }

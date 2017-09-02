@@ -1,11 +1,97 @@
 <resources>
     <string name="app_name">common</string>
 
+    <!-- Actions -->
+    <string name="action_help">Help</string>
+    <string name="action_sign_out">Sign out</string>
+    <string name="action_ok">OK</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_save">Save</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_delete_title">Delete %s</string>
+    <string name="action_delete_message">Are you sure you want to delete %s? This action cannot be reversed.</string>
+    <string name="action_pick">Pick</string>
+
+    <!-- Navigation drawer -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
     <!-- BookingStatus -->
     <string name="booking_status_pending">Waiting confirmation</string>
     <string name="booking_status_confirmed">Confirmed︎</string>
     <string name="booking_status_rejected">Rejected</string>
-    <string name="booking_status_canceled">Canceled</string>
+    <string name="booking_status_user_canceled">Canceled by user</string>
+    <string name="booking_status_provider_canceled">Canceled by provider</string>
     <string name="booking_status_finished">Finished</string>
     <string name="booking_status_unknown">Unknown</string>
+
+    <!-- ProviderFragment -->
+    <string name="provider_name">Name</string>
+    <string name="provider_category">Category</string>
+    <string name="provider_subcategories">Subcategories</string>
+    <string name="provider_location">Location</string>
+    <string name="provider_city">City</string>
+    <string name="provider_address">Address</string>
+    <string name="provider_description">Description</string>
+    <string name="provider_phone">Phone</string>
+    <string name="provider_web">Web</string>
+    <string name="provider_email">Email</string>
+    <string name="provider_hours">Hours</string>
+    <string name="provider_error_name">You must give this provider a name</string>
+    <string name="provider_error_category">You must pick a category</string>
+    <string name="provider_error_subcategory">You must pick at least one subcategory</string>
+    <string name="provider_error_location">You must set your location</string>
+    <string name="provider_error_city">You must pick a city from the list</string>
+    <string name="provider_error_address">You must enter your address</string>
+    <string name="provider_pick_category_title">Pick category</string>
+    <string name="provider_pick_subcategory_title">Pick subcategory</string>
+    <string name="msg_provider_location_selected">Selected location:\n%s</string>
+    <string name="msg_provider_starting_location_picker">Starting location picker</string>
+    <string name="msg_provider_loading_subcategories">Fetching subcategories</string>
+    <string name="msg_provider_loading_categories">Fetching categories</string>
+    <string name="msg_provider_saving">Saving provider</string>
+    <string name="msg_pick_category_first">You must pick a category first</string>
+
+    <!-- UserFragment -->
+    <string name="user_name">Name</string>
+    <string name="user_email">Email</string>
+    <string name="user_city">City</string>
+    <string name="user_age">Age group</string>
+    <string name="user_sex">Sex</string>
+    <string name="user_error_name">Please enter a name</string>
+    <string name="user_error_email">You must enter a valid email address</string>
+    <string name="user_error_city">You must pick a city from the list</string>
+    <string name="user_pick_age">Pick age group</string>
+    <string name="msg_user_loading_age">Fetching age groups</string>
+    <string name="user_pick_sex">Pick sex</string>
+    <string name="msg_user_saving">Saving user info</string>
+    <array name="user_sexes">
+        <item>Female</item>
+        <item>Male</item>
+    </array>
+
+    <!-- ProviderEditActivity -->
+    <string name="msg_provider_save_failed">We couldn\'t save your changes. Please try again later.</string>
+
+    <!-- ServiceDialog -->
+    <string name="service_name">Name</string>
+    <string name="service_price">Price</string>
+    <string name="service_duration">Duration in minutes</string>
+    <string name="service_sale">On sale</string>
+    <string name="service_error_name">Service must have a name</string>
+    <string name="service_error_duration">Please enter duration of service in minutes</string>
+    <string name="service_error_price">Please enter price in correct format ($1,299.99 or 150 kn)</string>
+    <string name="menu_providers">Providers</string>
+    <string name="menu_categories">Categories</string>
+    <string name="menu_users">Users</string>
+    <string name="menu_sign_out">Sign out</string>
+
+    <!-- SubcategoryDialog -->
+    <string name="subcategory_error_name">Subcategory name is required</string>
+    <string name="subcategory_name_usa">English (United States)</string>
+    <string name="subcategory_name_hrv">Croatian</string>
+
+    <!-- Misc -->
+    <string name="currency_regex">^(\\W\\d{1,3}(?:\\d*(?:[.,]\\d{2})?|(?:,\\d{3})*(?:\\.\\d{2})?|(?:\\.\\d{3})*(?:,\\d{2})?))|(\\d{1,3}(?:\\d*(?:[.,]\\d{2})?|(?:,\\d{3})*(?:\\.\\d{2})?|(?:\\.\\d{3})*(?:,\\d{2})?) [\\D]{2,3})?</string>
 </resources>

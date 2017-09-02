@@ -39,13 +39,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.common.model.Booking;
+import hr.nas2skupa.eleventhhour.common.model.Provider;
+import hr.nas2skupa.eleventhhour.common.model.Service;
+import hr.nas2skupa.eleventhhour.common.ui.helpers.SimpleDividerItemDecoration;
+import hr.nas2skupa.eleventhhour.common.utils.Utils;
 import hr.nas2skupa.eleventhhour.events.MakeNewBookingEvent;
-import hr.nas2skupa.eleventhhour.model.Booking;
-import hr.nas2skupa.eleventhhour.model.Provider;
-import hr.nas2skupa.eleventhhour.model.Service;
-import hr.nas2skupa.eleventhhour.ui.helpers.SimpleDividerItemDecoration;
 import hr.nas2skupa.eleventhhour.ui.viewholders.ServiceViewHolder;
-import hr.nas2skupa.eleventhhour.utils.Utils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -128,7 +128,7 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
         recyclerView.setAdapter(adapter);
     }
 
-    private void showDatePicker(Service model) {
+    private void showDatePicker(Service service) {
         Calendar now = Calendar.getInstance();
         DatePickerDialog dpd = DatePickerDialog.newInstance(
                 ServicesFragment.this,
@@ -136,7 +136,7 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
                 now.get(Calendar.MONTH),
                 now.get(Calendar.DAY_OF_MONTH)
         );
-        dpd.setTitle(model.getName());
+        dpd.setTitle(service.name);
         dpd.setMinDate(now);
         dpd.show(getActivity().getFragmentManager(), "Datepickerdialog");
     }
@@ -151,7 +151,7 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
                 now.get(Calendar.MINUTE),
                 now.get(Calendar.SECOND),
                 true);
-        tpd.setTitle(selectedService.getName());
+        tpd.setTitle(selectedService.name);
         tpd.setTimeInterval(1, 15);
         if (now.get(Calendar.YEAR) == year && now.get(Calendar.MONTH) == monthOfYear && now.get(Calendar.DAY_OF_MONTH) == dayOfMonth)
             tpd.setMinTime(now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), now.get(Calendar.SECOND));
@@ -165,12 +165,13 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
         pickedDateTime.set(Calendar.SECOND, second);
 
         final Calendar to = (Calendar) pickedDateTime.clone();
-        to.add(Calendar.MINUTE, selectedService.getDuration());
+        to.add(Calendar.MINUTE, selectedService.duration);
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         Fragment last = getFragmentManager().findFragmentByTag("dialog");
         if (last != null) transaction.remove(last);
         transaction.addToBackStack(null);
+        transaction.commit();
 
         FirebaseDatabase.getInstance().getReference()
                 .child("providers")
@@ -186,9 +187,9 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
                                 .serviceKey(serviceKey)
                                 .from(pickedDateTime)
                                 .to(to)
-                                .providerName(provider.getName())
-                                .serviceName(selectedService.getName())
-                                .price(selectedService.getPrice())
+                                .providerName(provider.name)
+                                .serviceName(selectedService.name)
+                                .price(selectedService.price)
                                 .build()
                                 .show(getFragmentManager(), "dialog");
                     }

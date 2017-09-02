@@ -12,8 +12,13 @@ import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.ResultCodes;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Arrays;
+import java.util.HashMap;
+
+import timber.log.Timber;
 
 public class SignInActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 123;
@@ -26,6 +31,7 @@ public class SignInActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
+            saveUserInfo(auth.getCurrentUser());
             startApplication();
         } else {
             startSignInProcess();
@@ -55,6 +61,7 @@ public class SignInActivity extends AppCompatActivity {
 
             // Successfully signed in
             if (resultCode == ResultCodes.OK && auth.getCurrentUser() != null) {
+                saveUserInfo(auth.getCurrentUser());
                 startApplication();
                 return;
             } else {
@@ -71,12 +78,28 @@ public class SignInActivity extends AppCompatActivity {
                 }
 
                 if (response.getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
+                    Timber.e("Login failed (UNKNOWN_ERROR)");
                     Toast.makeText(this, R.string.unknown_error, Toast.LENGTH_LONG).show();
                     return;
                 }
             }
+            Timber.e("Login failed (No error code)");
             Toast.makeText(this, R.string.unknown_error, Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void saveUserInfo(FirebaseUser currentUser) {
+        HashMap<String, Object> userMap = new HashMap<>();
+        userMap.put("name", currentUser.getDisplayName());
+        userMap.put("email", currentUser.getEmail());
+        if (currentUser.getPhotoUrl() != null) {
+            userMap.put("photoUrl", currentUser.getPhotoUrl().toString());
+        }
+        FirebaseDatabase.getInstance().getReference()
+                .child("users")
+                .child(currentUser.getUid())
+                .child("info")
+                .updateChildren(userMap);
     }
 
     private void startApplication() {
@@ -92,6 +115,7 @@ public class SignInActivity extends AppCompatActivity {
                 throw new IllegalStateException("You must configure <meta-data android:name=\\\"app_entry_point\\\" android:value=\\\" main entry intent action\\\"/> in your AndroidManifest.xml file.\"");
             }
         } catch (Exception e) {
+            Timber.e("Login failed (Could not start main app)", e);
             Toast.makeText(this, R.string.unknown_error, Toast.LENGTH_LONG).show();
         }
     }

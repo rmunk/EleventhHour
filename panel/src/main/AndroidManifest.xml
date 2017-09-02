@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="hr.nas2skupa.eleventhhour.panel">
+          package="hr.nas2skupa.eleventhhour.panel">
 
     <application
         android:allowBackup="true"
@@ -13,24 +13,55 @@
             android:name="hr.nas2skupa.eleventhhour.auth.SignInActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".AuthActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SplashTheme">
+            <intent-filter>
+                <action android:name="hr.nas2skupa.eleventhhour.panel.MAIN"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
         <activity
             android:name=".MainActivity_"
             android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="hr.nas2skupa.eleventhhour.panel.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
         </activity>
+        <activity
+            android:name=".ProviderDetailsActivity_"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ProviderEditActivity_"
+            android:parentActivityName=".ProviderDetailsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/MaterialTheme.Light.DarkToolbar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ProviderDetailsActivity"/>
+        </activity>
+
+        <service android:name=".PanelBookingService"/>
+        <service
+            android:name=".PanelFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+        <service
+            android:name=".PanelFirebaseInstanceIdService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
 
         <meta-data
             android:name="app_entry_point"
-            android:value="hr.nas2skupa.eleventhhour.panel.MAIN" />
+            android:value="hr.nas2skupa.eleventhhour.panel.MAIN"/>
 
     </application>
 

@@ -1,8 +1,11 @@
 <resources>
     <string name="app_name">Eleventh Hour Panel</string>
+    <string name="help_page" translatable="false">http://nas2skupa.com/</string>
+
+    <!-- Activity and fragment titles -->
+    <string name="title_fragment_planer">Planer</string>
 
     <!-- Actions -->
-    <string name="action_sign_out">Sign out</string>
     <string name="action_display_range">Display range</string>
     <string name="action_show_one_day">1 day</string>
     <string name="action_show_three_days">3 days</string>
@@ -10,10 +13,30 @@
     <string name="action_today">Today</string>
     <string name="action_show_cancelled">Show cancelled bookings</string>
 
+    <!-- Navigation drawer -->
+    <string name="menu_planer">Planer</string>
+    <string name="menu_profile">Company profile</string>
+
+    <!-- AuthActivity -->
+    <string name="user_without_providers">%s is not associated with any of providers we know about.</string>
+    <string name="checking_permissions">Checking permissions</string>
+
     <!-- BookingDetailsDialog -->
     <string name="reject_booking">Reject</string>
     <string name="cancel_booking">Cancel booking</string>
     <string name="confirm_booking">Confirm</string>
     <string name="msg_booking_failed">Sorry, booking could not be updated. Please try again later.</string>
+
+    <!-- PanelFirebaseMessagingService -->
+    <string name="notification_title_new">You have a new appointment</string>
+    <string name="notification_text_new">%1$s wants to make appointment for %2$s on %3$s</string>
+    <string name="notification_title_cancelled">Appointment cancelled</string>
+    <string name="notification_text_cancelled">%1$s cancelled appointment for %2$s on %3$s</string>
+    <string name="notification_action_reject">Reject</string>
+    <string name="notification_action_confirm">Confirm</string>
+
+    <!-- PanelBookingService -->
+    <string name="notification_confirmation_error">Sorry, appointment could not be confirmed.</string>
+    <string name="notification_rejection_error">Sorry, appointment could not be rejected.</string>
 
 </resources>

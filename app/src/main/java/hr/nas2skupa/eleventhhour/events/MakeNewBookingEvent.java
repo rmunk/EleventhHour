@@ -1,6 +1,6 @@
 package hr.nas2skupa.eleventhhour.events;
 
-import hr.nas2skupa.eleventhhour.model.Booking;
+import hr.nas2skupa.eleventhhour.common.model.Booking;
 
 /**
  * Created by nas2skupa on 23/10/2016.

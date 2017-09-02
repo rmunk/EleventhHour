@@ -24,11 +24,11 @@ import org.androidannotations.annotations.ViewById;
 import org.greenrobot.eventbus.EventBus;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.common.model.Subcategory;
+import hr.nas2skupa.eleventhhour.common.ui.helpers.SimpleDividerItemDecoration;
+import hr.nas2skupa.eleventhhour.common.utils.Utils;
 import hr.nas2skupa.eleventhhour.events.SubcategorySelectedEvent;
-import hr.nas2skupa.eleventhhour.model.Subcategory;
-import hr.nas2skupa.eleventhhour.ui.helpers.SimpleDividerItemDecoration;
 import hr.nas2skupa.eleventhhour.ui.viewholders.SubcategoryViewHolder;
-import hr.nas2skupa.eleventhhour.utils.Utils;
 
 /**
  * A simple {@link Fragment} subclass.

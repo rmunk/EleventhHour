@@ -16,7 +16,7 @@ import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.ui.helpers.DrawerActivity;
+import hr.nas2skupa.eleventhhour.common.utils.Utils;
 
 @EActivity(R.layout.activity_main)
 @OptionsMenu(R.menu.main)
@@ -27,6 +27,7 @@ public class MainActivity extends DrawerActivity
     public static final String ACTION_CALENDAR = "hr.nas2skupa.eleventhhour.ACTION_CALENDAR";
     public static final String ACTION_FAVORITES = "hr.nas2skupa.eleventhhour.ACTION_FAVORITES";
     public static final String ACTION_TOP = "hr.nas2skupa.eleventhhour.ACTION_TOP";
+    public static final String ACTION_PROFILE = "hr.nas2skupa.eleventhhour.ACTION_PROFILE";
     public static final String ACTION_HELP = "hr.nas2skupa.eleventhhour.ACTION_HELP";
 
     @ViewById(R.id.toolbar)
@@ -37,6 +38,7 @@ public class MainActivity extends DrawerActivity
         super.onNewIntent(intent);
 
         setPage(intent.getAction());
+        handleIntent(intent);
     }
 
     @Override
@@ -60,6 +62,7 @@ public class MainActivity extends DrawerActivity
     @AfterViews
     public void afterViews() {
         setPage(getIntent().getAction());
+        handleIntent(getIntent());
     }
 
     private void setPage(@NonNull String action) {
@@ -92,6 +95,10 @@ public class MainActivity extends DrawerActivity
                             .replace(R.id.fragment_container, TopProvidersFragment_.builder().build(), "TopProvidersFragment")
                             .commit();
                 break;
+
+            case ACTION_PROFILE:
+                UserDetailsActivity_.intent(this).extra("userKey", Utils.getMyUid()).start();
+                break;
             case ACTION_HELP:
                 try {
                     Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.help_page)));
@@ -102,6 +109,23 @@ public class MainActivity extends DrawerActivity
                 break;
             default:
                 setPage(ACTION_HOME);
+        }
+    }
+
+    private void handleIntent(Intent intent) {
+        if (intent == null) return;
+
+        if (intent.hasExtra("bookingKey") && intent.hasExtra("userKey")) {
+
+            String bookingKey = intent.getStringExtra("bookingKey");
+            String userKey = intent.getStringExtra("userKey");
+
+            if (!userKey.equals(Utils.getMyUid())) return;
+
+            BookingDetailsDialog_.builder()
+                    .bookingKey(bookingKey)
+                    .build()
+                    .show(getSupportFragmentManager(), "BookingDetailsDialog");
         }
     }
 }

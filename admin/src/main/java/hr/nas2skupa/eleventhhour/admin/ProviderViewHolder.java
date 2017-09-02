@@ -4,13 +4,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import hr.nas2skupa.eleventhhour.model.Provider;
+import hr.nas2skupa.eleventhhour.common.model.Provider;
 
 /**
  * Created by nas2skupa on 28/02/2017.
  */
 
-class ProviderViewHolder extends RecyclerView.ViewHolder {
+public class ProviderViewHolder extends RecyclerView.ViewHolder {
     private TextView titleView;
 
 
@@ -21,6 +21,6 @@ class ProviderViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bindToProvider(Provider provider) {
-        titleView.setText(provider.getName());
+        titleView.setText(provider.name);
     }
 }

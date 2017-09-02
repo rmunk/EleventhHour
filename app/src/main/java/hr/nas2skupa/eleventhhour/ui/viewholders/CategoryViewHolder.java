@@ -11,7 +11,7 @@ import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.model.Category;
+import hr.nas2skupa.eleventhhour.common.model.Category;
 
 /**
  * Created by nas2skupa on 18/09/16.
@@ -31,14 +31,14 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bindToCategory(final Category category) {
-        titleView.setText(category.getName());
+        titleView.setText(category.getLocalName());
         titleView.setSelected(true);
         try {
-            backgroundView.setBackgroundColor(Color.parseColor(category.getColor()));
+            backgroundView.setBackgroundColor(Color.parseColor(category.color));
         } catch (Exception ignored) {
 
         }
-        Picasso.with(iconView.getContext()).load(category.getIcon())
+        Picasso.with(iconView.getContext()).load(category.icon)
                 .networkPolicy(NetworkPolicy.OFFLINE)
                 .fit()
                 .into(iconView, new Callback() {
@@ -50,7 +50,7 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder {
                     public void onError() {
                         //Try again online if cache failed
                         Picasso.with(iconView.getContext())
-                                .load(category.getIcon())
+                                .load(category.icon)
                                 .fit()
                                 .into(iconView);
                     }

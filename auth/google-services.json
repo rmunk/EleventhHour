@@ -67,6 +67,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "941408115461-9322fmra2ca49ufufgenivqb13d53ks7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "hr.nas2skupa.eleventhhour.admin",
+            "certificate_hash": "3655dc707d763296d2a20509554fe8a0093304c6"
+          }
+        },
+        {
           "client_id": "941408115461-6p65irmclran9de7013o39b5ip8m3j9b.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -111,6 +119,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "941408115461-j9s8ii4lsuucjbk06394spvhovqeqi6u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "hr.nas2skupa.eleventhhour.auth",
+            "certificate_hash": "3655dc707d763296d2a20509554fe8a0093304c6"
+          }
+        },
+        {
           "client_id": "941408115461-0agt3mev08f6444sm0qed1c6mj41srsg.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -154,6 +170,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "941408115461-gplc7ntr4eieqir84binel2hlhg4ke3j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "hr.nas2skupa.eleventhhour.panel",
+            "certificate_hash": "3655dc707d763296d2a20509554fe8a0093304c6"
+          }
+        },
         {
           "client_id": "941408115461-a214s3hp192hprp5loiec22i5fepibk1.apps.googleusercontent.com",
           "client_type": 1,

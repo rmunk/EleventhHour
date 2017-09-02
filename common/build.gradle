@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'android-apt'
 
 android {
     compileSdkVersion compileSdk
@@ -7,11 +8,10 @@ android {
     defaultConfig {
         minSdkVersion minSdk
         targetSdkVersion targetSdk
-        versionCode 1
-        versionName "1.0.0"
+        versionCode unifiedVersionCode
+        versionName unifiedVersionName
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
     buildTypes {
         release {
@@ -28,17 +28,34 @@ dependencies {
     })
     compile "com.android.support:appcompat-v7:$supportLibraryVersion"
     compile "com.android.support:recyclerview-v7:$supportLibraryVersion"
+    compile "com.android.support:design:$supportLibraryVersion"
+    compile "com.android.support.constraint:constraint-layout:$constraintLayoutVersion"
 
     compile "com.google.android.gms:play-services-maps:$playServicesVersion"
     compile "com.google.android.gms:play-services-location:$playServicesVersion"
+    compile "com.google.android.gms:play-services-places:$playServicesVersion"
 
     compile "com.google.firebase:firebase-core:$firebaseVersion"
     compile "com.google.firebase:firebase-auth:$firebaseVersion"
     compile "com.google.firebase:firebase-database:$firebaseVersion"
     compile "com.google.firebase:firebase-crash:$firebaseVersion"
     compile "com.google.firebase:firebase-messaging:$firebaseVersion"
+    compile "com.firebaseui:firebase-ui-database:$firebaseUIVersion"
+    compile 'com.firebase:geofire-android:2.1.1'
 
     compile 'com.mikepenz:materialize:1.0.0@aar'
+    compile 'jp.wasabeef:recyclerview-animators:2.2.4'
+    compile 'com.jakewharton.timber:timber:4.5.1'
+
+    compile 'org.androidannotations:androidannotations-api:4.1.0'
+    apt 'org.androidannotations:androidannotations:4.1.0'
 
     testCompile 'junit:junit:4.12'
+}
+apt {
+    arguments {
+        androidManifestFile variant.outputs[0]?.processResources?.manifestFile
+        resourcePackageName "hr.nas2skupa.eleventhhour.common"
+        library true
+    }
 }

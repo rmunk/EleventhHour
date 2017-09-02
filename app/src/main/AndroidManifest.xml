@@ -7,7 +7,6 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <application
-        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -23,12 +22,21 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ui.AuthActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SplashTheme">
+            <intent-filter>
+                <action android:name="hr.nas2skupa.eleventhhour.MAIN"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".ui.MainActivity_"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
             <intent-filter>
-                <action android:name="hr.nas2skupa.eleventhhour.MAIN"/>
                 <action android:name="hr.nas2skupa.eleventhhour.ACTION_HOME"/>
                 <action android:name="hr.nas2skupa.eleventhhour.ACTION_CALENDAR"/>
 
@@ -48,6 +56,31 @@
             android:label="@string/title_activity_map"
             android:screenOrientation="portrait"
             android:theme="@style/MaterialTheme.Light.TranslucentStatus"/>
+        <activity
+            android:name=".ui.UserDetailsActivity_"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.UserEditActivity_"
+            android:parentActivityName=".ui.UserDetailsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/MaterialTheme.Light.DarkToolbar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.UserDetailsActivity"/>
+        </activity>
+
+        <service
+            android:name=".ClientFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+        <service
+            android:name=".ClientFirebaseInstanceIdService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
 
         <meta-data
             android:name="app_entry_point"

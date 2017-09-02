@@ -21,7 +21,7 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.model.Category;
+import hr.nas2skupa.eleventhhour.common.model.Category;
 import hr.nas2skupa.eleventhhour.ui.viewholders.CategoryViewHolder;
 import jp.wasabeef.recyclerview.animators.LandingAnimator;
 

@@ -25,9 +25,6 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.firebase.geofire.GeoFire;
-import com.firebase.geofire.GeoLocation;
-import com.firebase.geofire.LocationCallback;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -38,6 +35,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import org.androidannotations.annotations.AfterViews;
@@ -48,13 +47,11 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
-import java.util.HashMap;
 import java.util.Locale;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.model.Provider;
-import hr.nas2skupa.eleventhhour.ui.helpers.DrawerActivity;
-import hr.nas2skupa.eleventhhour.utils.Utils;
+import hr.nas2skupa.eleventhhour.common.model.Provider;
+import hr.nas2skupa.eleventhhour.common.utils.Utils;
 
 @EActivity(R.layout.activity_provider)
 @OptionsMenu(R.menu.main)
@@ -93,6 +90,7 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
     private ValueEventListener ratingListener;
     private boolean showDetails = false;
     private Provider provider;
+    private float userRating;
 
     private GoogleMap map;
 
@@ -139,7 +137,7 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
                     ActivityCompat.requestPermissions(ProviderActivity.this, new String[]{Manifest.permission.CALL_PHONE}, REQUEST_PHONE_PERMISSION);
                     return;
                 }
-                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + provider.getPhone()));
+                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + provider.phone));
                 if (intent.resolveActivity(getPackageManager()) != null) {
                     startActivity(intent);
                 }
@@ -148,7 +146,7 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
         txtWeb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String url = provider.getWeb();
+                String url = provider.web;
                 if (!url.startsWith("http://") && !url.startsWith("https://"))
                     url = "http://" + url;
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -160,7 +158,7 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
         txtEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + provider.getEmail()));
+                Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + provider.email));
                 if (intent.resolveActivity(getPackageManager()) != null) {
                     startActivity(Intent.createChooser(intent, "Email"));
                 }
@@ -173,24 +171,24 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
     }
 
     public void bindToProvider(Provider provider) {
-        txtProviderName.setText(provider.getName());
-        imgSale.setVisibility(provider.isSale() ? View.VISIBLE : View.GONE);
-        imgFavorite.setVisibility(provider.isFavorite() ? View.VISIBLE : View.GONE);
-        ratingIndicator.setRating(provider.getRating());
-        txtRatings.setText(String.valueOf(provider.getRatingsCnt()));
+        txtProviderName.setText(provider.name);
+        imgSale.setVisibility(provider.hasSale ? View.VISIBLE : View.GONE);
+        imgFavorite.setVisibility(provider.favorite ? View.VISIBLE : View.GONE);
+        ratingIndicator.setRating(provider.rating);
+        txtRatings.setText(String.valueOf(provider.ratings));
 
-        txtDescription.setText(provider.getDescription());
+        txtDescription.setText(provider.description);
         txtDescription.setVisibility(txtDescription.getText().length() > 0 ? View.VISIBLE : View.GONE);
-        txtPhone.setText(provider.getPhone());
+        txtPhone.setText(provider.phone);
         txtPhone.setVisibility(txtPhone.getText().length() > 0 ? View.VISIBLE : View.GONE);
-        txtAddress.setText(provider.getAddress());
+        txtAddress.setText(provider.address);
         txtAddress.setVisibility(txtAddress.getText().length() > 0 ? View.VISIBLE : View.GONE);
         txtAddress.setSelected(true);
-        txtWeb.setText(provider.getWeb());
+        txtWeb.setText(provider.web);
         txtWeb.setVisibility(txtWeb.getText().length() > 0 ? View.VISIBLE : View.GONE);
-        txtEmail.setText(provider.getEmail());
+        txtEmail.setText(provider.email);
         txtEmail.setVisibility(txtEmail.getText().length() > 0 ? View.VISIBLE : View.GONE);
-        txtHours.setText(provider.getHours());
+        txtHours.setText(provider.hours);
         txtHours.setVisibility(txtHours.getText().length() > 0 ? View.VISIBLE : View.GONE);
     }
 
@@ -233,7 +231,7 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
         switch (requestCode) {
             case REQUEST_PHONE_PERMISSION:
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
-                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + provider.getPhone()));
+                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + provider.phone));
                     if (intent.resolveActivity(getPackageManager()) != null) {
                         startActivity(intent);
                     }
@@ -271,43 +269,65 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
 
     @Click(R.id.btn_favorite)
     public void toggleFavorite(ImageView imageView) {
-        provider.setFavorite(!provider.isFavorite());
-        imageView.setImageResource(provider.isFavorite() ? R.drawable.ic_heart_broken_black_24dp : R.drawable.ic_favorite_black_36dp);
+        provider.favorite = !provider.favorite;
+        imageView.setImageResource(provider.favorite ? R.drawable.ic_heart_broken_black_24dp : R.drawable.ic_favorite_black_36dp);
         FirebaseDatabase.getInstance().getReference()
                 .child("users")
                 .child(Utils.getMyUid())
                 .child("favorites")
                 .child(providerKey)
-                .setValue(provider.isFavorite() ? true : null);
+                .setValue(provider.favorite ? true : null);
     }
 
     @Override
-    public void onRatingChanged(RatingBar ratingBar, float newUserRating, boolean fromUser) {
+    public void onRatingChanged(final RatingBar ratingBar, final float newUserRating, boolean fromUser) {
         if (!fromUser) return;
 
-        HashMap<String, Object> ratingUpdate = new HashMap<>();
-        float oldUserRating = provider.getUserRating();
-        int oldRatingsCnt = provider.getRatingsCnt();
-
-        boolean alreadyRated = oldUserRating > 0;
-        int newRatingsCnt = !alreadyRated ? oldRatingsCnt + 1
-                : newUserRating > 0 ? oldRatingsCnt
-                : oldRatingsCnt - 1;
-        float newRating = (oldRatingsCnt * provider.getRating() - oldUserRating + newUserRating) / newRatingsCnt;
-        ratingUpdate.put("rating", newRating);
-        ratingUpdate.put("ratingsCnt", newRatingsCnt);
-        ratingUpdate.put(".priority", 5 - newRating);
+        ratingBar.setEnabled(false);
         DatabaseReference providers = FirebaseDatabase.getInstance().getReference()
                 .child("providers")
                 .child(providerKey);
-        providers.updateChildren(ratingUpdate);
+        providers.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Provider provider = mutableData.getValue(Provider.class);
 
-        FirebaseDatabase.getInstance().getReference()
-                .child("users")
-                .child(Utils.getMyUid())
-                .child("ratings")
-                .child(providerKey)
-                .setValue(newUserRating > 0 ? newUserRating : null);
+                if (provider == null) {
+                    return Transaction.success(mutableData);
+                }
+
+                int oldRatingsCnt = provider.ratings;
+                float oldRating = oldRatingsCnt > 0 ? provider.rating : 0;
+                float oldUserRating = oldRatingsCnt > 0 ? userRating : 0;
+
+                boolean alreadyRated = oldUserRating > 0;
+                int newRatingsCnt = !alreadyRated ? oldRatingsCnt + 1
+                        : newUserRating > 0 ? oldRatingsCnt
+                        : oldRatingsCnt - 1;
+                float newRating = newRatingsCnt > 0
+                        ? (oldRatingsCnt * oldRating - oldUserRating + newUserRating) / newRatingsCnt
+                        : 0;
+
+                provider.rating = newRating;
+                provider.ratings = newRatingsCnt;
+
+                mutableData.setValue(provider);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                userRating = newUserRating;
+                FirebaseDatabase.getInstance().getReference()
+                        .child("users")
+                        .child(Utils.getMyUid())
+                        .child("ratings")
+                        .child(providerKey)
+                        .setValue(newUserRating > 0 ? newUserRating : null);
+                ratingBar.setEnabled(true);
+            }
+        });
+
     }
 
     @Override
@@ -326,40 +346,24 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
             Provider newProvider = dataSnapshot.getValue(Provider.class);
             if (newProvider == null) {
                 Toast.makeText(ProviderActivity.this,
-                        String.format(Locale.getDefault(), getString(R.string.provider_removed), provider.getName()),
+                        String.format(Locale.getDefault(), getString(R.string.provider_removed), provider.name),
                         Toast.LENGTH_SHORT).show();
                 onBackPressed();
                 return;
             }
 
-            newProvider.setFavorite(provider != null && provider.isFavorite());
+            newProvider.favorite = provider != null && provider.favorite;
             provider = newProvider;
-            provider.setKey(dataSnapshot.getKey());
+            provider.key = dataSnapshot.getKey();
             bindToProvider(provider);
 
-
-            DatabaseReference ref = FirebaseDatabase.getInstance()
-                    .getReference("geofire/providers")
-                    .child(provider.getCategory())
-                    .child(provider.getSubcategory());
-            GeoFire geoFire = new GeoFire(ref);
-            geoFire.getLocation(providerKey, new LocationCallback() {
-                @Override
-                public void onLocationResult(String key, GeoLocation location) {
-                    if (map != null && location != null) {
-                        LatLng target = new LatLng(location.latitude, location.longitude);
-                        map.addMarker(new MarkerOptions()
-                                .position(target)
-                                .title(provider.getName()));
-                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(target, 16));
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
+            if (map != null && provider.location != null) {
+                LatLng target = provider.location.toLatLng();
+                map.addMarker(new MarkerOptions()
+                        .position(target)
+                        .title(provider.name));
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(target, 16));
+            }
         }
 
         @Override
@@ -372,9 +376,9 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             Boolean value = dataSnapshot.getValue(Boolean.class);
-            provider.setFavorite(value != null);
+            provider.favorite = value != null;
             bindToProvider(provider);
-            btnFavorite.setImageResource(provider.isFavorite() ? R.drawable.ic_heart_broken_black_24dp : R.drawable.ic_favorite_black_36dp);
+            btnFavorite.setImageResource(provider.favorite ? R.drawable.ic_heart_broken_black_24dp : R.drawable.ic_favorite_black_36dp);
         }
 
         @Override
@@ -387,8 +391,7 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             Float value = dataSnapshot.getValue(Float.class);
-            float userRating = value != null ? value : 0;
-            provider.setUserRating(userRating);
+            userRating = provider.ratings > 0 && value != null ? value : 0;
             ratingBar.setRating(userRating);
         }
 

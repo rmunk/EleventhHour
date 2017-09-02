@@ -1,4 +1,7 @@
 project.ext {
+    unifiedVersionCode = 11
+    unifiedVersionName = '0.5.1'
+
     compileSdk = 25
     targetSdk = 25
     minSdk = 16
@@ -9,4 +12,5 @@ project.ext {
     firebaseVersion = '10.2.0'
     firebaseUIVersion = '1.2.0'
     supportLibraryVersion = '25.1.1'
+    constraintLayoutVersion = '1.0.2'
 }

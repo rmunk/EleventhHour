@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="wrap_content"
+                                             tools:context=".CategoryActivity">
+
+    <ImageView
+        android:id="@+id/img_usa"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="0dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/layout_name_usa"
+        app:srcCompat="@drawable/flag_us"/>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/layout_name_usa"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintLeft_toRightOf="@+id/img_usa"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <EditText
+            android:id="@+id/txt_name_usa"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/subcategory_name_usa"
+            android:inputType="textCapSentences|textPersonName"
+            android:maxLines="2"
+            />
+    </android.support.design.widget.TextInputLayout>
+
+    <ImageView
+        android:id="@+id/img_hrv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:srcCompat="@drawable/flag_hr"
+        app:layout_constraintTop_toTopOf="@+id/layout_name_hrv"
+        android:layout_marginTop="0dp"/>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/layout_name_hrv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintLeft_toRightOf="@+id/img_hrv"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layout_name_usa"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="16dp">
+
+        <EditText
+            android:id="@+id/txt_name_hrv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/subcategory_name_hrv"
+            android:inputType="textCapSentences|textPersonName"
+            android:maxLines="2"
+            />
+    </android.support.design.widget.TextInputLayout>
+</android.support.constraint.ConstraintLayout>

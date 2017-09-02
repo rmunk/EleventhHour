@@ -9,8 +9,8 @@ android {
         applicationId "hr.nas2skupa.eleventhhour.panel"
         minSdkVersion minSdk
         targetSdkVersion targetSdk
-        versionCode 1
-        versionName "0.1.0"
+        versionCode unifiedVersionCode
+        versionName unifiedVersionName
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -19,6 +19,13 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            output.outputFile = new File(
+                    output.outputFile.parent,
+                    "eleventh-hour-panel-${variant.versionName}.apk")
         }
     }
 }
@@ -33,7 +40,7 @@ dependencies {
 
     compile "com.android.support:appcompat-v7:$supportLibraryVersion"
     compile "com.android.support:design:$supportLibraryVersion"
-    compile 'com.android.support.constraint:constraint-layout:1.0.0'
+    compile "com.android.support.constraint:constraint-layout:$constraintLayoutVersion"
 
     compile "com.firebaseui:firebase-ui-database:$firebaseUIVersion"
 

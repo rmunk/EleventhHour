@@ -9,8 +9,8 @@ android {
         applicationId "hr.nas2skupa.eleventhhour.admin"
         minSdkVersion minSdk
         targetSdkVersion targetSdk
-        versionCode 1
-        versionName "0.1.0"
+        versionCode unifiedVersionCode
+        versionName unifiedVersionName
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -21,27 +21,31 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            output.outputFile = new File(
+                    output.outputFile.parent,
+                    "eleventh-hour-admin-${variant.versionName}.apk")
+        }
+    }
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile project(':auth')
-    compile project(':common')
-
-    compile "com.android.support:appcompat-v7:$supportLibraryVersion"
-    compile 'com.android.support.constraint:constraint-layout:1.0.0'
-
-    compile "com.google.android.gms:play-services-places:$playServicesVersion"
-
-    compile "com.firebaseui:firebase-ui-database:$firebaseUIVersion"
-    compile 'com.firebase:geofire-android:2.1.1'
-
     compile 'org.androidannotations:androidannotations-api:4.1.0'
     apt 'org.androidannotations:androidannotations:4.1.0'
 
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile project(':auth')
+    compile project(':common')
 
     testCompile 'junit:junit:4.12'
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+}
+apt {
+    arguments {
+        androidManifestFile variant.outputs[0]?.processResources?.manifestFile
+        resourcePackageName "hr.nas2skupa.eleventhhour.admin"
+    }
 }

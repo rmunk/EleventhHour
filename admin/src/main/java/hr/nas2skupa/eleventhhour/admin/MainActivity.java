@@ -1,126 +1,70 @@
 package hr.nas2skupa.eleventhhour.admin;
 
 import android.content.Intent;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
-
-import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.Toolbar;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.OptionsItem;
-import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
-
-import hr.nas2skupa.eleventhhour.auth.SignInActivity;
-import hr.nas2skupa.eleventhhour.model.Provider;
-import hr.nas2skupa.eleventhhour.ui.helpers.SimpleDividerItemDecoration;
-import hr.nas2skupa.eleventhhour.utils.Utils;
 
 
 @EActivity(R.layout.activity_main)
-@OptionsMenu(R.menu.menu_main)
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends DrawerActivity {
+    public static final String ACTION_PROVIDERS = "hr.nas2skupa.eleventhhour.ACTION_PROVIDERS";
+    public static final String ACTION_CATEGORIES = "hr.nas2skupa.eleventhhour.ACTION_CATEGORIES";
+    public static final String ACTION_USERS = "hr.nas2skupa.eleventhhour.ACTION_USERS";
 
-    @ViewById(R.id.layout_main)
-    ViewGroup layoutMain;
-    @ViewById(R.id.recycler_view)
-    RecyclerView recyclerView;
-
-    private FirebaseRecyclerAdapter<Provider, ProviderViewHolder> adapter;
+    @ViewById Toolbar toolbar;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
 
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        FirebaseDatabase.getInstance()
-                .getReference("admins")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (!dataSnapshot.hasChild(user.getUid())) {
-                            Toast.makeText(MainActivity.this, user.getDisplayName() + " is not EleventhHour administrator!", Toast.LENGTH_LONG).show();
-                            signOut();
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        signOut();
-                    }
-                });
+        setPage(intent.getAction());
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+    void initToolbar(@ViewById(R.id.toolbar) Toolbar toolbar) {
+        toolbar.setTitle(R.string.title_fragment_providers);
+        setSupportActionBar(toolbar);
 
-        if (adapter != null) adapter.cleanup();
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, getDrawer(), toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        getDrawer().addDrawerListener(toggle);
+        toggle.syncState();
     }
 
     @AfterViews
-    public void init() {
-        LinearLayoutManager manager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(manager);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
-
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        Query query = database.child("providers").orderByChild("name/" + Utils.getLanguageIso());
-        adapter = new FirebaseRecyclerAdapter<Provider, ProviderViewHolder>(
-                Provider.class,
-                R.layout.item_provider,
-                ProviderViewHolder.class,
-                query) {
-            @Override
-            protected void populateViewHolder(final ProviderViewHolder viewHolder, Provider model, int position) {
-                final DatabaseReference categoryRef = getRef(position);
-
-                viewHolder.bindToProvider(model);
-                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        // TODO: open provider page
-                    }
-                });
-            }
-        };
-        recyclerView.setAdapter(adapter);
+    public void afterViews() {
+        setPage(getIntent().getAction());
     }
 
-    @OptionsItem(R.id.menu_sign_out)
-    void signOut() {
-        AuthUI.getInstance()
-                .signOut(this)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            startActivity(new Intent(MainActivity.this, SignInActivity.class));
-                            finish();
-                        } else {
-                            Toast.makeText(MainActivity.this, R.string.sign_out_failed, Toast.LENGTH_LONG);
-                        }
-                    }
-                });
+    private void setPage(String action) {
+        if (action == null) action = ACTION_PROVIDERS;
+
+        switch (action) {
+            case ACTION_PROVIDERS:
+                toolbar.setTitle(R.string.title_fragment_providers);
+                if (getSupportFragmentManager().findFragmentByTag("ProvidersFragment") == null)
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, ProvidersFragment_.builder().build(), "ProvidersFragment")
+                            .commit();
+                break;
+            case ACTION_CATEGORIES:
+                toolbar.setTitle(R.string.title_fragment_categories);
+                if (getSupportFragmentManager().findFragmentByTag("CategoriesFragment") == null)
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, CategoriesFragment_.builder().build(), "CategoriesFragment")
+                            .commit();
+                break;
+            case ACTION_USERS:
+                toolbar.setTitle(R.string.title_fragment_users);
+//                if (getSupportFragmentManager().findFragmentByTag("FavoriteProvidersFragment") == null)
+//                    getSupportFragmentManager().beginTransaction()
+//                            .replace(R.id.fragment_container, UsersFragment_.builder().build(), "UsersFragment")
+//                            .commit();
+                break;
+            default:
+                setPage(ACTION_PROVIDERS);
+        }
     }
 }
