@@ -16,6 +16,7 @@ import android.view.Gravity;
 import android.view.View;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -30,8 +31,6 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -42,16 +41,21 @@ import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.common.model.Booking;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
 import hr.nas2skupa.eleventhhour.common.model.Service;
+import hr.nas2skupa.eleventhhour.common.ui.MakeBookingDialog;
+import hr.nas2skupa.eleventhhour.common.ui.MakeBookingDialog_;
 import hr.nas2skupa.eleventhhour.common.ui.helpers.SimpleDividerItemDecoration;
 import hr.nas2skupa.eleventhhour.common.utils.Utils;
-import hr.nas2skupa.eleventhhour.events.MakeNewBookingEvent;
 import hr.nas2skupa.eleventhhour.ui.viewholders.ServiceViewHolder;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 @EFragment(R.layout.fragment_recycler_view)
-public class ServicesFragment extends Fragment implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
+public class ServicesFragment extends Fragment implements
+        DatePickerDialog.OnDateSetListener,
+        TimePickerDialog.OnTimeSetListener,
+        MakeBookingDialog.BookingDialogListener {
+
     @FragmentArg
     String providerKey;
 
@@ -73,18 +77,6 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
         super.onCreate(savedInstanceState);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) setTransitions();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -182,16 +174,19 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
                         Provider provider = dataSnapshot.getValue(Provider.class);
                         if (provider == null) onCancelled(null);
 
-                        MakeBookingDialog_.builder()
+                        MakeBookingDialog makeBookingDialog = MakeBookingDialog_.builder()
+                                .userKey(Utils.getMyUid())
                                 .providerKey(providerKey)
                                 .serviceKey(serviceKey)
                                 .from(pickedDateTime)
                                 .to(to)
+                                .userName(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
                                 .providerName(provider.name)
                                 .serviceName(selectedService.name)
                                 .price(selectedService.price)
-                                .build()
-                                .show(getFragmentManager(), "dialog");
+                                .build();
+                        makeBookingDialog.setBookingDialogListener(ServicesFragment.this);
+                        makeBookingDialog.show(getFragmentManager(), "MakeBookingDialog");
                     }
 
                     @Override
@@ -201,20 +196,6 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
                     }
                 });
 
-    }
-
-    @Subscribe
-    public void makeNewBooking(MakeNewBookingEvent event) {
-        undo = false;
-        Snackbar.make(getView(), "Your booking has been sent.", 5000)
-                .setAction("Undo", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        undo = true;
-                    }
-                })
-                .show();
-        sendBooking(event.getBooking());
     }
 
     @UiThread(delay = 5500)
@@ -246,5 +227,24 @@ public class ServicesFragment extends Fragment implements DatePickerDialog.OnDat
         setReenterTransition(new Fade());
         setExitTransition(new Slide(Gravity.TOP));
         setReturnTransition(new Slide(Gravity.TOP));
+    }
+
+    @Override
+    public void onBookingConfirmed(Booking booking) {
+        undo = false;
+        Snackbar.make(getView(), R.string.msg_booking_sent, 5000)
+                .setAction(R.string.action_undo, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        undo = true;
+                    }
+                })
+                .show();
+        sendBooking(booking);
+    }
+
+    @Override
+    public void onBookingDismissed() {
+
     }
 }

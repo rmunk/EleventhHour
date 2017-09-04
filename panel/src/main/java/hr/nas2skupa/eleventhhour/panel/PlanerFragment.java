@@ -1,12 +1,19 @@
 package hr.nas2skupa.eleventhhour.panel;
 
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.graphics.Color;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.alamkanak.weekview.DateTimeInterpreter;
 import com.alamkanak.weekview.MonthLoader;
@@ -15,9 +22,15 @@ import com.alamkanak.weekview.WeekViewEvent;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
+import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.OptionsItem;
@@ -36,6 +49,11 @@ import java.util.Map;
 
 import hr.nas2skupa.eleventhhour.common.model.Booking;
 import hr.nas2skupa.eleventhhour.common.model.BookingStatus;
+import hr.nas2skupa.eleventhhour.common.model.Provider;
+import hr.nas2skupa.eleventhhour.common.model.Service;
+import hr.nas2skupa.eleventhhour.common.ui.MakeBookingDialog;
+import hr.nas2skupa.eleventhhour.common.ui.MakeBookingDialog_;
+import hr.nas2skupa.eleventhhour.common.ui.helpers.DelayedProgressDialog;
 import hr.nas2skupa.eleventhhour.common.utils.ColorGenerator;
 
 
@@ -47,17 +65,26 @@ import hr.nas2skupa.eleventhhour.common.utils.ColorGenerator;
 public class PlanerFragment extends Fragment
         implements MonthLoader.MonthChangeListener,
         WeekView.EventClickListener,
-        ChildEventListener {
+        ChildEventListener,
+        DatePickerDialog.OnDateSetListener,
+        TimePickerDialog.OnTimeSetListener,
+        MakeBookingDialog.BookingDialogListener {
 
     private static final int START_HOUR = 8;
+    private static final long PROGRESS_DELAY = 500l;
 
     private List<MyWeekViewEvent> events = new ArrayList<>();
     private Map<String, Query> bookingsQueryList = new HashMap<>();
+    private ProgressDialog progressDialog;
+
     private boolean showCancelled = false;
 
     @FragmentArg String providerKey;
 
     @ViewById WeekView weekView;
+
+    private GregorianCalendar pickedDateTime;
+    private Service selectedService;
 
     public PlanerFragment() {
         // Required empty public constructor
@@ -84,6 +111,12 @@ public class PlanerFragment extends Fragment
         weekView.setOnEventClickListener(this);
         weekView.setMonthChangeListener(this);
         weekView.goToHour(START_HOUR);
+        weekView.setEmptyViewClickListener(new WeekView.EmptyViewClickListener() {
+            @Override
+            public void onEmptyViewClicked(Calendar time) {
+                Log.d(getTag(), "onEmptyViewClicked() called with: time = [" + time.getTime().toString() + "]");
+            }
+        });
         weekView.setDateTimeInterpreter(new DateTimeInterpreter() {
             @Override
             public String interpretDate(Calendar date) {
@@ -307,6 +340,188 @@ public class PlanerFragment extends Fragment
     public void onCancelled(DatabaseError databaseError) {
 
     }
+
+    @Click(R.id.fab_add_booking)
+    void addBooking() {
+        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(hr.nas2skupa.eleventhhour.common.R.string.msg_provider_loading_categories), PROGRESS_DELAY);
+        FirebaseDatabase.getInstance().getReference()
+                .child("services").child(providerKey).orderByChild("name")
+                .addListenerForSingleValueEvent(
+                        new ValueEventListener() {
+                            private int selected = 0;
+
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                final Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                                final int cnt = (int) dataSnapshot.getChildrenCount();
+                                final String[] names = new String[cnt];
+                                final Service[] services = new Service[cnt];
+
+                                int i = 0;
+                                for (DataSnapshot child : children) {
+                                    Service service = child.getValue(Service.class);
+                                    if (service != null) {
+                                        service.key = child.getKey();
+                                        names[i] = service.name;
+                                        services[i] = service;
+                                        i++;
+                                    }
+                                }
+
+                                progressDialog.dismiss();
+                                progressDialog.cancel();
+
+                                TextView titleView = new TextView(getContext());
+                                titleView.setBackgroundColor(getResources().getColor(R.color.accent));
+                                titleView.setTextColor(Color.WHITE);
+                                titleView.setTextSize(20);
+
+                                int horizontal = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics());
+                                int vertical = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics());
+
+                                titleView.setPadding(horizontal, vertical, horizontal, vertical);
+                                titleView.setText(R.string.planer_add_booking_title);
+
+                                new android.app.AlertDialog.Builder(getContext())
+//                                        .setTitle("Add appointment")
+                                        .setCustomTitle(titleView)
+                                        .setSingleChoiceItems(names, selected,
+                                                new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        selected = which;
+                                                    }
+                                                })
+                                        .setPositiveButton(hr.nas2skupa.eleventhhour.common.R.string.action_pick, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                selectedService = services[selected];
+                                                showDatePicker();
+                                            }
+                                        })
+                                        .setNegativeButton(hr.nas2skupa.eleventhhour.common.R.string.action_cancel, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                            }
+                                        })
+                                        .create()
+                                        .show();
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                            }
+                        }
+                );
+    }
+
+    private void showDatePicker() {
+        Calendar now = Calendar.getInstance();
+        DatePickerDialog dpd = DatePickerDialog.newInstance(
+                PlanerFragment.this,
+                now.get(Calendar.YEAR),
+                now.get(Calendar.MONTH),
+                now.get(Calendar.DAY_OF_MONTH)
+        );
+        dpd.setTitle(selectedService.name);
+        dpd.setMinDate(now);
+        dpd.show(getActivity().getFragmentManager(), "Datepickerdialog");
+    }
+
+    @Override
+    public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+        pickedDateTime = new GregorianCalendar(year, monthOfYear, dayOfMonth);
+        Calendar now = Calendar.getInstance();
+        TimePickerDialog tpd = TimePickerDialog.newInstance(
+                PlanerFragment.this,
+                now.get(Calendar.HOUR_OF_DAY),
+                now.get(Calendar.MINUTE),
+                now.get(Calendar.SECOND),
+                true);
+        tpd.setTitle(selectedService.name);
+        tpd.setTimeInterval(1, 15);
+        if (now.get(Calendar.YEAR) == year && now.get(Calendar.MONTH) == monthOfYear && now.get(Calendar.DAY_OF_MONTH) == dayOfMonth)
+            tpd.setMinTime(now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), now.get(Calendar.SECOND));
+        tpd.show(getActivity().getFragmentManager(), "TimePickerDialog");
+    }
+
+    @Override
+    public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute, int second) {
+        pickedDateTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        pickedDateTime.set(Calendar.MINUTE, minute);
+        pickedDateTime.set(Calendar.SECOND, second);
+
+        final Calendar to = (Calendar) pickedDateTime.clone();
+        to.add(Calendar.MINUTE, selectedService.duration);
+
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        Fragment last = getFragmentManager().findFragmentByTag("dialog");
+        if (last != null) transaction.remove(last);
+        transaction.addToBackStack(null);
+        transaction.commit();
+
+        FirebaseDatabase.getInstance().getReference()
+                .child("providers")
+                .child(providerKey)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Provider provider = dataSnapshot.getValue(Provider.class);
+                        if (provider == null) onCancelled(null);
+
+
+                        MakeBookingDialog makeBookingDialog = MakeBookingDialog_.builder()
+                                .userKey(null)
+                                .providerKey(providerKey)
+                                .serviceKey(selectedService.key)
+                                .from(pickedDateTime)
+                                .to(to)
+                                .userName(null)
+                                .providerName(provider.name)
+                                .serviceName(selectedService.name)
+                                .price(selectedService.price)
+                                .build();
+                        makeBookingDialog.setBookingDialogListener(PlanerFragment.this);
+                        makeBookingDialog.show(getFragmentManager(), "MakeBookingDialog");
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        if (getView() != null)
+                            Snackbar.make(getView(), R.string.msg_booking_failed, Snackbar.LENGTH_LONG).show();
+                    }
+                });
+
+    }
+
+    public void sendBooking(Booking booking) {
+        booking.status = BookingStatus.PROVIDER_ACCEPTED;
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+        String key = reference.child("bookings").child(providerKey).push().getKey();
+        Map<String, Object> bookingValues = booking.toMap();
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/bookings/" + providerKey + "/" + key, bookingValues);
+        reference.updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if (databaseError != null)
+                    Snackbar.make(getView(), R.string.msg_booking_failed, Snackbar.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    @Override
+    public void onBookingConfirmed(Booking booking) {
+        sendBooking(booking);
+    }
+
+    @Override
+    public void onBookingDismissed() {
+
+    }
+
 
     private class MyWeekViewEvent extends WeekViewEvent {
         private String bookingKey;

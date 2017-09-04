@@ -48,6 +48,7 @@ dependencies {
     apt 'org.androidannotations:androidannotations:4.1.0'
 
     compile 'com.github.alamkanak:android-week-view:1.2.6'
+    compile 'com.wdullaer:materialdatetimepicker:2.5.0'
 
     testCompile 'junit:junit:4.12'
 }
