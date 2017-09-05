@@ -32,18 +32,6 @@
             android:name=".MainActivity_"
             android:screenOrientation="portrait">
         </activity>
-        <activity
-            android:name=".ProviderDetailsActivity_"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name=".ProviderEditActivity_"
-            android:parentActivityName=".ProviderDetailsActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/MaterialTheme.Light.DarkToolbar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ProviderDetailsActivity"/>
-        </activity>
 
         <service android:name=".PanelBookingService"/>
         <service

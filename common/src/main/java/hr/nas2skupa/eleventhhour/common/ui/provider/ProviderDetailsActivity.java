@@ -1,4 +1,4 @@
-package hr.nas2skupa.eleventhhour.panel;
+package hr.nas2skupa.eleventhhour.common.ui.provider;
 
 import android.content.DialogInterface;
 import android.content.res.Resources;
@@ -11,6 +11,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -40,16 +41,12 @@ import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.DimensionPixelOffsetRes;
 
+import hr.nas2skupa.eleventhhour.common.R;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
-import hr.nas2skupa.eleventhhour.common.ui.provider.ProviderFragment;
-import hr.nas2skupa.eleventhhour.common.ui.provider.ProviderFragment_;
-import hr.nas2skupa.eleventhhour.common.ui.provider.ServiceDialog_;
-import hr.nas2skupa.eleventhhour.common.ui.provider.ServicesFragment;
-import hr.nas2skupa.eleventhhour.common.ui.provider.ServicesFragment_;
 
-@EActivity(R.layout.activity_provider_details)
-@OptionsMenu(R.menu.menu_provider_details)
-public class ProviderDetailsActivity extends DrawerActivity implements OnMapReadyCallback {
+@EActivity(resName = "activity_provider_details")
+@OptionsMenu(resName = "menu_provider_details")
+public class ProviderDetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
     @Extra String providerKey;
 
     @ViewById ViewGroup layoutMain;
@@ -115,12 +112,12 @@ public class ProviderDetailsActivity extends DrawerActivity implements OnMapRead
         onBackPressed();
     }
 
-    @OptionsItem(R.id.action_edit)
+    @OptionsItem(resName = "action_edit")
     void editProvider() {
         ProviderEditActivity_.intent(this).providerKey(providerKey).start();
     }
 
-    @OptionsItem(R.id.action_delete)
+    @OptionsItem(resName = "action_delete")
     void deleteProvider() {
         new AlertDialog.Builder(this)
                 .setTitle(String.format(getString(R.string.action_delete_title), provider.name))
@@ -139,7 +136,7 @@ public class ProviderDetailsActivity extends DrawerActivity implements OnMapRead
     }
 
     @SuppressWarnings("ConstantConditions")
-    void setToolbar(@ViewById(R.id.toolbar) Toolbar toolbar) {
+    void setToolbar(@ViewById(resName = "toolbar") Toolbar toolbar) {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -147,7 +144,7 @@ public class ProviderDetailsActivity extends DrawerActivity implements OnMapRead
         getSupportActionBar().setTitle("");
     }
 
-    void setAppBar(@ViewById(R.id.app_bar) AppBarLayout appBar) {
+    void setAppBar(@ViewById(resName = "app_bar") AppBarLayout appBar) {
         appBar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
@@ -189,7 +186,7 @@ public class ProviderDetailsActivity extends DrawerActivity implements OnMapRead
         }
     }
 
-    @Click(R.id.fab_services)
+    @Click(resName = "fab_services")
     void editServices() {
         appBar.setExpanded(false);
         nestedScroll.setNestedScrollingEnabled(false);

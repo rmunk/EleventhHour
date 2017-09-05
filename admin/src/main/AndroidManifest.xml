@@ -42,18 +42,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ProviderDetailsActivity_"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name=".ProviderEditActivity_"
-            android:parentActivityName=".ProviderDetailsActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/MaterialTheme.Light.DarkToolbar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ProviderDetailsActivity"/>
-        </activity>
-        <activity
             android:name=".CategoryActivity_"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"/>

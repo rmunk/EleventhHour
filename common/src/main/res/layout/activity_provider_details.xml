@@ -7,7 +7,7 @@
                                                  android:layout_height="match_parent"
                                                  android:background="@drawable/background_doodles_white"
                                                  android:orientation="vertical"
-                                                 tools:context="hr.nas2skupa.eleventhhour.admin.ProviderDetailsActivity">
+                                                 tools:context="hr.nas2skupa.eleventhhour.common.ui.provider.ProviderDetailsActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
