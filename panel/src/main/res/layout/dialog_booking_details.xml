@@ -1,184 +1,202 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                             xmlns:app="http://schemas.android.com/apk/res-auto"
-                                             xmlns:tools="http://schemas.android.com/tools"
-                                             android:layout_width="match_parent"
-                                             android:layout_height="wrap_content"
-                                             tools:layout_editor_absoluteX="8dp"
-                                             tools:layout_editor_absoluteY="8dp">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             tools:layout_editor_absoluteX="8dp"
+             tools:layout_editor_absoluteY="8dp">
 
-    <TextView
-        android:id="@+id/txt_booking_date"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@color/accent"
-        android:gravity="center_vertical"
-        android:paddingBottom="20dp"
-        android:paddingEnd="24dp"
-        android:paddingLeft="24dp"
-        android:paddingRight="24dp"
-        android:paddingStart="24dp"
-        android:paddingTop="20dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title.Inverse"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Monday, July 24, 2017"/>
-
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:id="@+id/txt_booking_service"
-              android:layout_width="0dp"
-              android:layout_height="wrap_content"
-              android:layout_marginLeft="24dp"
-              android:layout_marginStart="24dp"
-              android:layout_marginTop="16dp"
-              android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-              android:textColor="@color/colorAccent"
-              android:textSize="20sp"
-              app:layout_constraintLeft_toLeftOf="parent"
-              app:layout_constraintTop_toBottomOf="@+id/txt_booking_date"
-              tools:text="Mamografija"/>
-
-    <TextView
-        android:id="@+id/txt_booking_user"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginLeft="24dp"
-        android:layout_marginRight="24dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="20dp"
-        android:drawableLeft="@drawable/ic_person_black_18dp"
-        android:drawablePadding="4dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_booking_service"
-        tools:text="Poliklinika Sunce"/>
-
-    <TextView
-        android:id="@+id/txt_booking_time"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginLeft="24dp"
-        android:layout_marginRight="24dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="4dp"
-        android:drawableLeft="@drawable/ic_time_black_18dp"
-        android:drawablePadding="4dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_booking_user"
-        tools:text="15:30 - 16:15"/>
-
-    <TextView
-        android:id="@+id/txt_booking_status"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginLeft="24dp"
-        android:layout_marginRight="24dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="4dp"
-        android:drawableLeft="@drawable/ic_info_outline_black_18dp"
-        android:drawablePadding="4dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_booking_time"
-        tools:text="Waiting..."/>
-
-    <TextView
-        android:id="@+id/txt_booking_price"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginLeft="24dp"
-        android:layout_marginRight="24dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="4dp"
-        android:drawableLeft="@drawable/ic_cash_black_18dp"
-        android:drawablePadding="4dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_booking_status"
-        tools:text="350 kn"/>
-
-    <ScrollView
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginLeft="24dp"
-        android:layout_marginRight="24dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="4dp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintHeight_default="wrap"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_booking_price">
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/booking_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/txt_booking_note"
-            android:layout_width="match_parent"
+            android:id="@+id/txt_booking_date"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_assignment_black_18dp"
+            android:background="@color/accent"
+            android:gravity="center_vertical"
+            android:paddingBottom="16dp"
+            android:paddingEnd="24dp"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:paddingStart="24dp"
+            android:paddingTop="16dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title.Inverse"
+            android:textSize="18sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_constraintLeft_creator="1"
+            tools:layout_constraintRight_creator="1"
+            tools:text="Monday, July 24, 2017"/>
+
+        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:app="http://schemas.android.com/apk/res-auto"
+                  xmlns:tools="http://schemas.android.com/tools"
+                  android:id="@+id/txt_booking_service"
+                  android:layout_width="0dp"
+                  android:layout_height="wrap_content"
+                  android:layout_marginLeft="24dp"
+                  android:layout_marginStart="24dp"
+                  android:layout_marginTop="16dp"
+                  android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                  android:textColor="@color/colorAccent"
+                  android:textSize="20sp"
+                  app:layout_constraintLeft_toLeftOf="parent"
+                  app:layout_constraintTop_toBottomOf="@+id/txt_booking_date"
+                  tools:text="Mamografija"/>
+
+        <TextView
+            android:id="@+id/txt_booking_user"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="20dp"
+            android:drawableLeft="@drawable/ic_person_black_18dp"
             android:drawablePadding="4dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            tools:text="Imam puno toga za obaviti pa vas molim da me primite prvog kako bi stigao obaviti i ostale preglede.\n Hvala!"/>
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_booking_service"
+            tools:text="Poliklinika Sunce"/>
 
-    </ScrollView>
+        <TextView
+            android:id="@+id/txt_booking_time"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="4dp"
+            android:drawableLeft="@drawable/ic_time_black_18dp"
+            android:drawablePadding="4dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_booking_user"
+            tools:text="15:30 - 16:15"/>
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="0dp"
+        <TextView
+            android:id="@+id/txt_booking_status"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="4dp"
+            android:drawableLeft="@drawable/ic_info_outline_black_18dp"
+            android:drawablePadding="4dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_booking_time"
+            tools:text="Waiting..."/>
+
+        <TextView
+            android:id="@+id/txt_booking_price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="4dp"
+            android:drawableLeft="@drawable/ic_cash_black_18dp"
+            android:drawablePadding="4dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_booking_status"
+            tools:text="350 kn"/>
+
+        <ScrollView
+            android:id="@+id/scrollView2"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="4dp"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+            app:layout_constraintHeight_default="wrap"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_booking_price">
+
+            <TextView
+                android:id="@+id/txt_booking_note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_assignment_black_18dp"
+                android:drawablePadding="4dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                tools:text="Imam puno toga za obaviti pa vas molim da me primite prvog kako bi stigao obaviti i ostale preglede.\n Hvala!"/>
+
+        </ScrollView>
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:gravity="right|end"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent">
+
+            <Button
+                android:id="@+id/btn_cancel_booking"
+                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:text="@string/cancel_booking"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+
+            <Button
+                android:id="@+id/btn_reject_booking"
+                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:text="@string/reject_booking"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+
+            <Button
+                android:id="@+id/btn_confirm_booking"
+                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:text="@string/confirm_booking"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+        </LinearLayout>
+    </android.support.constraint.ConstraintLayout>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:gravity="right|end"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent">
-
-        <Button
-            android:id="@+id/btn_cancel_booking"
-            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:text="@string/cancel_booking"
-            android:visibility="gone"
-            tools:visibility="visible"/>
-
-        <Button
-            android:id="@+id/btn_reject_booking"
-            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:text="@string/reject_booking"
-            android:visibility="gone"
-            tools:visibility="visible"/>
-
-        <Button
-            android:id="@+id/btn_confirm_booking"
-            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:text="@string/confirm_booking"
-            android:visibility="gone"
-            tools:visibility="visible"/>
-    </LinearLayout>
-
-</android.support.constraint.ConstraintLayout>
+        android:layout_gravity="center"/>
+</FrameLayout>

@@ -35,6 +35,9 @@
     <string name="notification_action_reject">Reject</string>
     <string name="notification_action_confirm">Confirm</string>
 
+    <!-- PlanerFragment -->
+    <string name="planer_add_booking_title">Add appointment for</string>
+
     <!-- PanelBookingService -->
     <string name="notification_confirmation_error">Sorry, appointment could not be confirmed.</string>
     <string name="notification_rejection_error">Sorry, appointment could not be rejected.</string>

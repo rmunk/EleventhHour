@@ -1,7 +1,6 @@
 package hr.nas2skupa.eleventhhour.admin;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -44,6 +43,7 @@ import org.androidannotations.annotations.res.DimensionPixelOffsetRes;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
 import hr.nas2skupa.eleventhhour.common.ui.provider.ProviderFragment;
 import hr.nas2skupa.eleventhhour.common.ui.provider.ProviderFragment_;
+import hr.nas2skupa.eleventhhour.common.ui.provider.ServiceDialog_;
 import hr.nas2skupa.eleventhhour.common.ui.provider.ServicesFragment;
 import hr.nas2skupa.eleventhhour.common.ui.provider.ServicesFragment_;
 
@@ -59,6 +59,7 @@ public class ProviderDetailsActivity extends DrawerActivity implements OnMapRead
     @ViewById ViewGroup ratingHolder;
     @ViewById RatingBar ratingBar;
     @ViewById FloatingActionButton fabServices;
+    @ViewById FloatingActionButton fabAddService;
 
     @DimensionPixelOffsetRes int appBarHeight;
 
@@ -104,10 +105,9 @@ public class ProviderDetailsActivity extends DrawerActivity implements OnMapRead
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             appBar.setExpanded(true);
             nestedScroll.setNestedScrollingEnabled(true);
-            super.onBackPressed();
-        } else {
-            MainActivity_.intent(this).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK).start();
+            fabAddService.hide();
         }
+        super.onBackPressed();
     }
 
     @OptionsItem(android.R.id.home)
@@ -144,6 +144,7 @@ public class ProviderDetailsActivity extends DrawerActivity implements OnMapRead
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("");
     }
 
     void setAppBar(@ViewById(R.id.app_bar) AppBarLayout appBar) {
@@ -195,10 +196,30 @@ public class ProviderDetailsActivity extends DrawerActivity implements OnMapRead
         ServicesFragment servicesFragment = ServicesFragment_.builder()
                 .providerKey(providerKey)
                 .build();
+        servicesFragment.setOnServiceClickListener(new ServicesFragment.OnServiceClickListener() {
+            @Override
+            public void onServiceClick(View view, String providerKey, String serviceKey) {
+                ServiceDialog_.builder()
+                        .providerKey(providerKey)
+                        .serviceKey(serviceKey)
+                        .build()
+                        .show(getSupportFragmentManager(), "ServiceDialog");
+            }
+        });
         getSupportFragmentManager().beginTransaction()
                 .addToBackStack("ServicesFragment")
                 .replace(R.id.fragment_container, servicesFragment)
                 .commit();
+        fabAddService.show();
+    }
+
+    @Click(resName = "fab_add_service")
+    void addService() {
+        ServiceDialog_.builder()
+                .providerKey(providerKey)
+                .serviceKey(null)
+                .build()
+                .show(getSupportFragmentManager(), "ServiceDialog");
     }
 
     private class ProviderChangedListener implements ValueEventListener {

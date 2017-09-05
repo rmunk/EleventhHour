@@ -1,4 +1,4 @@
-package hr.nas2skupa.eleventhhour.ui;
+package hr.nas2skupa.eleventhhour.common.ui;
 
 
 import android.app.Dialog;
@@ -12,29 +12,26 @@ import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
-
-import com.google.firebase.auth.FirebaseAuth;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.Calendar;
-import java.util.Locale;
 
-import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.common.R;
 import hr.nas2skupa.eleventhhour.common.model.Booking;
-import hr.nas2skupa.eleventhhour.common.utils.Utils;
-import hr.nas2skupa.eleventhhour.events.MakeNewBookingEvent;
 
 /**
  * Dialog for booking a service.
  */
-@EFragment(R.layout.dialog_make_booking)
+@EFragment(resName = "dialog_make_booking")
 public class MakeBookingDialog extends DialogFragment {
+    @FragmentArg
+    String userKey;
     @FragmentArg
     String providerKey;
     @FragmentArg
@@ -44,22 +41,27 @@ public class MakeBookingDialog extends DialogFragment {
     @FragmentArg
     Calendar to;
     @FragmentArg
+    String userName;
+    @FragmentArg
     String providerName;
     @FragmentArg
     String serviceName;
     @FragmentArg
     String price;
 
-    @ViewById(R.id.txt_booking_confirmation)
-    TextView txtConfirmation;
-    @ViewById(R.id.txt_booking_note)
-    TextView txtNote;
+    @ViewById TextView txtConfirmation;
+    @ViewById EditText txtName;
+    @ViewById EditText txtNote;
 
     private View view;
-
+    private BookingDialogListener listener;
 
     public MakeBookingDialog() {
         // Required empty public constructor
+    }
+
+    public void setBookingDialogListener(BookingDialogListener listener) {
+        this.listener = listener;
     }
 
     @NonNull
@@ -75,10 +77,10 @@ public class MakeBookingDialog extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Booking booking = new Booking(
-                                Utils.getMyUid(),
+                                userKey,
                                 providerKey,
                                 serviceKey,
-                                FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
+                                txtName.getText().toString(),
                                 providerName,
                                 serviceName,
                                 price,
@@ -86,7 +88,8 @@ public class MakeBookingDialog extends DialogFragment {
                                 to.getTimeInMillis(),
                                 txtNote.getText().toString()
                         );
-                        EventBus.getDefault().post(new MakeNewBookingEvent(booking));
+
+                        if (listener != null) listener.onBookingConfirmed(booking);
 
                         MakeBookingDialog.this.dismiss();
                     }
@@ -94,6 +97,7 @@ public class MakeBookingDialog extends DialogFragment {
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        if (listener != null) listener.onBookingDismissed();
                         MakeBookingDialog.this.dismiss();
                     }
                 });
@@ -109,11 +113,17 @@ public class MakeBookingDialog extends DialogFragment {
 
     @AfterViews
     public void setConfirmationText() {
-        txtConfirmation.setText(String.format(Locale.getDefault(),
-                getString(R.string.confirmation_text),
+        txtName.setVisibility(userName == null ? View.VISIBLE : View.GONE);
+        txtConfirmation.setText(getString(R.string.confirmation_text,
                 DateUtils.formatDateTime(getContext(), from.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE),
                 DateUtils.formatDateTime(getContext(), from.getTimeInMillis(), DateUtils.FORMAT_SHOW_TIME),
                 DateUtils.formatDateTime(getContext(), to.getTimeInMillis(), DateUtils.FORMAT_SHOW_TIME)
         ));
+    }
+
+    public interface BookingDialogListener {
+        void onBookingConfirmed(Booking booking);
+
+        void onBookingDismissed();
     }
 }

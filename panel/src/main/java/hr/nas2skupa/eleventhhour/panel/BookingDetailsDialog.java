@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -40,26 +41,18 @@ public class BookingDetailsDialog extends DialogFragment {
     @FragmentArg
     String bookingKey;
 
-    @ViewById(R.id.txt_booking_date)
-    TextView txtBookingDate;
-    @ViewById(R.id.txt_booking_service)
-    TextView txtBookingService;
-    @ViewById(R.id.txt_booking_user)
-    TextView txtBookingUser;
-    @ViewById(R.id.txt_booking_time)
-    TextView txtBookingTime;
-    @ViewById(R.id.txt_booking_status)
-    TextView txtBookingStatus;
-    @ViewById(R.id.txt_booking_price)
-    TextView txtBookingPrice;
-    @ViewById(R.id.txt_booking_note)
-    TextView txtBookingNote;
-    @ViewById(R.id.btn_confirm_booking)
-    Button btnConfirmBooking;
-    @ViewById(R.id.btn_reject_booking)
-    Button btnRejectBooking;
-    @ViewById(R.id.btn_cancel_booking)
-    Button btnCancelBooking;
+    @ViewById ProgressBar progressBar;
+    @ViewById ViewGroup bookingContent;
+    @ViewById TextView txtBookingDate;
+    @ViewById TextView txtBookingService;
+    @ViewById TextView txtBookingUser;
+    @ViewById TextView txtBookingTime;
+    @ViewById TextView txtBookingStatus;
+    @ViewById TextView txtBookingPrice;
+    @ViewById TextView txtBookingNote;
+    @ViewById Button btnConfirmBooking;
+    @ViewById Button btnRejectBooking;
+    @ViewById Button btnCancelBooking;
 
     private View view;
     private DatabaseReference bookingReference;
@@ -100,12 +93,16 @@ public class BookingDetailsDialog extends DialogFragment {
     @Override
     public void onStart() {
         super.onStart();
+        progressBar.setVisibility(View.VISIBLE);
+        bookingContent.setVisibility(View.INVISIBLE);
         bookingReference.addValueEventListener(bookingListener);
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        progressBar.setVisibility(View.INVISIBLE);
+        bookingContent.setVisibility(View.VISIBLE);
         bookingReference.removeEventListener(bookingListener);
     }
 
@@ -152,6 +149,9 @@ public class BookingDetailsDialog extends DialogFragment {
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+            progressBar.setVisibility(View.INVISIBLE);
+            bookingContent.setVisibility(View.VISIBLE);
+
             booking = dataSnapshot.getValue(Booking.class);
 
             if (booking != null) {
@@ -163,6 +163,8 @@ public class BookingDetailsDialog extends DialogFragment {
                 txtBookingStatus.setText(StringUtils.printBookingStatus(getContext(), booking.getStatus()));
                 txtBookingPrice.setText(booking.price);
                 txtBookingNote.setText(booking.note);
+
+                txtBookingUser.setVisibility(booking.userName.isEmpty() ? View.GONE : View.VISIBLE);
                 txtBookingNote.setVisibility(booking.note.isEmpty() ? View.GONE : View.VISIBLE);
 
                 if (booking.getStatus() == BookingStatus.PENDING) {

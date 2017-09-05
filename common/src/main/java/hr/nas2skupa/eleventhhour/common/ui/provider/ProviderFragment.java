@@ -109,7 +109,7 @@ public class ProviderFragment extends Fragment {
                 providersReference.child(providerKey).addValueEventListener(new ProviderChangedListener());
             }
         }
-        setupCityPicker();
+        if (editable) setupCityPicker();
     }
 
     @Touch(resName = "editing_shroud")
@@ -333,6 +333,7 @@ public class ProviderFragment extends Fragment {
                 getActivity(), android.R.layout.simple_list_item_1,
                 new ArrayList<City>());
 
+        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_loading_subcategories), 500L);
         FirebaseDatabase.getInstance().getReference()
                 .child("cities")
                 .child("hrv")
@@ -371,6 +372,8 @@ public class ProviderFragment extends Fragment {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
+                        progressDialog.dismiss();
+                        progressDialog.cancel();
                         setCityListeners(cityNames, cityArrayAdapter);
                     }
 

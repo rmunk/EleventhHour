@@ -3,10 +3,10 @@
                                              xmlns:tools="http://schemas.android.com/tools"
                                              android:layout_width="match_parent"
                                              android:layout_height="wrap_content"
-                                             tools:context="hr.nas2skupa.eleventhhour.ui.MakeBookingDialog">
+                                             tools:context="hr.nas2skupa.eleventhhour.common.ui.MakeBookingDialog">
 
     <TextView
-        android:id="@+id/txt_booking_confirmation"
+        android:id="@+id/txt_confirmation"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
@@ -21,16 +21,30 @@
         tools:text="Do you want to make a booking on October 26 from 17:15 to 18:45?"/>
 
     <EditText
-        android:id="@+id/txt_booking_note"
+        android:id="@+id/txt_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:hint="@string/user_name"
+        android:inputType="textCapWords|textPersonName"
+        android:selectAllOnFocus="true"
+        android:maxLines="1"
+        app:layout_constraintLeft_toLeftOf="@id/txt_confirmation"
+        app:layout_constraintRight_toRightOf="@id/txt_confirmation"
+        app:layout_constraintTop_toBottomOf="@id/txt_confirmation"/>
+
+    <EditText
+        android:id="@+id/txt_note"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="24dp"
         android:ems="10"
         android:hint="@string/note_to_provider"
         android:inputType="textCapSentences|textMultiLine"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="@+id/txt_booking_confirmation"
-        app:layout_constraintRight_toRightOf="@+id/txt_booking_confirmation"
-        app:layout_constraintTop_toBottomOf="@+id/txt_booking_confirmation"/>
+        app:layout_constraintLeft_toLeftOf="@+id/txt_confirmation"
+        app:layout_constraintRight_toRightOf="@+id/txt_confirmation"
+        app:layout_constraintTop_toBottomOf="@+id/txt_name"/>
 </android.support.constraint.ConstraintLayout>

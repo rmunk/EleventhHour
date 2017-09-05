@@ -32,12 +32,7 @@
 
     <!-- ServicesFragment -->
     <string name="msg_booking_failed">Sorry, your booking did not go through. Please try again later.</string>
-
-    <!-- MakeBookingDialog -->
-    <string name="make_booking_action">Book now</string>
-    <string name="make_booking_cancel">Cancel</string>
-    <string name="confirmation_text" formatted="false">Do you want to make a booking on %s from %s to %s?</string>
-    <string name="note_to_provider">Note to provider</string>
+    <string name="msg_booking_sent">Your booking has been sent.</string>
 
      <!-- CalendarFragment -->
     <string name="msg_booking_cancel_failed">Sorry, your booking couldn\'t be canceled at the moment. Please try again later.</string>
