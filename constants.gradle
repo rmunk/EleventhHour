@@ -1,6 +1,6 @@
 project.ext {
-    unifiedVersionCode = 11
-    unifiedVersionName = '0.5.1'
+    unifiedVersionCode = 12
+    unifiedVersionName = '0.5.2'
 
     compileSdk = 25
     targetSdk = 25
