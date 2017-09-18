@@ -73,7 +73,6 @@ public abstract class ProvidersFragment extends Fragment {
     private ChildEventListener myFavoriteChangedListener;
     private HashMap<String, Boolean> favorites = new HashMap<>();
 
-    private Query dataRef;
     private FirebaseRecyclerAdapter<Provider, ProviderViewHolder> adapter;
     private String providerPhone;
 
@@ -108,7 +107,7 @@ public abstract class ProvidersFragment extends Fragment {
         recyclerView.getItemAnimator().setRemoveDuration(500);
         recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(getContext(), 8));
 
-        dataRef = FirebaseDatabase.getInstance().getReference().child("providers");
+        DatabaseReference dataRef = FirebaseDatabase.getInstance().getReference().child("providers");
         adapter = new ProvidersAdapter(
                 Provider.class,
                 R.layout.item_provider,
@@ -131,18 +130,7 @@ public abstract class ProvidersFragment extends Fragment {
         item.setChecked(!item.isChecked());
         item.getIcon().setAlpha(item.isChecked() ? 255 : 138);
 
-        if (item.isChecked()) dataRef = FirebaseDatabase.getInstance().getReference()
-                .child("providers")
-                .orderByChild("hasSale")
-                .equalTo(true);
-        else dataRef = FirebaseDatabase.getInstance().getReference().child("providers");
-
-        adapter = new ProvidersAdapter(Provider.class,
-                R.layout.item_provider,
-                ProviderViewHolder.class,
-                getKeyRef(),
-                dataRef);
-        recyclerView.swapAdapter(adapter, false);
+        //TODO: use FirebaseIndexRecyclerAdapter.onDataChanged to filter on device
     }
 
     @Override
@@ -199,7 +187,7 @@ public abstract class ProvidersFragment extends Fragment {
     private class ProvidersAdapter extends FirebaseIndexRecyclerAdapter<Provider, ProviderViewHolder> {
         int expandedPosition = -1;
 
-        ProvidersAdapter(Class<Provider> modelClass, int modelLayout, Class<ProviderViewHolder> viewHolderClass, Query keyRef, Query dataRef) {
+        ProvidersAdapter(Class<Provider> modelClass, int modelLayout, Class<ProviderViewHolder> viewHolderClass, Query keyRef, DatabaseReference dataRef) {
             super(modelClass, modelLayout, viewHolderClass, keyRef, dataRef);
         }
 
