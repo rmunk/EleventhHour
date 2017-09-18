@@ -8,7 +8,6 @@ import android.widget.Toast;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
 
@@ -35,31 +34,28 @@ public class DrawerActivity extends AbstractDrawerActivity {
                 MainActivity_.intent(this).flags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP).action(MainActivity.ACTION_HELP).start();
                 break;
             case R.id.nav_sign_out:
-                String token = FirebaseInstanceId.getInstance().getToken();
-                final DatabaseReference tokenReference = FirebaseDatabase.getInstance().getReference()
-                        .child("notificationTokens")
-                        .child("panel")
-                        .child(MainActivity.providerKey)
-                        .child(token);
-
-                // Remove notifications token
-                tokenReference.removeValue();
-
                 AuthUI.getInstance()
                         .signOut(this)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
+                                    // Remove notifications token
+                                    String token = FirebaseInstanceId.getInstance().getToken();
+                                    if (token != null) {
+                                        FirebaseDatabase.getInstance().getReference()
+                                                .child("notificationTokens")
+                                                .child("panel")
+                                                .child(MainActivity.providerKey)
+                                                .child(token).removeValue();
+                                    }
+
                                     Intent intent = new Intent(DrawerActivity.this, SignInActivity.class);
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                     startActivity(intent);
                                     finish();
                                 } else {
-                                    // Restore notifications token
-                                    tokenReference.setValue(true);
-
-                                    Toast.makeText(DrawerActivity.this, R.string.sign_out_failed, Toast.LENGTH_LONG);
+                                    Toast.makeText(DrawerActivity.this, R.string.sign_out_failed, Toast.LENGTH_LONG).show();
                                 }
                             }
                         });

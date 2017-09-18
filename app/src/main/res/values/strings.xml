@@ -55,4 +55,7 @@
 
     <!-- UserEditActivity -->
     <string name="msg_user_save_failed">We couldn\'t save your changes. Please try again later.</string>
+
+    <!-- UserDetailsActivity -->
+    <string name="user_delete_failed">Sorry, there was a problem while deleting your account. Please try again later and feel free to contact us if the problem persists.</string>
 </resources>
