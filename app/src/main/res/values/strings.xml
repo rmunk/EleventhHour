@@ -14,7 +14,8 @@
 
     <!-- Menu items -->
     <string name="action_settings">Settings</string>
-    <string name="menu_sale">Sale</string>
+    <string name="menu_sale">Has sale</string>
+    <string name="menu_sort_by_name">Sort by name</string>
 
     <!-- Activity and fragment titles -->
     <string name="title_fragment_home">Home</string>
