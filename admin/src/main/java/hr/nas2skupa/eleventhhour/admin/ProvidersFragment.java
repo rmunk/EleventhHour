@@ -20,6 +20,8 @@ import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.common.model.Provider;
 import hr.nas2skupa.eleventhhour.common.ui.helpers.SimpleDividerItemDecoration;
+import hr.nas2skupa.eleventhhour.common.ui.provider.ProviderDetailsActivity_;
+import hr.nas2skupa.eleventhhour.common.ui.provider.ProviderEditActivity_;
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 

@@ -20,7 +20,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
 
@@ -48,9 +47,9 @@ public class DrawerActivity extends AppCompatActivity
     public void setContentView(@LayoutRes int layoutResID) {
         drawer = (DrawerLayout) getLayoutInflater().inflate(R.layout.activity_drawer, null);
 
-        navView = (NavigationView) drawer.findViewById(R.id.nav_view);
+        navView = drawer.findViewById(R.id.nav_view);
         navView.setNavigationItemSelectedListener(this);
-        FrameLayout content = (FrameLayout) drawer.findViewById(R.id.content_main);
+        FrameLayout content = drawer.findViewById(R.id.content_main);
         getLayoutInflater().inflate(layoutResID, content, true);
         super.setContentView(drawer);
     }
@@ -65,8 +64,8 @@ public class DrawerActivity extends AppCompatActivity
                 FirebaseUser currentUser = firebaseAuth.getCurrentUser();
                 if (currentUser == null) return;
 
-                final TextView username = (TextView) navView.getHeaderView(0).findViewById(R.id.txt_drawer_username);
-                final TextView email = (TextView) navView.getHeaderView(0).findViewById(R.id.txt_drawer_email);
+                final TextView username = navView.getHeaderView(0).findViewById(R.id.txt_drawer_username);
+                final TextView email = navView.getHeaderView(0).findViewById(R.id.txt_drawer_email);
                 username.setText(currentUser.getDisplayName());
                 email.setText(currentUser.getEmail());
             }
@@ -116,31 +115,30 @@ public class DrawerActivity extends AppCompatActivity
                 break;
 
             case R.id.nav_sign_out:
-                String token = FirebaseInstanceId.getInstance().getToken();
-                final DatabaseReference tokenReference = FirebaseDatabase.getInstance().getReference()
-                        .child("notificationTokens")
-                        .child("client")
-                        .child(Utils.getMyUid())
-                        .child(token);
-
-                // Remove notifications token
-                tokenReference.removeValue();
-
+                final String myUid = Utils.getMyUid();
                 AuthUI.getInstance()
-                        .signOut(this)
+                        .signOut(DrawerActivity.this)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
+                                    // Remove notifications token
+                                    String token = FirebaseInstanceId.getInstance().getToken();
+                                    if (token != null) {
+                                        FirebaseDatabase.getInstance().getReference()
+                                                .child("notificationTokens")
+                                                .child("client")
+                                                .child(myUid)
+                                                .child(token)
+                                                .removeValue();
+                                    }
+
                                     Intent intent = new Intent(DrawerActivity.this, SignInActivity.class);
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                     startActivity(intent);
                                     finish();
                                 } else {
-                                    // Restore notifications token
-                                    tokenReference.setValue(true);
-
-                                    Toast.makeText(DrawerActivity.this, R.string.sign_out_failed, Toast.LENGTH_LONG);
+                                    Toast.makeText(DrawerActivity.this, R.string.sign_out_failed, Toast.LENGTH_LONG).show();
                                 }
                             }
                         });

@@ -12,8 +12,10 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v7.util.SortedList;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.util.SortedListAdapterCallback;
 import android.transition.AutoTransition;
 import android.transition.Fade;
 import android.transition.Slide;
@@ -42,6 +44,7 @@ import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
@@ -73,9 +76,10 @@ public abstract class ProvidersFragment extends Fragment {
     private ChildEventListener myFavoriteChangedListener;
     private HashMap<String, Boolean> favorites = new HashMap<>();
 
-    private Query dataRef;
     private FirebaseRecyclerAdapter<Provider, ProviderViewHolder> adapter;
     private String providerPhone;
+    private boolean filterSale;
+    private boolean sortByName;
 
 
     public abstract Query getKeyRef();
@@ -108,13 +112,7 @@ public abstract class ProvidersFragment extends Fragment {
         recyclerView.getItemAnimator().setRemoveDuration(500);
         recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(getContext(), 8));
 
-        dataRef = FirebaseDatabase.getInstance().getReference().child("providers");
-        adapter = new ProvidersAdapter(
-                Provider.class,
-                R.layout.item_provider,
-                ProviderViewHolder.class,
-                getKeyRef(),
-                dataRef);
+        adapter = new ProvidersAdapter(filterSale, sortByName);
         recyclerView.setAdapter(adapter);
     }
 
@@ -124,25 +122,26 @@ public abstract class ProvidersFragment extends Fragment {
 
         MenuItem item = menu.findItem(R.id.action_sale);
         if (item != null) item.getIcon().setAlpha(138);
+        item = menu.findItem(R.id.action_sort_by_name);
+        if (item != null) item.getIcon().setAlpha(138);
     }
 
     @OptionsItem(R.id.action_sale)
-    void multipleMenuItems(MenuItem item) {
+    void filterSale(MenuItem item) {
         item.setChecked(!item.isChecked());
         item.getIcon().setAlpha(item.isChecked() ? 255 : 138);
 
-        if (item.isChecked()) dataRef = FirebaseDatabase.getInstance().getReference()
-                .child("providers")
-                .orderByChild("hasSale")
-                .equalTo(true);
-        else dataRef = FirebaseDatabase.getInstance().getReference().child("providers");
+        filterSale = item.isChecked();
+        recyclerView.swapAdapter(new ProvidersAdapter(filterSale, sortByName), false);
+    }
 
-        adapter = new ProvidersAdapter(Provider.class,
-                R.layout.item_provider,
-                ProviderViewHolder.class,
-                getKeyRef(),
-                dataRef);
-        recyclerView.swapAdapter(adapter, false);
+    @OptionsItem(R.id.action_sort_by_name)
+    void sortByName(MenuItem item) {
+        item.setChecked(!item.isChecked());
+        item.getIcon().setAlpha(item.isChecked() ? 255 : 138);
+
+        sortByName = item.isChecked();
+        recyclerView.swapAdapter(new ProvidersAdapter(filterSale, sortByName), false);
     }
 
     @Override
@@ -197,16 +196,92 @@ public abstract class ProvidersFragment extends Fragment {
     }
 
     private class ProvidersAdapter extends FirebaseIndexRecyclerAdapter<Provider, ProviderViewHolder> {
-        int expandedPosition = -1;
+        private int expandedPosition = -1;
+        private final boolean filterSale;
+        private final boolean sortByName;
+        private final SortedList<Provider> providers = new SortedList<>(Provider.class, new SortedListAdapterCallback<Provider>(this) {
+            @Override
+            public int compare(Provider o1, Provider o2) {
+                if (sortByName) return o1.name.compareToIgnoreCase(o2.name);
+                else return Float.compare(o2.rating, o1.rating);
+            }
 
-        ProvidersAdapter(Class<Provider> modelClass, int modelLayout, Class<ProviderViewHolder> viewHolderClass, Query keyRef, Query dataRef) {
-            super(modelClass, modelLayout, viewHolderClass, keyRef, dataRef);
+            @Override
+            public boolean areContentsTheSame(Provider oldItem, Provider newItem) {
+                return Objects.equals(oldItem.name, oldItem.name);
+            }
+
+            @Override
+            public boolean areItemsTheSame(Provider item1, Provider item2) {
+                return Objects.equals(item1.key, item2.key);
+            }
+        });
+
+
+        ProvidersAdapter(boolean filterSale, boolean sortByName) {
+            super(Provider.class,
+                    R.layout.item_provider,
+                    ProviderViewHolder.class,
+                    ProvidersFragment.this.getKeyRef(),
+                    FirebaseDatabase.getInstance().getReference().child("providers"));
+            this.filterSale = filterSale;
+            this.sortByName = sortByName;
+        }
+
+        @Override
+        public Provider getItem(int position) {
+            return providers.get(position);
+        }
+
+        @Override
+        public int getItemCount() {
+            return providers.size();
+        }
+
+        @Override
+        public void onChildChanged(EventType type,
+                                   DataSnapshot snapshot, int index, int oldIndex) {
+            int i;
+            Provider oldProvider;
+            Provider provider = snapshot.getValue(Provider.class);
+            provider.key = snapshot.getKey();
+
+            switch (type) {
+                case ADDED:
+                    if (!filterSale || provider.hasSale) providers.add(provider);
+                    break;
+                case CHANGED:
+                    oldProvider = null;
+                    for (i = 0; i < providers.size(); i++) {
+                        if (Objects.equals(provider.key, providers.get(i).key)) {
+                            oldProvider = providers.get(i);
+                            break;
+                        }
+                    }
+                    if (oldProvider != null) {
+                        if (oldProvider.hasSale != provider.hasSale) {
+                            if (provider.hasSale) providers.add(provider);
+                            else providers.remove(oldProvider);
+                        }
+                    } else if (provider.hasSale) providers.add(provider);
+                    break;
+                case REMOVED:
+                    oldProvider = null;
+                    for (i = 0; i < providers.size(); i++) {
+                        if (Objects.equals(provider.key, providers.get(i).key)) {
+                            oldProvider = providers.get(i);
+                            break;
+                        }
+                    }
+                    if (oldProvider != null) providers.remove(oldProvider);
+                    break;
+                case MOVED:
+                    break;
+            }
         }
 
         @Override
         protected void populateViewHolder(final ProviderViewHolder viewHolder, final Provider provider, final int position) {
-            provider.key = getRef(position).getKey();
-
             provider.favorite = favorites.containsKey(provider.key)
                     ? favorites.get(provider.key)
                     : false;
@@ -220,10 +295,10 @@ public abstract class ProvidersFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-                        animateCardExpansion(position);
-                    else recyclerView.scrollToPosition(position);
+                        animateCardExpansion(viewHolder.getAdapterPosition());
+                    else recyclerView.scrollToPosition(viewHolder.getAdapterPosition());
 
-                    expandedPosition = isExpanded ? -1 : position;
+                    expandedPosition = isExpanded ? -1 : viewHolder.getAdapterPosition();
                     notifyDataSetChanged();
                 }
             });

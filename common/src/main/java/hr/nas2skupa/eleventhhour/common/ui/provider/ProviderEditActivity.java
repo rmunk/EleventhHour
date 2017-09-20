@@ -1,4 +1,4 @@
-package hr.nas2skupa.eleventhhour.panel;
+package hr.nas2skupa.eleventhhour.common.ui.provider;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,10 +12,10 @@ import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.ViewById;
 
-import hr.nas2skupa.eleventhhour.common.ui.provider.ProviderFragment;
-import hr.nas2skupa.eleventhhour.common.ui.provider.ProviderFragment_;
+import hr.nas2skupa.eleventhhour.common.R;
 
-@EActivity(R.layout.activity_provider_edit)
+
+@EActivity(resName = "activity_provider_edit")
 public class ProviderEditActivity extends AppCompatActivity {
     @Extra String providerKey;
 
@@ -40,7 +40,7 @@ public class ProviderEditActivity extends AppCompatActivity {
     }
 
     @SuppressWarnings("ConstantConditions")
-    void setToolbar(@ViewById(R.id.toolbar) Toolbar toolbar) {
+    void setToolbar(@ViewById(resName = "toolbar") Toolbar toolbar) {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setHomeButtonEnabled(false);

@@ -31,18 +31,19 @@ android {
 }
 
 dependencies {
-    compile 'org.androidannotations:androidannotations-api:4.1.0'
-    apt 'org.androidannotations:androidannotations:4.1.0'
-
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':auth')
     compile project(':common')
+
+    compile 'org.androidannotations:androidannotations-api:4.3.1'
+    apt 'org.androidannotations:androidannotations:4.3.1'
 
     testCompile 'junit:junit:4.12'
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 }
+
 apt {
     arguments {
         androidManifestFile variant.outputs[0]?.processResources?.manifestFile

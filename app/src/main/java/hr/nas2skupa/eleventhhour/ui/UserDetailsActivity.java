@@ -1,7 +1,9 @@
 package hr.nas2skupa.eleventhhour.ui;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -11,12 +13,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RatingBar;
+import android.widget.Toast;
 
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
@@ -26,9 +33,11 @@ import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.DimensionPixelOffsetRes;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.auth.SignInActivity;
 import hr.nas2skupa.eleventhhour.common.model.User;
 import hr.nas2skupa.eleventhhour.common.ui.user.UserFragment;
 import hr.nas2skupa.eleventhhour.common.ui.user.UserFragment_;
+import hr.nas2skupa.eleventhhour.common.utils.Utils;
 
 @EActivity(R.layout.activity_user_details)
 @OptionsMenu(R.menu.menu_user_details)
@@ -108,9 +117,34 @@ public class UserDetailsActivity extends DrawerActivity {
                 .setPositiveButton(getString(R.string.action_delete), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // TODO: Remove user from subcategories
-                        userReference.removeValue();
-                        onBackPressed();
+                        final String myUid = Utils.getMyUid();
+                        AuthUI.getInstance()
+                                .delete(UserDetailsActivity.this)
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            userReference.removeValue();
+
+                                            // Remove notifications token
+                                            String token = FirebaseInstanceId.getInstance().getToken();
+                                            FirebaseDatabase.getInstance().getReference()
+                                                    .child("notificationTokens")
+                                                    .child("client")
+                                                    .child(myUid)
+                                                    .child(token).removeValue();
+
+                                            // TODO: Delete user bookings
+
+                                            Intent intent = new Intent(UserDetailsActivity.this, SignInActivity.class);
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            startActivity(intent);
+                                            finish();
+                                        } else {
+                                            Toast.makeText(UserDetailsActivity.this, R.string.user_delete_failed, Toast.LENGTH_LONG).show();
+                                        }
+                                    }
+                                });
                     }
                 })
                 .setNegativeButton(R.string.action_cancel, null)
