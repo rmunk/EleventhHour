@@ -15,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.util.SortedListAdapterCallback;
 import android.transition.AutoTransition;
 import android.transition.Fade;
@@ -29,7 +30,6 @@ import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 
 import com.firebase.ui.database.FirebaseIndexRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -43,7 +43,9 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 import hr.nas2skupa.eleventhhour.R;
@@ -59,7 +61,7 @@ import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
  */
 @EFragment(R.layout.fragment_providers)
 @OptionsMenu(R.menu.providers)
-public abstract class ProvidersFragment extends Fragment {
+public abstract class ProvidersFragment extends Fragment implements SearchView.OnQueryTextListener {
     private static final int REQUEST_PHONE_PERMISSION = 1;
 
     @FragmentArg
@@ -75,8 +77,8 @@ public abstract class ProvidersFragment extends Fragment {
     private DatabaseReference favoriteReference;
     private ChildEventListener myFavoriteChangedListener;
     private HashMap<String, Boolean> favorites = new HashMap<>();
+    private ProvidersAdapter adapter;
 
-    private FirebaseRecyclerAdapter<Provider, ProviderViewHolder> adapter;
     private String providerPhone;
     private boolean filterSale;
     private boolean sortByName;
@@ -124,6 +126,10 @@ public abstract class ProvidersFragment extends Fragment {
         if (item != null) item.getIcon().setAlpha(138);
         item = menu.findItem(R.id.action_sort_by_name);
         if (item != null) item.getIcon().setAlpha(138);
+
+        final MenuItem searchItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(this);
     }
 
     @OptionsItem(R.id.action_sale)
@@ -132,7 +138,9 @@ public abstract class ProvidersFragment extends Fragment {
         item.getIcon().setAlpha(item.isChecked() ? 255 : 138);
 
         filterSale = item.isChecked();
-        recyclerView.swapAdapter(new ProvidersAdapter(filterSale, sortByName), false);
+        adapter.cleanup();
+        adapter = new ProvidersAdapter(filterSale, sortByName);
+        recyclerView.swapAdapter(adapter, false);
     }
 
     @OptionsItem(R.id.action_sort_by_name)
@@ -141,7 +149,9 @@ public abstract class ProvidersFragment extends Fragment {
         item.getIcon().setAlpha(item.isChecked() ? 255 : 138);
 
         sortByName = item.isChecked();
-        recyclerView.swapAdapter(new ProvidersAdapter(filterSale, sortByName), false);
+        adapter.cleanup();
+        adapter = new ProvidersAdapter(filterSale, sortByName);
+        recyclerView.swapAdapter(adapter, false);
     }
 
     @Override
@@ -195,10 +205,22 @@ public abstract class ProvidersFragment extends Fragment {
         }
     }
 
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        adapter.filter(newText);
+        return true;
+    }
+
     private class ProvidersAdapter extends FirebaseIndexRecyclerAdapter<Provider, ProviderViewHolder> {
         private int expandedPosition = -1;
         private final boolean filterSale;
         private final boolean sortByName;
+        private String query;
         private final SortedList<Provider> providers = new SortedList<>(Provider.class, new SortedListAdapterCallback<Provider>(this) {
             @Override
             public int compare(Provider o1, Provider o2) {
@@ -208,7 +230,7 @@ public abstract class ProvidersFragment extends Fragment {
 
             @Override
             public boolean areContentsTheSame(Provider oldItem, Provider newItem) {
-                return Objects.equals(oldItem.name, oldItem.name);
+                return false;
             }
 
             @Override
@@ -239,20 +261,21 @@ public abstract class ProvidersFragment extends Fragment {
         }
 
         @Override
-        public void onChildChanged(EventType type,
-                                   DataSnapshot snapshot, int index, int oldIndex) {
-            int i;
+        public void onChildChanged(EventType type, DataSnapshot snapshot, int index, int oldIndex) {
             Provider oldProvider;
-            Provider provider = snapshot.getValue(Provider.class);
+            Provider provider = super.getItem(index);
             provider.key = snapshot.getKey();
 
             switch (type) {
                 case ADDED:
-                    if (!filterSale || provider.hasSale) providers.add(provider);
+                    if (!filterSale || provider.hasSale) {
+                        providers.add(provider);
+                        refreshFilter();
+                    }
                     break;
                 case CHANGED:
                     oldProvider = null;
-                    for (i = 0; i < providers.size(); i++) {
+                    for (int i = 0; i < providers.size(); i++) {
                         if (Objects.equals(provider.key, providers.get(i).key)) {
                             oldProvider = providers.get(i);
                             break;
@@ -264,16 +287,20 @@ public abstract class ProvidersFragment extends Fragment {
                             else providers.remove(oldProvider);
                         }
                     } else if (provider.hasSale) providers.add(provider);
+                    refreshFilter();
                     break;
                 case REMOVED:
                     oldProvider = null;
-                    for (i = 0; i < providers.size(); i++) {
-                        if (Objects.equals(provider.key, providers.get(i).key)) {
-                            oldProvider = providers.get(i);
+                    for (int j = 0; j < providers.size(); j++) {
+                        if (Objects.equals(provider.key, providers.get(j).key)) {
+                            oldProvider = providers.get(j);
                             break;
                         }
                     }
-                    if (oldProvider != null) providers.remove(oldProvider);
+                    if (oldProvider != null) {
+                        providers.remove(oldProvider);
+                        refreshFilter();
+                    }
                     break;
                 case MOVED:
                     break;
@@ -379,6 +406,39 @@ public abstract class ProvidersFragment extends Fragment {
                 }
             });
             TransitionManager.beginDelayedTransition(recyclerView, transition);
+        }
+
+        void replaceAll(List<Provider> providers) {
+            this.providers.beginBatchedUpdates();
+            for (int i = this.providers.size() - 1; i >= 0; i--) {
+                final Provider provider = this.providers.get(i);
+                if (!providers.contains(provider)) {
+                    this.providers.remove(provider);
+                }
+            }
+            this.providers.addAll(providers);
+            this.providers.endBatchedUpdates();
+        }
+
+        void filter(String query) {
+            this.query = query;
+            final String lowerCaseQuery = query.toLowerCase();
+
+            final List<Provider> filteredModelList = new ArrayList<>();
+            for (int i = 0; i < super.getItemCount(); i++) {
+                Provider provider = super.getItem(i);
+                final String text = provider.name.toLowerCase();
+                if (!filterSale || provider.hasSale) {
+                    if (text.contains(lowerCaseQuery)) {
+                        filteredModelList.add(provider);
+                    }
+                }
+            }
+            replaceAll(filteredModelList);
+        }
+
+        void refreshFilter() {
+            if (query != null && !query.isEmpty()) filter(query);
         }
     }
 
