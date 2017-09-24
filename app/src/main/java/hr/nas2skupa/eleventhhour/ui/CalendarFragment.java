@@ -80,9 +80,9 @@ public class CalendarFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         bookingsReference = FirebaseDatabase.getInstance().getReference()
-                .child("users")
+                .child("userAppointments")
                 .child(Utils.getMyUid())
-                .child("bookings");
+                .child("data");
 
         bookingsChangedListener = new BookingsChangedListener();
     }
@@ -138,8 +138,8 @@ public class CalendarFragment extends Fragment {
         Map<String, Object> bookingValues = booking.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/bookings/" + booking.providerId + "/" + key, bookingValues);
-        childUpdates.put("/users/" + Utils.getMyUid() + "/bookings/" + key, bookingValues);
+        childUpdates.put(String.format("/providerAppointments/%s/data/%s", booking.providerId, key), bookingValues);
+        childUpdates.put(String.format("/userAppointments/%s/data/%s", Utils.getMyUid(), key), bookingValues);
         reference.updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
@@ -211,6 +211,7 @@ public class CalendarFragment extends Fragment {
                 .startAt(start.getTime())
                 .endAt(end.getTime());
 
+        if (adapter != null) adapter.cleanup();
         adapter = new FirebaseRecyclerAdapter<Booking, BookingViewHolder>(
                 Booking.class,
                 R.layout.item_booking,

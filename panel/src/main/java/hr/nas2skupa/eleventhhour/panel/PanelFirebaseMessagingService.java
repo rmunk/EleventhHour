@@ -51,8 +51,9 @@ public class PanelFirebaseMessagingService extends FirebaseMessagingService {
             if (!providerKey.equals(MainActivity.providerKey)) return;
 
             DatabaseReference bookingReference = FirebaseDatabase.getInstance().getReference()
-                    .child("bookings")
+                    .child("providerAppointments")
                     .child(providerKey)
+                    .child("data")
                     .child(bookingKey);
             bookingReference.addValueEventListener(new ValueEventListener() {
                 @Override

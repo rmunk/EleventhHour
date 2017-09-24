@@ -44,8 +44,7 @@ public class DrawerActivity extends AbstractDrawerActivity {
                                     String token = FirebaseInstanceId.getInstance().getToken();
                                     if (token != null) {
                                         FirebaseDatabase.getInstance().getReference()
-                                                .child("notificationTokens")
-                                                .child("panel")
+                                                .child("app/notificationTokens/panel")
                                                 .child(MainActivity.providerKey)
                                                 .child(token).removeValue();
                                     }

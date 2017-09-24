@@ -61,7 +61,7 @@ public class CategoryActivity extends DrawerActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        categoryReference = FirebaseDatabase.getInstance().getReference().child("categories").child(categoryKey);
+        categoryReference = FirebaseDatabase.getInstance().getReference().child("app/categories").child(categoryKey);
         categoryListener = new CategoryListener();
 
         if (savedInstanceState == null)

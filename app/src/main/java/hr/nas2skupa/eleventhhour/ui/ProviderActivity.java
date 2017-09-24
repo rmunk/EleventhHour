@@ -46,10 +46,12 @@ import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import java.util.Locale;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.common.Preferences;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
 import hr.nas2skupa.eleventhhour.common.utils.Utils;
 
@@ -57,6 +59,7 @@ import hr.nas2skupa.eleventhhour.common.utils.Utils;
 @OptionsMenu(R.menu.main)
 public class ProviderActivity extends DrawerActivity implements RatingBar.OnRatingBarChangeListener, OnMapReadyCallback {
     private static final int REQUEST_PHONE_PERMISSION = 1;
+    @Pref Preferences preferences;
 
     @Extra String providerKey;
 
@@ -198,20 +201,22 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
 
         providerReference = FirebaseDatabase.getInstance().getReference()
                 .child("providers")
+                .child(preferences.country())
+                .child("data")
                 .child(providerKey);
         providerListener = new ProviderChangedListener();
 
         favoriteReference = FirebaseDatabase.getInstance().getReference()
-                .child("users")
+                .child("providers")
+                .child(preferences.country())
+                .child("userFavorites")
                 .child(Utils.getMyUid())
-                .child("favorites")
                 .child(providerKey);
         favoriteListener = new FavoriteChangedListener();
 
         ratingReference = FirebaseDatabase.getInstance().getReference()
-                .child("users")
+                .child("userRatingsOfProviders")
                 .child(Utils.getMyUid())
-                .child("ratings")
                 .child(providerKey);
         ratingListener = new RatingChangedListener();
 
@@ -272,9 +277,10 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
         provider.favorite = !provider.favorite;
         imageView.setImageResource(provider.favorite ? R.drawable.ic_heart_broken_black_24dp : R.drawable.ic_favorite_black_36dp);
         FirebaseDatabase.getInstance().getReference()
-                .child("users")
+                .child("providers")
+                .child(preferences.country())
+                .child("userFavorites")
                 .child(Utils.getMyUid())
-                .child("favorites")
                 .child(providerKey)
                 .setValue(provider.favorite ? true : null);
     }
@@ -286,6 +292,8 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
         ratingBar.setEnabled(false);
         DatabaseReference providers = FirebaseDatabase.getInstance().getReference()
                 .child("providers")
+                .child(preferences.country())
+                .child("data")
                 .child(providerKey);
         providers.runTransaction(new Transaction.Handler() {
             @Override
@@ -319,9 +327,8 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
             public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
                 userRating = newUserRating;
                 FirebaseDatabase.getInstance().getReference()
-                        .child("users")
+                        .child("userRatingsOfProviders")
                         .child(Utils.getMyUid())
-                        .child("ratings")
                         .child(providerKey)
                         .setValue(newUserRating > 0 ? newUserRating : null);
                 ratingBar.setEnabled(true);
@@ -376,7 +383,7 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             Boolean value = dataSnapshot.getValue(Boolean.class);
-            provider.favorite = value != null;
+            provider.favorite = value != null ? value : false;
             bindToProvider(provider);
             btnFavorite.setImageResource(provider.favorite ? R.drawable.ic_heart_broken_black_24dp : R.drawable.ic_favorite_black_36dp);
         }

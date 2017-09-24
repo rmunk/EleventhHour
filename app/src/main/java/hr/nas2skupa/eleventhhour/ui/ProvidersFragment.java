@@ -42,6 +42,7 @@ import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,6 +50,7 @@ import java.util.List;
 import java.util.Objects;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.common.Preferences;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
 import hr.nas2skupa.eleventhhour.common.ui.helpers.VerticalSpaceItemDecoration;
 import hr.nas2skupa.eleventhhour.common.utils.Utils;
@@ -63,6 +65,8 @@ import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 @OptionsMenu(R.menu.providers)
 public abstract class ProvidersFragment extends Fragment implements SearchView.OnQueryTextListener {
     private static final int REQUEST_PHONE_PERMISSION = 1;
+
+    @Pref Preferences preferences;
 
     @FragmentArg
     String categoryKey;
@@ -95,9 +99,10 @@ public abstract class ProvidersFragment extends Fragment implements SearchView.O
         super.onCreate(savedInstanceState);
 
         favoriteReference = FirebaseDatabase.getInstance().getReference()
-                .child("users")
-                .child(Utils.getMyUid())
-                .child("favorites");
+                .child("providers")
+                .child(preferences.country())
+                .child("userFavorites")
+                .child(Utils.getMyUid());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) setTransitions();
     }
@@ -245,7 +250,10 @@ public abstract class ProvidersFragment extends Fragment implements SearchView.O
                     R.layout.item_provider,
                     ProviderViewHolder.class,
                     ProvidersFragment.this.getKeyRef(),
-                    FirebaseDatabase.getInstance().getReference().child("providers"));
+                    FirebaseDatabase.getInstance().getReference()
+                            .child("providers")
+                            .child(preferences.country())
+                            .child("data"));
             this.filterSale = filterSale;
             this.sortByName = sortByName;
         }

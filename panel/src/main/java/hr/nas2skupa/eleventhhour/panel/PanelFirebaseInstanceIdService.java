@@ -21,10 +21,7 @@ public class PanelFirebaseInstanceIdService extends FirebaseInstanceIdService {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null && MainActivity.providerKey != null) {
             FirebaseDatabase.getInstance().getReference()
-                    .child("users")
-                    .child(user.getUid())
-                    .child("notificationTokens")
-                    .child("panel")
+                    .child("app/notificationTokens/panel")
                     .child(MainActivity.providerKey)
                     .child(token)
                     .setValue(true);

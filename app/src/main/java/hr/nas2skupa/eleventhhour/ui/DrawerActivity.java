@@ -126,8 +126,7 @@ public class DrawerActivity extends AppCompatActivity
                                     String token = FirebaseInstanceId.getInstance().getToken();
                                     if (token != null) {
                                         FirebaseDatabase.getInstance().getReference()
-                                                .child("notificationTokens")
-                                                .child("client")
+                                                .child("app/notificationTokens/client")
                                                 .child(myUid)
                                                 .child(token)
                                                 .removeValue();

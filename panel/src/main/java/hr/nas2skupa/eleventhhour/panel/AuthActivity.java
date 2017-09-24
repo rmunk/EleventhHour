@@ -72,8 +72,7 @@ public class AuthActivity extends AppCompatActivity {
 
                             String token = FirebaseInstanceId.getInstance().getToken();
                             FirebaseDatabase.getInstance().getReference()
-                                    .child("notificationTokens")
-                                    .child("panel")
+                                    .child("app/notificationTokens/panel")
                                     .child(providerKey)
                                     .child(token)
                                     .setValue(true);

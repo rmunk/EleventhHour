@@ -99,7 +99,7 @@ public class CategoryActivity extends DrawerActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        categoryReference = FirebaseDatabase.getInstance().getReference().child("categories").child(categoryKey);
+        categoryReference = FirebaseDatabase.getInstance().getReference().child("app/categories").child(categoryKey);
 
         if (savedInstanceState == null)
             setSubcategoryFragment();
@@ -177,7 +177,7 @@ public class CategoryActivity extends DrawerActivity {
         subcategoryKey = event.getSubcategoryKey();
 
         FirebaseDatabase.getInstance().getReference()
-                .child("subcategories")
+                .child("app/subcategories")
                 .child(categoryKey)
                 .child(subcategoryKey)
                 .addValueEventListener(new ValueEventListener() {

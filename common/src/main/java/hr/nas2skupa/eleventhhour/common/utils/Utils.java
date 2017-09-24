@@ -15,7 +15,7 @@ public class Utils {
     }
 
     public static String getLanguageIso() {
-        return Locale.getDefault().getISO3Language();
+        return Locale.getDefault().getLanguage();
     }
 
     public static String getLocaleString(HashMap<String, String> strings) {

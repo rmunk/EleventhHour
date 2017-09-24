@@ -64,8 +64,9 @@ public class BookingDetailsDialog extends DialogFragment {
         super.onCreate(savedInstanceState);
 
         bookingReference = FirebaseDatabase.getInstance().getReference()
-                .child("bookings")
+                .child("providerAppointments")
                 .child(MainActivity.providerKey)
+                .child("data")
                 .child(bookingKey);
 
         bookingListener = new BookingListener();
@@ -133,8 +134,8 @@ public class BookingDetailsDialog extends DialogFragment {
         Map<String, Object> bookingValues = booking.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/bookings/" + booking.providerId + "/" + key, bookingValues);
-        childUpdates.put("/users/" + booking.userId + "/bookings/" + key, bookingValues);
+        childUpdates.put(String.format("/providerAppointments/%s/data/%s", booking.providerId, key), bookingValues);
+        childUpdates.put(String.format("/userAppointments/%s/data/%s", booking.userId, key), bookingValues);
         reference.updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {

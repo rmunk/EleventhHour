@@ -21,8 +21,7 @@ public class ClientFirebaseInstanceIdService extends FirebaseInstanceIdService {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             FirebaseDatabase.getInstance().getReference()
-                    .child("notificationTokens")
-                    .child("client")
+                    .child("app/notificationTokens/client")
                     .child(user.getUid())
                     .child(token)
                     .setValue(true);

@@ -54,9 +54,9 @@ public class ClientFirebaseMessagingService extends FirebaseMessagingService {
             if (!userKey.equals(user.getUid())) return;
 
             DatabaseReference bookingReference = FirebaseDatabase.getInstance().getReference()
-                    .child("users")
+                    .child("userAppointments")
                     .child(userKey)
-                    .child("bookings")
+                    .child("data")
                     .child(bookingKey);
             bookingReference.addValueEventListener(new ValueEventListener() {
                 @Override

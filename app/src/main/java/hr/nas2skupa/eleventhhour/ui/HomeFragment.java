@@ -47,7 +47,7 @@ public class HomeFragment extends Fragment {
         recyclerView.getItemAnimator().setRemoveDuration(300);
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        Query query = database.child("categories");
+        Query query = database.child("app/categories");
         adapter = new FirebaseRecyclerAdapter<Category, CategoryViewHolder>(Category.class, R.layout.item_category
                 , CategoryViewHolder.class, query) {
             @Override

@@ -81,9 +81,9 @@ public class BookingDetailsDialog extends DialogFragment implements OnMapReadyCa
         super.onCreate(savedInstanceState);
 
         bookingReference = FirebaseDatabase.getInstance().getReference()
-                .child("users")
+                .child("userAppointments")
                 .child(Utils.getMyUid())
-                .child("bookings")
+                .child("data")
                 .child(bookingKey);
 
         bookingListener = new BookingListener();

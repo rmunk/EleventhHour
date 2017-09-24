@@ -95,9 +95,8 @@ public class SignInActivity extends AppCompatActivity {
             userMap.put("photoUrl", currentUser.getPhotoUrl().toString());
         }
         FirebaseDatabase.getInstance().getReference()
-                .child("users")
+                .child("users/data")
                 .child(currentUser.getUid())
-                .child("info")
                 .updateChildren(userMap);
     }
 

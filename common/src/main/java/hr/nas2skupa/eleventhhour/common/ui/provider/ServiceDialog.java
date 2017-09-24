@@ -56,8 +56,9 @@ public class ServiceDialog extends DialogFragment implements DialogInterface.OnS
         if (serviceKey == null) return;
 
         DatabaseReference serviceReference = FirebaseDatabase.getInstance().getReference()
-                .child("services")
+                .child("providerServices")
                 .child(providerKey)
+                .child("data")
                 .child(serviceKey);
 
         serviceReference.addListenerForSingleValueEvent(new ServiceListener());
@@ -84,8 +85,9 @@ public class ServiceDialog extends DialogFragment implements DialogInterface.OnS
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     FirebaseDatabase.getInstance().getReference()
-                                            .child("services")
+                                            .child("providerServices")
                                             .child(providerKey)
+                                            .child("data")
                                             .child(serviceKey)
                                             .removeValue();
                                 }
@@ -139,9 +141,12 @@ public class ServiceDialog extends DialogFragment implements DialogInterface.OnS
                 service.price = txtPrice.getText().toString();
                 service.onSale = chkSale.isChecked();
 
-                DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("services").child(providerKey);
-                if (serviceKey == null) serviceKey = ref.push().getKey();
-                ref.child(serviceKey).setValue(service);
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
+                        .child("providerServices")
+                        .child(providerKey)
+                        .child("data");
+                if (serviceKey == null) serviceKey = reference.push().getKey();
+                reference.child(serviceKey).setValue(service);
                 dialog.dismiss();
             }
         });

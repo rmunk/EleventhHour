@@ -56,8 +56,8 @@ public class PanelBookingService extends Service {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/bookings/" + providerKey + "/" + bookingKey + "/status", status);
-        childUpdates.put("/users/" + userKey + "/bookings/" + bookingKey + "/status", status);
+        childUpdates.put(String.format("/providerAppointments/%s/data/%s/status", providerKey, bookingKey), status);
+        childUpdates.put(String.format("/userAppointments/%s/data/%s/status", userKey, bookingKey), status);
         reference.updateChildren(childUpdates).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {

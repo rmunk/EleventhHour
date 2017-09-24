@@ -52,7 +52,7 @@ public class SubcategoryDialog extends DialogFragment implements DialogInterface
         if (subcategoryKey == null) return;
 
         DatabaseReference subcategoryReference = FirebaseDatabase.getInstance().getReference()
-                .child("subcategories")
+                .child("app/subcategories")
                 .child(categoryKey)
                 .child(subcategoryKey);
 
@@ -79,7 +79,7 @@ public class SubcategoryDialog extends DialogFragment implements DialogInterface
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     FirebaseDatabase.getInstance().getReference()
-                                            .child("subcategories")
+                                            .child("app/subcategories")
                                             .child(categoryKey)
                                             .child(subcategoryKey)
                                             .removeValue();
@@ -125,9 +125,9 @@ public class SubcategoryDialog extends DialogFragment implements DialogInterface
                 if (!validate()) return;
 
                 subcategory.setLocalName("def", txtNameUsa.getText().toString());
-                subcategory.setLocalName("hrv", txtNameHrv.getText().toString());
+                subcategory.setLocalName("hr", txtNameHrv.getText().toString());
 
-                DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("subcategories").child(categoryKey);
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("app/subcategories").child(categoryKey);
                 if (subcategoryKey == null) subcategoryKey = ref.push().getKey();
                 ref.child(subcategoryKey).setValue(subcategory);
                 dialog.dismiss();
@@ -142,7 +142,7 @@ public class SubcategoryDialog extends DialogFragment implements DialogInterface
 
             if (subcategory != null) {
                 txtNameUsa.setText(subcategory.getLocalName("def"));
-                txtNameHrv.setText(subcategory.getLocalName("hrv"));
+                txtNameHrv.setText(subcategory.getLocalName("hr"));
             }
         }
 

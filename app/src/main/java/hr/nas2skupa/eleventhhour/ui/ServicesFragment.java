@@ -31,6 +31,7 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -38,6 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.common.Preferences;
 import hr.nas2skupa.eleventhhour.common.model.Booking;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
 import hr.nas2skupa.eleventhhour.common.model.Service;
@@ -56,8 +58,9 @@ public class ServicesFragment extends Fragment implements
         TimePickerDialog.OnTimeSetListener,
         MakeBookingDialog.BookingDialogListener {
 
-    @FragmentArg
-    String providerKey;
+    @Pref Preferences preferences;
+
+    @FragmentArg String providerKey;
 
     @ViewById(R.id.recycler_view)
     RecyclerView recyclerView;
@@ -95,8 +98,11 @@ public class ServicesFragment extends Fragment implements
         recyclerView.setHasFixedSize(true);
         recyclerView.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
 
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        Query query = database.child("services").child(providerKey).orderByChild("name");
+        Query query = FirebaseDatabase.getInstance().getReference()
+                .child("providerServices")
+                .child(providerKey)
+                .child("data")
+                .orderByChild("name");
         adapter = new FirebaseRecyclerAdapter<Service, ServiceViewHolder>(
                 Service.class,
                 R.layout.item_service,
@@ -167,6 +173,8 @@ public class ServicesFragment extends Fragment implements
 
         FirebaseDatabase.getInstance().getReference()
                 .child("providers")
+                .child(preferences.country())
+                .child("data")
                 .child(providerKey)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -203,12 +211,12 @@ public class ServicesFragment extends Fragment implements
         if (undo) return;
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        String key = reference.child("bookings").child(providerKey).push().getKey();
+        String key = reference.child(String.format("/providerAppointments/%s/data", booking.providerId)).push().getKey();
         Map<String, Object> bookingValues = booking.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/bookings/" + providerKey + "/" + key, bookingValues);
-        childUpdates.put("/users/" + Utils.getMyUid() + "/bookings/" + key, bookingValues);
+        childUpdates.put(String.format("/providerAppointments/%s/data/%s", booking.providerId, key), bookingValues);
+        childUpdates.put(String.format("/userAppointments/%s/data/%s", booking.userId, key), bookingValues);
         reference.updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {

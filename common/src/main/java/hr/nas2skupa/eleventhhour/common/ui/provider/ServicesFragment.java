@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.animation.OvershootInterpolator;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
@@ -52,8 +51,11 @@ public class ServicesFragment extends Fragment {
         recyclerView.setItemAnimator(new SlideInUpAnimator(new OvershootInterpolator(0.1f)));
         recyclerView.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
 
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        Query query = database.child("services").child(providerKey).orderByChild("name");
+        Query query = FirebaseDatabase.getInstance().getReference()
+                .child("providerServices")
+                .child(providerKey)
+                .child("data")
+                .orderByChild("name");
         adapter = new ServicesAdapter(Service.class, R.layout.item_service, ServiceViewHolder.class, query);
         recyclerView.setAdapter(adapter);
     }

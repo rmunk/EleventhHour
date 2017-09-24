@@ -62,9 +62,8 @@ public class UserDetailsActivity extends DrawerActivity {
         super.onCreate(savedInstanceState);
 
         userReference = FirebaseDatabase.getInstance().getReference()
-                .child("users")
-                .child(userKey)
-                .child("info");
+                .child("users/data")
+                .child(userKey);
         userListener = new UserChangedListener();
 
         UserFragment userFragment = UserFragment_.builder()
@@ -129,7 +128,7 @@ public class UserDetailsActivity extends DrawerActivity {
                                             // Remove notifications token
                                             String token = FirebaseInstanceId.getInstance().getToken();
                                             FirebaseDatabase.getInstance().getReference()
-                                                    .child("notificationTokens")
+                                                    .child("app/notificationTokens")
                                                     .child("client")
                                                     .child(myUid)
                                                     .child(token).removeValue();
