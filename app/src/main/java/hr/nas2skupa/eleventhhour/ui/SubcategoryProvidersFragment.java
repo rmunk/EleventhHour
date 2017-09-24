@@ -7,20 +7,20 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.common.Preferences;
+import hr.nas2skupa.eleventhhour.common.Preferences_;
 
 /**
  * Created by nas2skupa on 03/12/2016.
  */
 @EFragment(R.layout.fragment_providers)
 public class SubcategoryProvidersFragment extends ProvidersFragment {
-    @Pref Preferences preferences;
+    @Pref Preferences_ preferences;
 
     @Override
     public Query getKeyRef() {
         return FirebaseDatabase.getInstance().getReference()
                 .child("providers")
-                .child(preferences.country())
+                .child(preferences.country().get())
                 .child("bySubcategory")
                 .child(subcategoryKey);
     }

@@ -43,7 +43,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import hr.nas2skupa.eleventhhour.common.Preferences;
+import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.R;
 import hr.nas2skupa.eleventhhour.common.model.City;
 import hr.nas2skupa.eleventhhour.common.model.User;
@@ -58,7 +58,7 @@ public class UserFragment extends Fragment {
     private static final long PROGRESS_DELAY = 500L;
     private static final String[] sexes = new String[]{"female", "male"};
 
-    @Pref Preferences preferences;
+    @Pref Preferences_ preferences;
 
     @FragmentArg String userKey;
     @FragmentArg Boolean editable;
@@ -217,7 +217,7 @@ public class UserFragment extends Fragment {
 
         FirebaseDatabase.getInstance().getReference()
                 .child("app/cities")
-                .child(preferences.country())
+                .child(preferences.country().get())
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -249,7 +249,7 @@ public class UserFragment extends Fragment {
                 });
         FirebaseDatabase.getInstance().getReference()
                 .child("app/cities")
-                .child(preferences.country())
+                .child(preferences.country().get())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -384,7 +384,7 @@ public class UserFragment extends Fragment {
         if (user.city != null) {
             FirebaseDatabase.getInstance().getReference()
                     .child("app/cities")
-                    .child(preferences.country())
+                    .child(preferences.country().get())
                     .child(user.city)
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override

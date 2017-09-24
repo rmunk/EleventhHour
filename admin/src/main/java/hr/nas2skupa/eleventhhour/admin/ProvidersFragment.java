@@ -18,7 +18,7 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 
-import hr.nas2skupa.eleventhhour.common.Preferences;
+import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
 import hr.nas2skupa.eleventhhour.common.ui.helpers.SimpleDividerItemDecoration;
 import hr.nas2skupa.eleventhhour.common.ui.provider.ProviderDetailsActivity_;
@@ -32,7 +32,7 @@ import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 @EFragment(R.layout.fragment_providers)
 public class ProvidersFragment extends Fragment {
 
-    @Pref Preferences preferences;
+    @Pref Preferences_ preferences;
 
     @ViewById ViewGroup layoutMain;
     @ViewById RecyclerView recyclerView;
@@ -52,7 +52,7 @@ public class ProvidersFragment extends Fragment {
 
         Query query = FirebaseDatabase.getInstance().getReference()
                 .child("providers")
-                .child(preferences.country())
+                .child(preferences.country().get())
                 .child("data")
                 .orderByChild("name");
         adapter = new FirebaseRecyclerAdapter<Provider, ProviderViewHolder>(

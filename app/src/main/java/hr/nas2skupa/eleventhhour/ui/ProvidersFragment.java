@@ -50,7 +50,7 @@ import java.util.List;
 import java.util.Objects;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.common.Preferences;
+import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
 import hr.nas2skupa.eleventhhour.common.ui.helpers.VerticalSpaceItemDecoration;
 import hr.nas2skupa.eleventhhour.common.utils.Utils;
@@ -66,7 +66,7 @@ import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 public abstract class ProvidersFragment extends Fragment implements SearchView.OnQueryTextListener {
     private static final int REQUEST_PHONE_PERMISSION = 1;
 
-    @Pref Preferences preferences;
+    @Pref Preferences_ preferences;
 
     @FragmentArg
     String categoryKey;
@@ -100,7 +100,7 @@ public abstract class ProvidersFragment extends Fragment implements SearchView.O
 
         favoriteReference = FirebaseDatabase.getInstance().getReference()
                 .child("providers")
-                .child(preferences.country())
+                .child(preferences.country().get())
                 .child("userFavorites")
                 .child(Utils.getMyUid());
 
@@ -252,7 +252,7 @@ public abstract class ProvidersFragment extends Fragment implements SearchView.O
                     ProvidersFragment.this.getKeyRef(),
                     FirebaseDatabase.getInstance().getReference()
                             .child("providers")
-                            .child(preferences.country())
+                            .child(preferences.country().get())
                             .child("data"));
             this.filterSale = filterSale;
             this.sortByName = sortByName;

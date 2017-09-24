@@ -7,7 +7,7 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.common.Preferences;
+import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.utils.Utils;
 
 /**
@@ -15,13 +15,13 @@ import hr.nas2skupa.eleventhhour.common.utils.Utils;
  */
 @EFragment(R.layout.fragment_providers)
 public class FavoriteProvidersFragment extends ProvidersFragment {
-    @Pref Preferences preferences;
+    @Pref Preferences_ preferences;
 
     @Override
     public Query getKeyRef() {
         return FirebaseDatabase.getInstance().getReference()
                 .child("providers")
-                .child(preferences.country())
+                .child(preferences.country().get())
                 .child("userFavorites")
                 .child(Utils.getMyUid());
     }

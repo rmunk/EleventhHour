@@ -42,14 +42,14 @@ import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.DimensionPixelOffsetRes;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 
-import hr.nas2skupa.eleventhhour.common.Preferences;
+import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.R;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
 
 @EActivity(resName = "activity_provider_details")
 @OptionsMenu(resName = "menu_provider_details")
 public class ProviderDetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
-    @Pref Preferences preferences;
+    @Pref Preferences_ preferences;
 
     @Extra String providerKey;
 
@@ -75,7 +75,7 @@ public class ProviderDetailsActivity extends AppCompatActivity implements OnMapR
 
         providerReference = FirebaseDatabase.getInstance().getReference()
                 .child("providers")
-                .child(preferences.country())
+                .child(preferences.country().get())
                 .child("data")
                 .child(providerKey);
         providerListener = new ProviderChangedListener();

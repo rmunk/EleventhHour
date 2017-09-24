@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import hr.nas2skupa.eleventhhour.common.Preferences;
+import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.model.Booking;
 import hr.nas2skupa.eleventhhour.common.model.BookingStatus;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
@@ -75,7 +75,7 @@ public class PlanerFragment extends Fragment
     private static final int START_HOUR = 8;
     private static final long PROGRESS_DELAY = 500l;
 
-    @Pref Preferences preferences;
+    @Pref Preferences_ preferences;
 
     @FragmentArg String providerKey;
 
@@ -471,7 +471,7 @@ public class PlanerFragment extends Fragment
 
         FirebaseDatabase.getInstance().getReference()
                 .child("providers")
-                .child(preferences.country())
+                .child(preferences.country().get())
                 .child("data")
                 .child(providerKey)
                 .addListenerForSingleValueEvent(new ValueEventListener() {

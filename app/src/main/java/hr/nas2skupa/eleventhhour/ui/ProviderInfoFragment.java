@@ -31,7 +31,7 @@ import org.androidannotations.annotations.sharedpreferences.Pref;
 import java.util.Locale;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.common.Preferences;
+import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
 import hr.nas2skupa.eleventhhour.common.utils.Utils;
 
@@ -42,7 +42,7 @@ import hr.nas2skupa.eleventhhour.common.utils.Utils;
 public class ProviderInfoFragment extends Fragment {
     private static final int REQUEST_PHONE_PERMISSION = 1;
 
-    @Pref Preferences preferences;
+    @Pref Preferences_ preferences;
 
     @FragmentArg
     String providerKey;
@@ -98,13 +98,13 @@ public class ProviderInfoFragment extends Fragment {
 
         providerReference = FirebaseDatabase.getInstance().getReference()
                 .child("providers")
-                .child(preferences.country())
+                .child(preferences.country().get())
                 .child("data")
                 .child(providerKey);
 
         favoriteReference = FirebaseDatabase.getInstance().getReference()
                 .child("providers")
-                .child(preferences.country())
+                .child(preferences.country().get())
                 .child("userFavorites")
                 .child(Utils.getMyUid())
                 .child(providerKey);

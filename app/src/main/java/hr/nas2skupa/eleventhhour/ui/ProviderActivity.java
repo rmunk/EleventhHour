@@ -51,7 +51,7 @@ import org.androidannotations.annotations.sharedpreferences.Pref;
 import java.util.Locale;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.common.Preferences;
+import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
 import hr.nas2skupa.eleventhhour.common.utils.Utils;
 
@@ -59,7 +59,7 @@ import hr.nas2skupa.eleventhhour.common.utils.Utils;
 @OptionsMenu(R.menu.main)
 public class ProviderActivity extends DrawerActivity implements RatingBar.OnRatingBarChangeListener, OnMapReadyCallback {
     private static final int REQUEST_PHONE_PERMISSION = 1;
-    @Pref Preferences preferences;
+    @Pref Preferences_ preferences;
 
     @Extra String providerKey;
 
@@ -201,14 +201,14 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
 
         providerReference = FirebaseDatabase.getInstance().getReference()
                 .child("providers")
-                .child(preferences.country())
+                .child(preferences.country().get())
                 .child("data")
                 .child(providerKey);
         providerListener = new ProviderChangedListener();
 
         favoriteReference = FirebaseDatabase.getInstance().getReference()
                 .child("providers")
-                .child(preferences.country())
+                .child(preferences.country().get())
                 .child("userFavorites")
                 .child(Utils.getMyUid())
                 .child(providerKey);
@@ -278,7 +278,7 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
         imageView.setImageResource(provider.favorite ? R.drawable.ic_heart_broken_black_24dp : R.drawable.ic_favorite_black_36dp);
         FirebaseDatabase.getInstance().getReference()
                 .child("providers")
-                .child(preferences.country())
+                .child(preferences.country().get())
                 .child("userFavorites")
                 .child(Utils.getMyUid())
                 .child(providerKey)
@@ -292,7 +292,7 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
         ratingBar.setEnabled(false);
         DatabaseReference providers = FirebaseDatabase.getInstance().getReference()
                 .child("providers")
-                .child(preferences.country())
+                .child(preferences.country().get())
                 .child("data")
                 .child(providerKey);
         providers.runTransaction(new Transaction.Handler() {

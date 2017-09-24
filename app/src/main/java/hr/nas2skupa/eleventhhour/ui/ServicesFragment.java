@@ -39,7 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import hr.nas2skupa.eleventhhour.R;
-import hr.nas2skupa.eleventhhour.common.Preferences;
+import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.model.Booking;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
 import hr.nas2skupa.eleventhhour.common.model.Service;
@@ -58,7 +58,7 @@ public class ServicesFragment extends Fragment implements
         TimePickerDialog.OnTimeSetListener,
         MakeBookingDialog.BookingDialogListener {
 
-    @Pref Preferences preferences;
+    @Pref Preferences_ preferences;
 
     @FragmentArg String providerKey;
 
@@ -173,7 +173,7 @@ public class ServicesFragment extends Fragment implements
 
         FirebaseDatabase.getInstance().getReference()
                 .child("providers")
-                .child(preferences.country())
+                .child(preferences.country().get())
                 .child("data")
                 .child(providerKey)
                 .addListenerForSingleValueEvent(new ValueEventListener() {

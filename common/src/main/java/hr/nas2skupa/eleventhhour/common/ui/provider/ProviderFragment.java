@@ -46,7 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import hr.nas2skupa.eleventhhour.common.Preferences;
+import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.R;
 import hr.nas2skupa.eleventhhour.common.model.Category;
 import hr.nas2skupa.eleventhhour.common.model.City;
@@ -68,7 +68,7 @@ public class ProviderFragment extends Fragment {
     private static final int GOOGLE_PLAY_SERVICES_NOT_AVAILABLE_REQUEST = 1003;
     private static final long PROGRESS_DELAY = 500L;
 
-    @Pref Preferences preferences;
+    @Pref Preferences_ preferences;
 
     @FragmentArg String providerKey;
     @FragmentArg Boolean editable;
@@ -100,7 +100,7 @@ public class ProviderFragment extends Fragment {
     private Provider provider = new Provider();
     private DatabaseReference providerReference = FirebaseDatabase.getInstance().getReference()
             .child("providers")
-            .child(preferences.country())
+            .child(preferences.country().get())
             .child("data")
             .child(providerKey);
 
@@ -343,7 +343,7 @@ public class ProviderFragment extends Fragment {
         progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_loading_subcategories), 500L);
         FirebaseDatabase.getInstance().getReference()
                 .child("app/cities")
-                .child(preferences.country())
+                .child(preferences.country().get())
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -375,7 +375,7 @@ public class ProviderFragment extends Fragment {
                 });
         FirebaseDatabase.getInstance().getReference()
                 .child("app/cities")
-                .child(preferences.country())
+                .child(preferences.country().get())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -500,13 +500,13 @@ public class ProviderFragment extends Fragment {
                         if (providerKey == null) {
                             providerKey = FirebaseDatabase.getInstance().getReference()
                                     .child("providers")
-                                    .child(preferences.country())
+                                    .child(preferences.country().get())
                                     .child("data")
                                     .push().getKey();
                         }
 
                         childUpdates.put(String.format("/providers/%s/data/%s/",
-                                preferences.country(),
+                                preferences.country().get(),
                                 providerKey),
                                 provider.toMap());
 
@@ -514,7 +514,7 @@ public class ProviderFragment extends Fragment {
                             String subcategory = child.getKey();
                             boolean isInSubcategory = provider.subcategories.containsKey(subcategory);
                             childUpdates.put(String.format("/providers/%s/bySubcategory/%s/%s/",
-                                    preferences.country(),
+                                    preferences.country().get(),
                                     subcategory,
                                     providerKey),
                                     isInSubcategory ? true : null);
@@ -615,7 +615,7 @@ public class ProviderFragment extends Fragment {
         if (provider.city != null) {
             FirebaseDatabase.getInstance().getReference()
                     .child("app/cities")
-                    .child(preferences.country())
+                    .child(preferences.country().get())
                     .child(provider.city)
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
