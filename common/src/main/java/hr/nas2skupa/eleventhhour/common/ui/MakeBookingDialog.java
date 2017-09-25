@@ -94,7 +94,7 @@ public class MakeBookingDialog extends DialogFragment {
                         MakeBookingDialog.this.dismiss();
                     }
                 })
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (listener != null) listener.onBookingDismissed();

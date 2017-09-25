@@ -21,7 +21,7 @@
     <!-- Activity and fragment titles -->
     <string name="title_fragment_home">Home</string>
     <string name="title_fragment_calendar">My bookings</string>
-    <string name="title_fragment_favorites">Favorite providers</string>
+    <string name="title_fragment_favorites">My favorite</string>
     <string name="title_fragment_top">Top offers</string>
     <string name="title_activity_map">Map</string>
 
@@ -35,6 +35,9 @@
     <!-- ServicesFragment -->
     <string name="msg_booking_failed">Sorry, your booking did not go through. Please try again later.</string>
     <string name="msg_booking_sent">Your booking has been sent.</string>
+
+    <!-- ProvidersFragment -->
+    <string name="providers_search_by_name">Search by name</string>
 
      <!-- CalendarFragment -->
     <string name="msg_booking_cancel_failed">Sorry, your booking couldn\'t be canceled at the moment. Please try again later.</string>

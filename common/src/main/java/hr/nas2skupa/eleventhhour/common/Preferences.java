@@ -11,4 +11,7 @@ import org.androidannotations.annotations.sharedpreferences.SharedPref;
 public interface Preferences {
     @DefaultString("HR")
     String country();
+
+    @DefaultString("all")
+    String city();
 }

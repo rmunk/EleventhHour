@@ -44,9 +44,11 @@ import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import hr.nas2skupa.eleventhhour.R;
@@ -68,24 +70,20 @@ public abstract class ProvidersFragment extends Fragment implements SearchView.O
 
     @Pref Preferences_ preferences;
 
-    @FragmentArg
-    String categoryKey;
-    @FragmentArg
-    String subcategoryKey;
+    @FragmentArg String categoryKey;
+    @FragmentArg String subcategoryKey;
 
-    @ViewById(R.id.layout_main)
-    ViewGroup layoutMain;
-    @ViewById(R.id.recycler_view)
-    RecyclerView recyclerView;
+    @ViewById ViewGroup layoutMain;
+    @ViewById RecyclerView recyclerView;
 
     private DatabaseReference favoriteReference;
     private ChildEventListener myFavoriteChangedListener;
     private HashMap<String, Boolean> favorites = new HashMap<>();
-    private ProvidersAdapter adapter;
 
+    ProvidersAdapter adapter;
     private String providerPhone;
-    private boolean filterSale;
-    private boolean sortByName;
+    boolean filterSale;
+    boolean sortByName;
 
 
     public abstract Query getKeyRef();
@@ -134,6 +132,7 @@ public abstract class ProvidersFragment extends Fragment implements SearchView.O
 
         final MenuItem searchItem = menu.findItem(R.id.action_search);
         final SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setQueryHint(getString(R.string.providers_search_by_name));
         searchView.setOnQueryTextListener(this);
     }
 
@@ -221,7 +220,7 @@ public abstract class ProvidersFragment extends Fragment implements SearchView.O
         return true;
     }
 
-    private class ProvidersAdapter extends FirebaseIndexRecyclerAdapter<Provider, ProviderViewHolder> {
+    class ProvidersAdapter extends FirebaseIndexRecyclerAdapter<Provider, ProviderViewHolder> {
         private int expandedPosition = -1;
         private final boolean filterSale;
         private final boolean sortByName;
@@ -229,7 +228,11 @@ public abstract class ProvidersFragment extends Fragment implements SearchView.O
         private final SortedList<Provider> providers = new SortedList<>(Provider.class, new SortedListAdapterCallback<Provider>(this) {
             @Override
             public int compare(Provider o1, Provider o2) {
-                if (sortByName) return o1.name.compareToIgnoreCase(o2.name);
+                if (sortByName) {
+                    Collator collator = Collator.getInstance(new Locale(Utils.getLanguageIso()));
+                    collator.setStrength(Collator.PRIMARY);
+                    return collator.compare(o1.name, o2.name);
+                }
                 else return Float.compare(o2.rating, o1.rating);
             }
 
