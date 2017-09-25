@@ -21,17 +21,23 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.sharedpreferences.Pref;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import hr.nas2skupa.eleventhhour.auth.SignInActivity;
+import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.ui.helpers.DelayedProgressDialog;
 
 /**
  * Created by nas2skupa on 15/03/2017.
  */
 
+@EActivity
 public class AuthActivity extends AppCompatActivity {
+    @Pref Preferences_ preferences;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,10 +47,17 @@ public class AuthActivity extends AppCompatActivity {
         progressDialog.setCancelable(false);
 
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        FirebaseDatabase.getInstance()
-                .getReference("users")
-                .child(user.getUid())
+        if (user == null) {
+            signOut();
+            Toast.makeText(AuthActivity.this, R.string.unknown_error, Toast.LENGTH_LONG);
+            return;
+        }
+
+        FirebaseDatabase.getInstance().getReference()
                 .child("providers")
+                .child(preferences.country().get())
+                .child("userEmployers")
+                .child(user.getUid())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -71,11 +84,13 @@ public class AuthActivity extends AppCompatActivity {
                             String providerKey = providersKeys.get(0);
 
                             String token = FirebaseInstanceId.getInstance().getToken();
-                            FirebaseDatabase.getInstance().getReference()
-                                    .child("app/notificationTokens/panel")
-                                    .child(providerKey)
-                                    .child(token)
-                                    .setValue(true);
+                            if (token != null) {
+                                FirebaseDatabase.getInstance().getReference()
+                                        .child("app/notificationTokens/panel")
+                                        .child(providerKey)
+                                        .child(token)
+                                        .setValue(true);
+                            }
 
                             MainActivity_.intent(AuthActivity.this)
                                     .providerKey(providerKey)

@@ -114,6 +114,7 @@ public class MakeBookingDialog extends DialogFragment {
     @AfterViews
     public void setConfirmationText() {
         txtName.setVisibility(userName == null ? View.VISIBLE : View.GONE);
+        txtName.setText(userName);
         txtConfirmation.setText(getString(R.string.confirmation_text,
                 DateUtils.formatDateTime(getContext(), from.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE),
                 DateUtils.formatDateTime(getContext(), from.getTimeInMillis(), DateUtils.FORMAT_SHOW_TIME),

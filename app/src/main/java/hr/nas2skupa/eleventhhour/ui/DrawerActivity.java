@@ -16,7 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
-import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -115,30 +115,39 @@ public class DrawerActivity extends AppCompatActivity
                 break;
 
             case R.id.nav_sign_out:
-                final String myUid = Utils.getMyUid();
-                AuthUI.getInstance()
-                        .signOut(DrawerActivity.this)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    // Remove notifications token
-                                    String token = FirebaseInstanceId.getInstance().getToken();
-                                    if (token != null) {
-                                        FirebaseDatabase.getInstance().getReference()
-                                                .child("app/notificationTokens/client")
-                                                .child(myUid)
-                                                .child(token)
-                                                .removeValue();
-                                    }
+                final String token = FirebaseInstanceId.getInstance().getToken();
 
+                // Remove notifications token
+                if (token != null) {
+                    FirebaseDatabase.getInstance().getReference()
+                            .child("app/notificationTokens/client")
+                            .child(Utils.getMyUid())
+                            .child(token)
+                            .removeValue();
+                }
+
+                AuthUI.getInstance()
+                        .signOut(this)
+                        .continueWith(new Continuation<Void, Void>() {
+                            @Override
+                            public Void then(@NonNull Task<Void> task) throws Exception {
+                                if (task.isSuccessful()) {
                                     Intent intent = new Intent(DrawerActivity.this, SignInActivity.class);
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                     startActivity(intent);
                                     finish();
                                 } else {
+                                    // Restore notifications token
+                                    if (token != null) {
+                                        FirebaseDatabase.getInstance().getReference()
+                                                .child("app/notificationTokens/client")
+                                                .child(Utils.getMyUid())
+                                                .child(token)
+                                                .setValue(true);
+                                    }
                                     Toast.makeText(DrawerActivity.this, R.string.sign_out_failed, Toast.LENGTH_LONG).show();
                                 }
+                                return null;
                             }
                         });
                 break;
