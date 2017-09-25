@@ -26,10 +26,12 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import java.util.Locale;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
 import hr.nas2skupa.eleventhhour.common.utils.Utils;
 
@@ -39,6 +41,8 @@ import hr.nas2skupa.eleventhhour.common.utils.Utils;
 @EFragment(R.layout.fragment_provider_info)
 public class ProviderInfoFragment extends Fragment {
     private static final int REQUEST_PHONE_PERMISSION = 1;
+
+    @Pref Preferences_ preferences;
 
     @FragmentArg
     String providerKey;
@@ -94,12 +98,15 @@ public class ProviderInfoFragment extends Fragment {
 
         providerReference = FirebaseDatabase.getInstance().getReference()
                 .child("providers")
+                .child(preferences.country().get())
+                .child("data")
                 .child(providerKey);
 
         favoriteReference = FirebaseDatabase.getInstance().getReference()
-                .child("users")
+                .child("providers")
+                .child(preferences.country().get())
+                .child("userFavorites")
                 .child(Utils.getMyUid())
-                .child("favorites")
                 .child(providerKey);
     }
 
@@ -127,9 +134,7 @@ public class ProviderInfoFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Boolean favorite = dataSnapshot.getValue(Boolean.class);
-                if (favorite == null) return;
-
-                imgFavorite.setVisibility(favorite ? View.VISIBLE : View.GONE);
+                imgFavorite.setVisibility(favorite != null && favorite ? View.VISIBLE : View.GONE);
             }
 
             @Override

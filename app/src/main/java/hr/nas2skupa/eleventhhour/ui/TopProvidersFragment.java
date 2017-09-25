@@ -15,6 +15,8 @@ public class TopProvidersFragment extends ProvidersFragment {
     @Override
     public Query getKeyRef() {
         return FirebaseDatabase.getInstance().getReference()
+                .child("providers")
+                .child(preferences.country().get())
                 .child("promoted");
     }
 }

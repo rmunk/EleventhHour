@@ -16,8 +16,9 @@ public class FavoriteProvidersFragment extends ProvidersFragment {
     @Override
     public Query getKeyRef() {
         return FirebaseDatabase.getInstance().getReference()
-                .child("users")
-                .child(Utils.getMyUid())
-                .child("favorites");
+                .child("providers")
+                .child(preferences.country().get())
+                .child("userFavorites")
+                .child(Utils.getMyUid());
     }
 }

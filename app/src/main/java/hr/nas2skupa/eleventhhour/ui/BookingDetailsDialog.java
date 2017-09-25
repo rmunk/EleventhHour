@@ -36,9 +36,11 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.greenrobot.eventbus.EventBus;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.model.Booking;
 import hr.nas2skupa.eleventhhour.common.model.BookingStatus;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
@@ -51,23 +53,17 @@ import hr.nas2skupa.eleventhhour.events.CancelBookingEvent;
  */
 @EFragment(R.layout.dialog_booking_details)
 public class BookingDetailsDialog extends DialogFragment implements OnMapReadyCallback {
-    @FragmentArg
-    String bookingKey;
+    @Pref Preferences_ preferences;
 
-    @ViewById(R.id.txt_booking_date)
-    TextView txtBookingDate;
-    @ViewById(R.id.txt_booking_service)
-    TextView txtBookingService;
-    @ViewById(R.id.txt_booking_provider)
-    TextView txtBookingProvider;
-    @ViewById(R.id.txt_booking_time)
-    TextView txtBookingTime;
-    @ViewById(R.id.txt_booking_status)
-    TextView txtBookingStatus;
-    @ViewById(R.id.txt_booking_price)
-    TextView txtBookingPrice;
-    @ViewById(R.id.txt_booking_note)
-    TextView txtBookingNote;
+    @FragmentArg String bookingKey;
+
+    @ViewById TextView txtBookingDate;
+    @ViewById TextView txtBookingService;
+    @ViewById TextView txtBookingProvider;
+    @ViewById TextView txtBookingTime;
+    @ViewById TextView txtBookingStatus;
+    @ViewById TextView txtBookingPrice;
+    @ViewById TextView txtBookingNote;
 
     private View view;
     private DatabaseReference bookingReference;
@@ -81,9 +77,9 @@ public class BookingDetailsDialog extends DialogFragment implements OnMapReadyCa
         super.onCreate(savedInstanceState);
 
         bookingReference = FirebaseDatabase.getInstance().getReference()
-                .child("users")
+                .child("userAppointments")
                 .child(Utils.getMyUid())
-                .child("bookings")
+                .child("data")
                 .child(bookingKey);
 
         bookingListener = new BookingListener();
@@ -181,7 +177,11 @@ public class BookingDetailsDialog extends DialogFragment implements OnMapReadyCa
                         .setVisibility(View.GONE);
 
 
-                FirebaseDatabase.getInstance().getReference("providers").child(booking.providerId)
+                FirebaseDatabase.getInstance().getReference()
+                        .child("providers")
+                        .child(preferences.country().get())
+                        .child("data")
+                        .child(booking.providerId)
                         .addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {

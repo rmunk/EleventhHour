@@ -53,7 +53,7 @@ public class SubcategoriesFragment extends Fragment {
         recyclerView.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        Query query = database.child("subcategories").child(categoryKey).orderByChild("name/" + Utils.getLanguageIso());
+        Query query = database.child("app/subcategories").child(categoryKey).orderByChild("name/" + Utils.getLanguageIso());
         adapter = new SubcategoriesAdapter(Subcategory.class, R.layout.item_subcategory, SubcategoryViewHolder.class, query);
         recyclerView.setAdapter(adapter);
     }

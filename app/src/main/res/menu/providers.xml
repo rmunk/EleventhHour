@@ -3,11 +3,17 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_search"
+        android:title="@string/action_search"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="always"/>
+
+    <item
         android:id="@+id/action_sort_by_name"
         android:checkable="true"
         android:checked="false"
         android:icon="@drawable/ic_sort_by_alpha_white_24dp"
-        android:title="@string/menu_sort_by_name"
+        android:title="@string/action_sort_by_name"
         app:showAsAction="always"/>
 
     <item
@@ -15,6 +21,6 @@
         android:checkable="true"
         android:checked="false"
         android:icon="@drawable/ic_sale_white_24dp"
-        android:title="@string/menu_sale"
+        android:title="@string/action_sale"
         app:showAsAction="always"/>
 </menu>

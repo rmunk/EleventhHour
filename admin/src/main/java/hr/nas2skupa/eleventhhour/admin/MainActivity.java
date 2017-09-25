@@ -1,16 +1,21 @@
 package hr.nas2skupa.eleventhhour.admin;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
+import hr.nas2skupa.eleventhhour.auth.SignInActivity;
+
 
 @EActivity(R.layout.activity_main)
-public class MainActivity extends DrawerActivity {
+public class MainActivity extends DrawerActivity implements FirebaseAuth.AuthStateListener {
     public static final String ACTION_PROVIDERS = "hr.nas2skupa.eleventhhour.ACTION_PROVIDERS";
     public static final String ACTION_CATEGORIES = "hr.nas2skupa.eleventhhour.ACTION_CATEGORIES";
     public static final String ACTION_USERS = "hr.nas2skupa.eleventhhour.ACTION_USERS";
@@ -22,6 +27,18 @@ public class MainActivity extends DrawerActivity {
         super.onNewIntent(intent);
 
         setPage(intent.getAction());
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseAuth.getInstance().addAuthStateListener(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        FirebaseAuth.getInstance().removeAuthStateListener(this);
     }
 
     void initToolbar(@ViewById(R.id.toolbar) Toolbar toolbar) {
@@ -65,6 +82,13 @@ public class MainActivity extends DrawerActivity {
                 break;
             default:
                 setPage(ACTION_PROVIDERS);
+        }
+    }
+
+    @Override
+    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            startActivity(new Intent(this, SignInActivity.class));
         }
     }
 }

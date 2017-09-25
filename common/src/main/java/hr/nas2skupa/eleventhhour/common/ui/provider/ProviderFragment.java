@@ -38,6 +38,7 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.Touch;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.R;
 import hr.nas2skupa.eleventhhour.common.model.Category;
 import hr.nas2skupa.eleventhhour.common.model.City;
@@ -65,6 +67,8 @@ public class ProviderFragment extends Fragment {
     private static final int GOOGLE_PLAY_SERVICES_REPAIRABLE_REQUEST = 1002;
     private static final int GOOGLE_PLAY_SERVICES_NOT_AVAILABLE_REQUEST = 1003;
     private static final long PROGRESS_DELAY = 500L;
+
+    @Pref Preferences_ preferences;
 
     @FragmentArg String providerKey;
     @FragmentArg Boolean editable;
@@ -94,8 +98,11 @@ public class ProviderFragment extends Fragment {
     private ProgressDialog progressDialog;
 
     private Provider provider = new Provider();
-    private DatabaseReference providersReference = FirebaseDatabase.getInstance().
-            getReference().child("providers");
+    private DatabaseReference providerReference = FirebaseDatabase.getInstance().getReference()
+            .child("providers")
+            .child(preferences.country().get())
+            .child("data")
+            .child(providerKey);
 
     public ProviderFragment() {
     }
@@ -104,9 +111,9 @@ public class ProviderFragment extends Fragment {
     void loadProvider() {
         if (providerKey != null) {
             if (editable) {
-                providersReference.child(providerKey).addListenerForSingleValueEvent(new ProviderChangedListener());
+                providerReference.addListenerForSingleValueEvent(new ProviderChangedListener());
             } else {
-                providersReference.child(providerKey).addValueEventListener(new ProviderChangedListener());
+                providerReference.addValueEventListener(new ProviderChangedListener());
             }
         }
         if (editable) setupCityPicker();
@@ -124,7 +131,7 @@ public class ProviderFragment extends Fragment {
         progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_loading_categories), PROGRESS_DELAY);
 
         FirebaseDatabase.getInstance().getReference()
-                .child("categories")
+                .child("app/categories")
                 .addListenerForSingleValueEvent(
                         new ValueEventListener() {
                             @Override
@@ -203,7 +210,7 @@ public class ProviderFragment extends Fragment {
 
         progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_loading_subcategories), 500L);
         FirebaseDatabase.getInstance().getReference()
-                .child("subcategories")
+                .child("app/subcategories")
                 .child(provider.category)
                 .addListenerForSingleValueEvent(
                         new ValueEventListener() {
@@ -335,8 +342,8 @@ public class ProviderFragment extends Fragment {
 
         progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_loading_subcategories), 500L);
         FirebaseDatabase.getInstance().getReference()
-                .child("cities")
-                .child("hrv")
+                .child("app/cities")
+                .child(preferences.country().get())
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -367,8 +374,8 @@ public class ProviderFragment extends Fragment {
                     }
                 });
         FirebaseDatabase.getInstance().getReference()
-                .child("cities")
-                .child("hrv")
+                .child("app/cities")
+                .child(preferences.country().get())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -475,7 +482,7 @@ public class ProviderFragment extends Fragment {
 
         progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_saving), 500L);
         FirebaseDatabase.getInstance().getReference()
-                .child("subcategories")
+                .child("app/subcategories")
                 .child(provider.category)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -491,36 +498,46 @@ public class ProviderFragment extends Fragment {
                         geoUpdates.put("l", Arrays.asList(location.latitude, location.longitude));
 
                         if (providerKey == null) {
-                            providerKey = providersReference.push().getKey();
+                            providerKey = FirebaseDatabase.getInstance().getReference()
+                                    .child("providers")
+                                    .child(preferences.country().get())
+                                    .child("data")
+                                    .push().getKey();
                         }
 
-                        childUpdates.put("/providers/" + providerKey, provider.toMap());
+                        childUpdates.put(String.format("/providers/%s/data/%s/",
+                                preferences.country().get(),
+                                providerKey),
+                                provider.toMap());
 
                         for (DataSnapshot child : children) {
                             String subcategory = child.getKey();
                             boolean isInSubcategory = provider.subcategories.containsKey(subcategory);
-                            childUpdates.put(
-                                    String.format("/subcategoryProviders/%s/%s",
-                                            subcategory,
-                                            providerKey),
+                            childUpdates.put(String.format("/providers/%s/bySubcategory/%s/%s/",
+                                    preferences.country().get(),
+                                    subcategory,
+                                    providerKey),
                                     isInSubcategory ? true : null);
-                            childUpdates.put(
-                                    String.format("/geofire/providers/%s/%s/%s",
-                                            provider.category,
-                                            subcategory,
-                                            providerKey)
-                                    , isInSubcategory ? geoUpdates : null);
+                            childUpdates.put(String.format("/geofire/providers/byCategory/%s/%s/",
+                                    provider.category,
+                                    providerKey),
+                                    isInSubcategory ? geoUpdates : null);
+                            childUpdates.put(String.format("/geofire/providers/bySubcategory/%s/%s",
+                                    subcategory,
+                                    providerKey),
+                                    isInSubcategory ? geoUpdates : null);
                         }
 
-                        FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
-                            @Override
-                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                                listener.onProviderSavedListener(providerKey, databaseError == null);
+                        FirebaseDatabase.getInstance().getReference()
+                                .updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
+                                    @Override
+                                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                        listener.onProviderSavedListener(providerKey, databaseError == null);
 
-                                progressDialog.dismiss();
-                                progressDialog.cancel();
-                            }
-                        });
+                                        progressDialog.dismiss();
+                                        progressDialog.cancel();
+                                    }
+                                });
                     }
 
                     @Override
@@ -550,7 +567,7 @@ public class ProviderFragment extends Fragment {
 
         if (provider.category != null) {
             FirebaseDatabase.getInstance().getReference()
-                    .child("categories")
+                    .child("app/categories")
                     .child(provider.category)
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -570,7 +587,7 @@ public class ProviderFragment extends Fragment {
 
         if (provider.subcategories != null) {
             FirebaseDatabase.getInstance().getReference()
-                    .child("subcategories")
+                    .child("app/subcategories")
                     .child(provider.category)
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -597,8 +614,8 @@ public class ProviderFragment extends Fragment {
 
         if (provider.city != null) {
             FirebaseDatabase.getInstance().getReference()
-                    .child("cities")
-                    .child("hrv")
+                    .child("app/cities")
+                    .child(preferences.country().get())
                     .child(provider.city)
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override

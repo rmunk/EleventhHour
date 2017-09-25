@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AuthActivity"
+            android:name=".AuthActivity_"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
             <intent-filter>

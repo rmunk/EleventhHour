@@ -36,6 +36,7 @@ import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.model.Booking;
 import hr.nas2skupa.eleventhhour.common.model.BookingStatus;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
@@ -73,13 +75,16 @@ public class PlanerFragment extends Fragment
     private static final int START_HOUR = 8;
     private static final long PROGRESS_DELAY = 500l;
 
-    private List<MyWeekViewEvent> events = new ArrayList<>();
-    private Map<String, Query> bookingsQueryList = new HashMap<>();
-    private ProgressDialog progressDialog;
-
-    private boolean showCancelled = false;
+    @Pref Preferences_ preferences;
 
     @FragmentArg String providerKey;
+
+    private List<MyWeekViewEvent> events = new ArrayList<>();
+
+    private Map<String, Query> bookingsQueryList = new HashMap<>();
+
+    private ProgressDialog progressDialog;
+    private boolean showCancelled = false;
 
     @ViewById WeekView weekView;
 
@@ -236,8 +241,9 @@ public class PlanerFragment extends Fragment
             calendar.add(Calendar.MONTH, 1);
             long to = calendar.getTimeInMillis();
             Query bookingsQuery = FirebaseDatabase.getInstance().getReference()
-                    .child("bookings")
+                    .child("providerAppointments")
                     .child(providerKey)
+                    .child("data")
                     .orderByChild("from")
                     .startAt(from)
                     .endAt(to);
@@ -343,9 +349,12 @@ public class PlanerFragment extends Fragment
 
     @Click(R.id.fab_add_booking)
     void addBooking() {
-        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(hr.nas2skupa.eleventhhour.common.R.string.msg_provider_loading_categories), PROGRESS_DELAY);
+        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(hr.nas2skupa.eleventhhour.common.R.string.msg_planer_loading_services), PROGRESS_DELAY);
         FirebaseDatabase.getInstance().getReference()
-                .child("services").child(providerKey).orderByChild("name")
+                .child("providerServices")
+                .child(providerKey)
+                .child("data")
+                .orderByChild("name")
                 .addListenerForSingleValueEvent(
                         new ValueEventListener() {
                             private int selected = 0;
@@ -462,6 +471,8 @@ public class PlanerFragment extends Fragment
 
         FirebaseDatabase.getInstance().getReference()
                 .child("providers")
+                .child(preferences.country().get())
+                .child("data")
                 .child(providerKey)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -494,16 +505,19 @@ public class PlanerFragment extends Fragment
 
     }
 
-    public void sendBooking(Booking booking) {
+    public void addCustomBooking(Booking booking) {
         booking.status = BookingStatus.PROVIDER_ACCEPTED;
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        String key = reference.child("bookings").child(providerKey).push().getKey();
+        String key = FirebaseDatabase.getInstance().getReference()
+                .child("providerAppointments")
+                .child(providerKey)
+                .child("data")
+                .push().getKey();
         Map<String, Object> bookingValues = booking.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/bookings/" + providerKey + "/" + key, bookingValues);
-        reference.updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
+        childUpdates.put(String.format("/providerAppointments/%s/data/%s", providerKey, key), bookingValues);
+        FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                 if (databaseError != null)
@@ -514,7 +528,7 @@ public class PlanerFragment extends Fragment
 
     @Override
     public void onBookingConfirmed(Booking booking) {
-        sendBooking(booking);
+        addCustomBooking(booking);
     }
 
     @Override

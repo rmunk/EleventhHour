@@ -9,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
@@ -38,11 +37,13 @@ import org.androidannotations.annotations.FocusChange;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.Touch;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.R;
 import hr.nas2skupa.eleventhhour.common.model.City;
 import hr.nas2skupa.eleventhhour.common.model.User;
@@ -56,6 +57,8 @@ import hr.nas2skupa.eleventhhour.common.ui.helpers.DelayedProgressDialog;
 public class UserFragment extends Fragment {
     private static final long PROGRESS_DELAY = 500L;
     private static final String[] sexes = new String[]{"female", "male"};
+
+    @Pref Preferences_ preferences;
 
     @FragmentArg String userKey;
     @FragmentArg Boolean editable;
@@ -78,7 +81,7 @@ public class UserFragment extends Fragment {
 
     private User user = new User();
     private DatabaseReference usersReference = FirebaseDatabase.getInstance().
-            getReference().child("users");
+            getReference().child("users/data");
 
     public UserFragment() {
     }
@@ -87,9 +90,9 @@ public class UserFragment extends Fragment {
     void loadUser() {
         if (userKey != null) {
             if (editable) {
-                usersReference.child(userKey).child("info").addListenerForSingleValueEvent(new UserChangedListener());
+                usersReference.child(userKey).addListenerForSingleValueEvent(new UserChangedListener());
             } else {
-                usersReference.child(userKey).child("info").addValueEventListener(new UserChangedListener());
+                usersReference.child(userKey).addValueEventListener(new UserChangedListener());
             }
         }
 
@@ -111,7 +114,7 @@ public class UserFragment extends Fragment {
         progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_user_loading_age), PROGRESS_DELAY);
 
         FirebaseDatabase.getInstance().getReference()
-                .child("ageGroups")
+                .child("app/ageGroups")
                 .addListenerForSingleValueEvent(
                         new ValueEventListener() {
                             @Override
@@ -213,8 +216,8 @@ public class UserFragment extends Fragment {
                 new ArrayList<City>());
 
         FirebaseDatabase.getInstance().getReference()
-                .child("cities")
-                .child("hrv")
+                .child("app/cities")
+                .child(preferences.country().get())
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -245,8 +248,8 @@ public class UserFragment extends Fragment {
                     }
                 });
         FirebaseDatabase.getInstance().getReference()
-                .child("cities")
-                .child("hrv")
+                .child("app/cities")
+                .child(preferences.country().get())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -355,7 +358,7 @@ public class UserFragment extends Fragment {
             });
         }
 
-        usersReference.child(userKey).child("info").updateChildren(user.toMap())
+        usersReference.child(userKey).updateChildren(user.toMap())
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -380,8 +383,8 @@ public class UserFragment extends Fragment {
 
         if (user.city != null) {
             FirebaseDatabase.getInstance().getReference()
-                    .child("cities")
-                    .child("hrv")
+                    .child("app/cities")
+                    .child(preferences.country().get())
                     .child(user.city)
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override

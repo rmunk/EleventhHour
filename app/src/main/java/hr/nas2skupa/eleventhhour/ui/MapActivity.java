@@ -89,8 +89,7 @@ public class MapActivity extends FragmentActivity implements
         zagreb = new LatLng(45.813316, 15.982176);
 
         DatabaseReference geoFireReference = FirebaseDatabase.getInstance().getReference()
-                .child("geofire/providers/")
-                .child(categoryKey)
+                .child("geofire/providers/bySubcategory/")
                 .child(subcategoryKey);
         GeoFire geoFire = new GeoFire(geoFireReference);
         geoQueryEventListener = new GeoQueryEventListener();

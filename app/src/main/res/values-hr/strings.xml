@@ -27,7 +27,7 @@
     <string name="title_fragment_calendar">Moji termini</string>
     <string name="title_fragment_home">Početna</string>
     <string name="menu_profile">Moj profil</string>
-    <string name="menu_sale">Akcija</string>
+    <string name="action_sale">Akcija</string>
     <string name="title_activity_map">Karta</string>
     <string name="title_fragment_top">Top ponude</string>
     <string name="title_fragment_favorites">Favoriti</string>

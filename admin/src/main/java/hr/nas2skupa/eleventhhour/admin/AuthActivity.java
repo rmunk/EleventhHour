@@ -36,8 +36,8 @@ public class AuthActivity extends AppCompatActivity {
         final ProgressDialog progressDialog = DelayedProgressDialog.show(this, null, getString(R.string.checking_permissions), 500l);
         progressDialog.setCancelable(false);
 
-        FirebaseDatabase.getInstance()
-                .getReference("admins")
+        FirebaseDatabase.getInstance().getReference()
+                .child("app/admins")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
