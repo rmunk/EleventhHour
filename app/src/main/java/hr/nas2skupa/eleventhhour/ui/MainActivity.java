@@ -10,18 +10,21 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.auth.SignInActivity;
 import hr.nas2skupa.eleventhhour.common.utils.Utils;
 
 @EActivity(R.layout.activity_main)
 @OptionsMenu(R.menu.main)
 public class MainActivity extends DrawerActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, FirebaseAuth.AuthStateListener {
 
     public static final String ACTION_HOME = "hr.nas2skupa.eleventhhour.ACTION_HOME";
     public static final String ACTION_CALENDAR = "hr.nas2skupa.eleventhhour.ACTION_CALENDAR";
@@ -39,6 +42,18 @@ public class MainActivity extends DrawerActivity
 
         setPage(intent.getAction());
         handleIntent(intent);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseAuth.getInstance().addAuthStateListener(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        FirebaseAuth.getInstance().removeAuthStateListener(this);
     }
 
     @Override
@@ -126,6 +141,13 @@ public class MainActivity extends DrawerActivity
                     .bookingKey(bookingKey)
                     .build()
                     .show(getSupportFragmentManager(), "BookingDetailsDialog");
+        }
+    }
+
+    @Override
+    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            startActivity(new Intent(this, SignInActivity.class));
         }
     }
 }

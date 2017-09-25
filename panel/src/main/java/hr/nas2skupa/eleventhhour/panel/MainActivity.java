@@ -21,7 +21,7 @@ import hr.nas2skupa.eleventhhour.auth.SignInActivity;
 import hr.nas2skupa.eleventhhour.common.ui.provider.ProviderDetailsActivity_;
 
 @EActivity(R.layout.activity_main)
-public class MainActivity extends DrawerActivity {
+public class MainActivity extends DrawerActivity implements FirebaseAuth.AuthStateListener {
 
     public static final String ACTION_PLANER = "hr.nas2skupa.eleventhhour.panel.ACTION_PLANER";
     public static final String ACTION_PROFILE = "hr.nas2skupa.eleventhhour.panel.ACTION_PROFILE";
@@ -31,8 +31,6 @@ public class MainActivity extends DrawerActivity {
     public static String providerKey;
 
     @ViewById Toolbar toolbar;
-
-    private MyAuthStateListener authStateListener;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,14 +42,13 @@ public class MainActivity extends DrawerActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        authStateListener = new MyAuthStateListener();
-        FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
+        FirebaseAuth.getInstance().addAuthStateListener(this);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        FirebaseAuth.getInstance().removeAuthStateListener(authStateListener);
+        FirebaseAuth.getInstance().removeAuthStateListener(this);
     }
 
     @Override
@@ -122,12 +119,10 @@ public class MainActivity extends DrawerActivity {
         }
     }
 
-    private class MyAuthStateListener implements FirebaseAuth.AuthStateListener {
-        @Override
-        public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-            if (FirebaseAuth.getInstance().getCurrentUser() == null || providerKey == null) {
-                startActivity(new Intent(MainActivity.this, SignInActivity.class));
-            }
+    @Override
+    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            startActivity(new Intent(this, SignInActivity.class));
         }
     }
 }
