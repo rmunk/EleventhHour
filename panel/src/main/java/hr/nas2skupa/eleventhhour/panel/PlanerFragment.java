@@ -349,7 +349,7 @@ public class PlanerFragment extends Fragment
 
     @Click(R.id.fab_add_booking)
     void addBooking() {
-        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(hr.nas2skupa.eleventhhour.common.R.string.msg_planer_loading_services), PROGRESS_DELAY);
+        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_planer_loading_services), PROGRESS_DELAY);
         FirebaseDatabase.getInstance().getReference()
                 .child("providerServices")
                 .child(providerKey)
