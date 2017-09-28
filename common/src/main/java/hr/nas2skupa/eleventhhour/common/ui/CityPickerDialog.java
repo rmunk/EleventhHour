@@ -149,7 +149,7 @@ public class CityPickerDialog extends DialogFragment implements SearchView.OnQue
         return true;
     }
 
-    private static class CitiesAdapter extends FirebaseRecyclerAdapter<City, CitiesAdapter.CityViewHolder> {
+    public static class CitiesAdapter extends FirebaseRecyclerAdapter<City, CitiesAdapter.CityViewHolder> {
         private CitiesAdapterListener listener;
         private boolean loaded = false;
         private String query = "";
@@ -251,7 +251,7 @@ public class CityPickerDialog extends DialogFragment implements SearchView.OnQue
             filter(query);
         }
 
-        static class CityViewHolder extends RecyclerView.ViewHolder {
+        public static class CityViewHolder extends RecyclerView.ViewHolder {
             private CheckedTextView txtName;
 
             public CityViewHolder(View itemView) {
