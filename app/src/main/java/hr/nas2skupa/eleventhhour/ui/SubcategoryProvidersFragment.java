@@ -1,10 +1,6 @@
 package hr.nas2skupa.eleventhhour.ui;
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
+import android.view.MenuItem;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -13,6 +9,9 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.OptionsMenuItem;
 
 import java.util.Objects;
 
@@ -25,26 +24,32 @@ import hr.nas2skupa.eleventhhour.common.ui.CityPickerDialog_;
  * Created by nas2skupa on 03/12/2016.
  */
 @EFragment(R.layout.fragment_providers)
-public class SubcategoryProvidersFragment extends ProvidersFragment implements View.OnClickListener, CityPickerDialog.CityPickerDialogListener, ValueEventListener {
+@OptionsMenu(R.menu.subcategory_providers)
+public class SubcategoryProvidersFragment extends ProvidersFragment
+        implements CityPickerDialog.CityPickerDialogListener, ValueEventListener {
 
-    private ActionBar actionBar;
+    @OptionsMenuItem MenuItem menuPickCity;
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onResume() {
+        super.onResume();
 
-        actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayShowTitleEnabled(true);
-            actionBar.setTitle(R.string.pick_city_all_cities);
-            FirebaseDatabase.getInstance().getReference()
-                    .child("app/cities")
-                    .child(preferences.country().get())
-                    .child(preferences.city().get())
-                    .addListenerForSingleValueEvent(this);
-        }
+        FirebaseDatabase.getInstance().getReference()
+                .child("app/cities")
+                .child(preferences.country().get())
+                .child(preferences.city().get())
+                .addValueEventListener(this);
+    }
 
-        getActivity().findViewById(R.id.toolbar).setOnClickListener(this);
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        FirebaseDatabase.getInstance().getReference()
+                .child("app/cities")
+                .child(preferences.country().get())
+                .child(preferences.city().get())
+                .removeEventListener(this);
     }
 
     @Override
@@ -55,9 +60,7 @@ public class SubcategoryProvidersFragment extends ProvidersFragment implements V
                     .child(preferences.country().get())
                     .child("bySubcategory")
                     .child(subcategoryKey);
-        }
-
-        else {
+        } else {
             return FirebaseDatabase.getInstance().getReference()
                     .child("providers")
                     .child(preferences.country().get())
@@ -68,19 +71,24 @@ public class SubcategoryProvidersFragment extends ProvidersFragment implements V
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-        actionBar.setDisplayShowTitleEnabled(true);
         City city = dataSnapshot.getValue(City.class);
-        if (city != null) actionBar.setTitle(city.getLocalName());
-        else preferences.city().put("all");
+        if (city == null) {
+            preferences.city().put("all");
+            menuPickCity.setTitle(R.string.pick_city_all_cities);
+            menuPickCity.getIcon().setAlpha(138);
+        } else {
+            menuPickCity.setTitle(city.getLocalName());
+            menuPickCity.getIcon().setAlpha(255);
+        }
     }
 
     @Override
     public void onCancelled(DatabaseError databaseError) {
 
     }
-    
-    @Override
-    public void onClick(View view) {
+
+    @OptionsItem(R.id.menu_pick_city)
+    public void pickCity() {
         CityPickerDialog cityPickerDialog = CityPickerDialog_.builder().build();
         cityPickerDialog.setCityPickerDialogListener(this);
         cityPickerDialog.show(getChildFragmentManager(), "CityPickerDialog");
@@ -88,20 +96,22 @@ public class SubcategoryProvidersFragment extends ProvidersFragment implements V
 
     @Override
     public void onCityPicked(City city) {
-        if (actionBar != null) actionBar.setTitle(city.getLocalName());
         preferences.city().put(city.key);
         adapter.cleanup();
         adapter = new ProvidersAdapter(filterSale, sortByName);
         recyclerView.swapAdapter(adapter, false);
+        menuPickCity.setTitle(city.getLocalName());
+        menuPickCity.getIcon().setAlpha(255);
     }
 
     @Override
     public void onAllSelected() {
-        if (actionBar != null) actionBar.setTitle(R.string.pick_city_all_cities);
         preferences.city().put("all");
         adapter.cleanup();
         adapter = new ProvidersAdapter(filterSale, sortByName);
         recyclerView.swapAdapter(adapter, false);
+        menuPickCity.setTitle(R.string.pick_city_all_cities);
+        menuPickCity.getIcon().setAlpha(138);
     }
 
     @Override

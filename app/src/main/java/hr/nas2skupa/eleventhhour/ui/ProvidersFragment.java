@@ -125,18 +125,18 @@ public abstract class ProvidersFragment extends Fragment implements SearchView.O
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
-        MenuItem item = menu.findItem(R.id.action_sale);
+        MenuItem item = menu.findItem(R.id.menu_sale);
         if (item != null) item.getIcon().setAlpha(138);
-        item = menu.findItem(R.id.action_sort_by_name);
+        item = menu.findItem(R.id.menu_sort_by_name);
         if (item != null) item.getIcon().setAlpha(138);
 
-        final MenuItem searchItem = menu.findItem(R.id.action_search);
+        final MenuItem searchItem = menu.findItem(R.id.menu_search);
         final SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setQueryHint(getString(R.string.providers_search_by_name));
         searchView.setOnQueryTextListener(this);
     }
 
-    @OptionsItem(R.id.action_sale)
+    @OptionsItem(R.id.menu_sale)
     void filterSale(MenuItem item) {
         item.setChecked(!item.isChecked());
         item.getIcon().setAlpha(item.isChecked() ? 255 : 138);
@@ -147,7 +147,7 @@ public abstract class ProvidersFragment extends Fragment implements SearchView.O
         recyclerView.swapAdapter(adapter, false);
     }
 
-    @OptionsItem(R.id.action_sort_by_name)
+    @OptionsItem(R.id.menu_sort_by_name)
     void sortByName(MenuItem item) {
         item.setChecked(!item.isChecked());
         item.getIcon().setAlpha(item.isChecked() ? 255 : 138);
