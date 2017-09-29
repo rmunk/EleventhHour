@@ -12,6 +12,5 @@ public interface Preferences {
     @DefaultString("HR")
     String country();
 
-    @DefaultString("all")
     String city();
 }

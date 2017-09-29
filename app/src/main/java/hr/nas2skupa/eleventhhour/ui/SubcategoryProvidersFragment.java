@@ -13,8 +13,6 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.OptionsMenuItem;
 
-import java.util.Objects;
-
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.common.model.City;
 import hr.nas2skupa.eleventhhour.common.ui.CityPickerDialog;
@@ -25,8 +23,7 @@ import hr.nas2skupa.eleventhhour.common.ui.CityPickerDialog_;
  */
 @EFragment(R.layout.fragment_providers)
 @OptionsMenu(R.menu.subcategory_providers)
-public class SubcategoryProvidersFragment extends ProvidersFragment
-        implements CityPickerDialog.CityPickerDialogListener, ValueEventListener {
+public class SubcategoryProvidersFragment extends ProvidersFragment implements ValueEventListener {
 
     @OptionsMenuItem MenuItem menuPickCity;
 
@@ -54,18 +51,18 @@ public class SubcategoryProvidersFragment extends ProvidersFragment
 
     @Override
     public Query getKeyRef() {
-        if (Objects.equals(preferences.city().get(), "all")) {
-            return FirebaseDatabase.getInstance().getReference()
-                    .child("providers")
-                    .child(preferences.country().get())
-                    .child("bySubcategory")
-                    .child(subcategoryKey);
-        } else {
+        if (preferences.city().exists()) {
             return FirebaseDatabase.getInstance().getReference()
                     .child("providers")
                     .child(preferences.country().get())
                     .child("bySubcategoryAndCity")
                     .child(subcategoryKey + preferences.city().get());
+        } else {
+            return FirebaseDatabase.getInstance().getReference()
+                    .child("providers")
+                    .child(preferences.country().get())
+                    .child("bySubcategory")
+                    .child(subcategoryKey);
         }
     }
 
@@ -73,7 +70,7 @@ public class SubcategoryProvidersFragment extends ProvidersFragment
     public void onDataChange(DataSnapshot dataSnapshot) {
         City city = dataSnapshot.getValue(City.class);
         if (city == null) {
-            preferences.city().put("all");
+            preferences.city().remove();
             menuPickCity.setTitle(R.string.pick_city_all_cities);
             menuPickCity.getIcon().setAlpha(138);
         } else {
@@ -89,33 +86,35 @@ public class SubcategoryProvidersFragment extends ProvidersFragment
 
     @OptionsItem(R.id.menu_pick_city)
     public void pickCity() {
-        CityPickerDialog cityPickerDialog = CityPickerDialog_.builder().build();
-        cityPickerDialog.setCityPickerDialogListener(this);
+        CityPickerDialog cityPickerDialog = CityPickerDialog_.builder()
+                .selectedCityKey(preferences.city().get())
+                .build();
+        cityPickerDialog.setCityPickerDialogListener(new CityPickerDialog.CityPickerDialogListener() {
+            @Override
+            public void onCityPicked(City city) {
+                preferences.city().put(city.key);
+                adapter.cleanup();
+                adapter = new ProvidersAdapter(filterSale, sortByName);
+                recyclerView.swapAdapter(adapter, false);
+                menuPickCity.setTitle(city.getLocalName());
+                menuPickCity.getIcon().setAlpha(255);
+            }
+
+            @Override
+            public void onAllSelected() {
+                preferences.city().remove();
+                adapter.cleanup();
+                adapter = new ProvidersAdapter(filterSale, sortByName);
+                recyclerView.swapAdapter(adapter, false);
+                menuPickCity.setTitle(R.string.pick_city_all_cities);
+                menuPickCity.getIcon().setAlpha(138);
+            }
+
+            @Override
+            public void onCancelled() {
+
+            }
+        });
         cityPickerDialog.show(getChildFragmentManager(), "CityPickerDialog");
-    }
-
-    @Override
-    public void onCityPicked(City city) {
-        preferences.city().put(city.key);
-        adapter.cleanup();
-        adapter = new ProvidersAdapter(filterSale, sortByName);
-        recyclerView.swapAdapter(adapter, false);
-        menuPickCity.setTitle(city.getLocalName());
-        menuPickCity.getIcon().setAlpha(255);
-    }
-
-    @Override
-    public void onAllSelected() {
-        preferences.city().put("all");
-        adapter.cleanup();
-        adapter = new ProvidersAdapter(filterSale, sortByName);
-        recyclerView.swapAdapter(adapter, false);
-        menuPickCity.setTitle(R.string.pick_city_all_cities);
-        menuPickCity.getIcon().setAlpha(138);
-    }
-
-    @Override
-    public void onCancelled() {
-
     }
 }
