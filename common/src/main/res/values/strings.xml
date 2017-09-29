@@ -50,6 +50,7 @@
     <string name="provider_pick_subcategory_title">Pick subcategory</string>
     <string name="msg_provider_location_selected">Selected location:\n%s</string>
     <string name="msg_provider_starting_location_picker">Starting location picker</string>
+    <string name="msg_provider_loading_cities">Fetching cities</string>
     <string name="msg_provider_loading_subcategories">Fetching subcategories</string>
     <string name="msg_provider_loading_categories">Fetching categories</string>
     <string name="msg_provider_saving">Saving provider</string>
