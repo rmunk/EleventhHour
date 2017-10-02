@@ -25,28 +25,38 @@ import hr.nas2skupa.eleventhhour.common.ui.CityPickerDialog_;
 @OptionsMenu(R.menu.subcategory_providers)
 public class SubcategoryProvidersFragment extends ProvidersFragment implements ValueEventListener {
 
-    @OptionsMenuItem MenuItem menuPickCity;
+    @OptionsMenuItem
+    void menuPickCity(MenuItem item) {
+        menuPickCity = item;
+        menuPickCity.getIcon().setAlpha(preferences.city().exists() ? 255 : 138);
+    }
+
+    MenuItem menuPickCity;
 
     @Override
     public void onResume() {
         super.onResume();
 
-        FirebaseDatabase.getInstance().getReference()
-                .child("app/cities")
-                .child(preferences.country().get())
-                .child(preferences.city().get())
-                .addValueEventListener(this);
+        if (preferences.city().exists()) {
+            FirebaseDatabase.getInstance().getReference()
+                    .child("app/cities")
+                    .child(preferences.country().get())
+                    .child(preferences.city().get())
+                    .addValueEventListener(this);
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
-        FirebaseDatabase.getInstance().getReference()
-                .child("app/cities")
-                .child(preferences.country().get())
-                .child(preferences.city().get())
-                .removeEventListener(this);
+        if (preferences.city().exists()) {
+            FirebaseDatabase.getInstance().getReference()
+                    .child("app/cities")
+                    .child(preferences.country().get())
+                    .child(preferences.city().get())
+                    .removeEventListener(this);
+        }
     }
 
     @Override
