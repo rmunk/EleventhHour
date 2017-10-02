@@ -1,6 +1,10 @@
 package hr.nas2skupa.eleventhhour.ui;
 
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -38,6 +42,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import hr.nas2skupa.eleventhhour.AlarmService;
 import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.model.Booking;
@@ -207,23 +212,49 @@ public class ServicesFragment extends Fragment implements
     }
 
     @UiThread(delay = 5500)
-    public void sendBooking(Booking booking) {
+    public void sendBooking(final Booking booking) {
         if (undo) return;
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        String key = reference.child(String.format("/providerAppointments/%s/data", booking.providerId)).push().getKey();
+        booking.key = reference.child(String.format("/providerAppointments/%s/data", booking.providerId)).push().getKey();
         Map<String, Object> bookingValues = booking.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put(String.format("/providerAppointments/%s/data/%s", booking.providerId, key), bookingValues);
-        childUpdates.put(String.format("/userAppointments/%s/data/%s", booking.userId, key), bookingValues);
+        childUpdates.put(String.format("/providerAppointments/%s/data/%s", booking.providerId, booking.key), bookingValues);
+        childUpdates.put(String.format("/userAppointments/%s/data/%s", booking.userId, booking.key), bookingValues);
         reference.updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                if (databaseError != null)
+                if (databaseError == null) {
+                    setReminder(booking);
+                } else {
                     Snackbar.make(getView(), R.string.msg_booking_failed, Snackbar.LENGTH_LONG).show();
+                }
             }
         });
+
+    }
+
+    private void setReminder(Booking booking) {
+        final int id = booking.key.hashCode();
+        AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
+
+        Intent alarmIntent = new Intent(getContext(), AlarmService.class);
+        alarmIntent.putExtra("bookingKey", booking.key);
+        alarmIntent.putExtra("providerKey", booking.providerId);
+        alarmIntent.putExtra("userKey", booking.userId);
+        PendingIntent pendingAlarmIntent = PendingIntent.getService(getContext(), id, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(booking.from);
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        calendar.set(Calendar.HOUR_OF_DAY, 20);
+        calendar.set(Calendar.MINUTE, 00);
+        calendar.set(Calendar.SECOND, 00);
+
+        if (calendar.after(Calendar.getInstance())) {
+            alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingAlarmIntent);
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
