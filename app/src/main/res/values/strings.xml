@@ -64,8 +64,7 @@
     <!-- UserDetailsActivity -->
     <string name="user_delete_failed">Sorry, there was a problem while deleting your account. Please try again later and feel free to contact us if the problem persists.</string>
 
-    <!-- AlarmService -->
-    <string name="alarm_notification_title">Appointment reminder</string>
-    <string name="alarm_notification_text">%1$s tomorrow at %2$s</string>
-    <string name="alarm_notification_details">%1$s tomorrow %2$s at %3$s</string>
+    <!-- ReminderService -->
+    <string name="alarm_notification_title">Reminder from %s</string>
+    <string name="alarm_notification_text">%1$s %2$s</string>
 </resources>

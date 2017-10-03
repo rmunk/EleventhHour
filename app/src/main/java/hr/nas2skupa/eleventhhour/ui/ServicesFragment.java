@@ -42,8 +42,8 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import hr.nas2skupa.eleventhhour.AlarmService;
 import hr.nas2skupa.eleventhhour.R;
+import hr.nas2skupa.eleventhhour.ReminderService;
 import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.model.Booking;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
@@ -239,7 +239,7 @@ public class ServicesFragment extends Fragment implements
         final int id = booking.key.hashCode();
         AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
 
-        Intent alarmIntent = new Intent(getContext(), AlarmService.class);
+        Intent alarmIntent = new Intent(getContext(), ReminderService.class);
         alarmIntent.putExtra("bookingKey", booking.key);
         alarmIntent.putExtra("providerKey", booking.providerId);
         alarmIntent.putExtra("userKey", booking.userId);
@@ -247,10 +247,7 @@ public class ServicesFragment extends Fragment implements
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(booking.from);
-        calendar.add(Calendar.DAY_OF_MONTH, -1);
-        calendar.set(Calendar.HOUR_OF_DAY, 20);
-        calendar.set(Calendar.MINUTE, 00);
-        calendar.set(Calendar.SECOND, 00);
+        calendar.add(Calendar.HOUR_OF_DAY, -1);
 
         if (calendar.after(Calendar.getInstance())) {
             alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingAlarmIntent);
