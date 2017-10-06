@@ -39,22 +39,22 @@ public class ProviderViewHolder extends RecyclerView.ViewHolder {
     public ProviderViewHolder(final View itemView) {
         super(itemView);
 
-        txtProviderName = (TextView) itemView.findViewById(R.id.txt_provider_name);
-        imgFavorite = (ImageView) itemView.findViewById(R.id.img_favorite);
-        imgSale = (ImageView) itemView.findViewById(R.id.img_sale);
-        ratingIndicator = (RatingBar) itemView.findViewById(R.id.rating_indicator);
-        txtRatings = (TextView) itemView.findViewById(R.id.txt_ratings);
-        txtDistance = (TextView) itemView.findViewById(R.id.txt_distance);
-        imgExpand = (ImageView) itemView.findViewById(R.id.img_expand);
+        txtProviderName = itemView.findViewById(R.id.txt_provider_name);
+        imgFavorite = itemView.findViewById(R.id.img_favorite);
+        imgSale = itemView.findViewById(R.id.img_sale);
+        ratingIndicator = itemView.findViewById(R.id.rating_indicator);
+        txtRatings = itemView.findViewById(R.id.txt_ratings);
+        txtDistance = itemView.findViewById(R.id.txt_distance);
+        imgExpand = itemView.findViewById(R.id.img_expand);
 
         separator1 = itemView.findViewById(R.id.separator1);
-        viewDetails = (ViewGroup) itemView.findViewById(R.id.provider_details);
-        txtDescription = (TextView) itemView.findViewById(R.id.txt_description);
-        txtPhone = (TextView) itemView.findViewById(R.id.txt_phone);
-        txtAddress = (TextView) itemView.findViewById(R.id.txt_address);
-        txtWeb = (TextView) itemView.findViewById(R.id.txt_web);
-        txtEmail = (TextView) itemView.findViewById(R.id.txt_email);
-        txtHours = (TextView) itemView.findViewById(R.id.txt_hours);
+        viewDetails = itemView.findViewById(R.id.provider_details);
+        txtDescription = itemView.findViewById(R.id.txt_description);
+        txtPhone = itemView.findViewById(R.id.txt_phone);
+        txtAddress = itemView.findViewById(R.id.txt_address);
+        txtWeb = itemView.findViewById(R.id.txt_web);
+        txtEmail = itemView.findViewById(R.id.txt_email);
+        txtHours = itemView.findViewById(R.id.txt_hours);
     }
 
     public void bindToProvider(Provider provider) {
@@ -75,7 +75,7 @@ public class ProviderViewHolder extends RecyclerView.ViewHolder {
         txtWeb.setVisibility(txtWeb.getText().length() > 0 ? View.VISIBLE : View.GONE);
         txtEmail.setText(provider.email);
         txtEmail.setVisibility(txtEmail.getText().length() > 0 ? View.VISIBLE : View.GONE);
-        txtHours.setText(provider.hours);
+        if (provider.hours != null) txtHours.setText(provider.hours.today());
         txtHours.setVisibility(txtHours.getText().length() > 0 ? View.VISIBLE : View.GONE);
 
         viewDetails.setVisibility(detailsVisible ? View.VISIBLE : View.GONE);

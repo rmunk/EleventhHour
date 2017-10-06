@@ -52,8 +52,11 @@ import hr.nas2skupa.eleventhhour.common.R;
 import hr.nas2skupa.eleventhhour.common.model.Category;
 import hr.nas2skupa.eleventhhour.common.model.City;
 import hr.nas2skupa.eleventhhour.common.model.Location;
+import hr.nas2skupa.eleventhhour.common.model.OpenHours;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
 import hr.nas2skupa.eleventhhour.common.model.Subcategory;
+import hr.nas2skupa.eleventhhour.common.ui.HoursEditDialog;
+import hr.nas2skupa.eleventhhour.common.ui.HoursEditDialog_;
 import hr.nas2skupa.eleventhhour.common.ui.helpers.DelayedProgressDialog;
 
 import static android.app.Activity.RESULT_OK;
@@ -94,8 +97,7 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
     @ViewById TextInputLayout layoutAddress;
 
     private boolean locationPickerStarted;
-    private boolean pickingCategory;
-    private boolean pickingSubcategory;
+    private boolean dialogOpen;
     private ProgressDialog progressDialog;
 
     private Provider provider = new Provider();
@@ -153,8 +155,8 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
 
     @Touch(resName = "txt_category")
     boolean pickCategory(View v, MotionEvent event) {
-        if (pickingCategory || event.getAction() != MotionEvent.ACTION_UP) return true;
-        pickingCategory = true;
+        if (dialogOpen || event.getAction() != MotionEvent.ACTION_UP) return true;
+        dialogOpen = true;
         progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_loading_categories), PROGRESS_DELAY);
 
         FirebaseDatabase.getInstance().getReference()
@@ -197,7 +199,7 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
                                         .setPositiveButton(R.string.action_pick, new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
-                                                pickingCategory = false;
+                                                dialogOpen = false;
 
                                                 pickedCategory = keys[selected[0]];
                                                 pickedSubcategories = null;
@@ -208,7 +210,13 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
                                         .setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
-                                                pickingCategory = false;
+                                                dialogOpen = false;
+                                            }
+                                        })
+                                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                            @Override
+                                            public void onCancel(DialogInterface dialog) {
+                                                dialogOpen = false;
                                             }
                                         })
                                         .create()
@@ -217,7 +225,7 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
 
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
-                                pickingCategory = false;
+                                dialogOpen = false;
                             }
                         }
                 );
@@ -226,12 +234,12 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
 
     @Touch(resName = "txt_subcategories")
     boolean pickSubcategory(View view, MotionEvent event) {
-        if (pickingSubcategory || event.getAction() != MotionEvent.ACTION_UP) return true;
-        pickingSubcategory = true;
+        if (dialogOpen || event.getAction() != MotionEvent.ACTION_UP) return true;
+        dialogOpen = true;
 
         if (pickedCategory == null) {
             Snackbar.make(view, R.string.msg_pick_category_first, Snackbar.LENGTH_SHORT).show();
-            pickingSubcategory = false;
+            dialogOpen = false;
             return true;
         }
 
@@ -275,7 +283,7 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
                                         .setPositiveButton(R.string.action_pick, new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
-                                                pickingSubcategory = false;
+                                                dialogOpen = false;
                                                 HashMap<String, Boolean> subcategories = new HashMap<>();
                                                 StringBuilder builder = new StringBuilder();
                                                 for (int j = 0; j < checked.length; j++) {
@@ -294,7 +302,13 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
                                         .setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
-                                                pickingSubcategory = false;
+                                                dialogOpen = false;
+                                            }
+                                        })
+                                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                            @Override
+                                            public void onCancel(DialogInterface dialog) {
+                                                dialogOpen = false;
                                             }
                                         })
                                         .create()
@@ -303,7 +317,7 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
 
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
-                                pickingSubcategory = false;
+                                dialogOpen = false;
                             }
                         }
                 );
@@ -441,6 +455,28 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
         });
     }
 
+    @Touch(resName = "txt_hours")
+    boolean editHours(MotionEvent event) {
+        if (dialogOpen || event.getAction() != MotionEvent.ACTION_UP) return true;
+        dialogOpen = true;
+
+        HoursEditDialog hoursEditDialog = HoursEditDialog_.builder().build();
+        hoursEditDialog.setHoursEditDialogListener(new HoursEditDialog.HoursEditDialogListener() {
+            @Override
+            public void onHoursSet(OpenHours hours) {
+                dialogOpen = false;
+            }
+
+            @Override
+            public void onCancelled() {
+                dialogOpen = false;
+            }
+        });
+        hoursEditDialog.show(getFragmentManager(), "HoursEditDialog");
+
+        return true;
+    }
+
     private boolean validate() {
         boolean valid = true;
         if (txtName.getText().toString().isEmpty()) {
@@ -479,7 +515,7 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
         provider.phone = txtPhone.getText().toString();
         provider.web = txtWeb.getText().toString();
         provider.email = txtEmail.getText().toString();
-        provider.hours = txtHours.getText().toString();
+//        provider.hours = txtHours.getText().toString();
 
         progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_saving), 500L);
         final HashMap<String, Object> childUpdates = new HashMap<>();
@@ -574,7 +610,7 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
         txtPhone.setText(provider.phone);
         txtWeb.setText(provider.web);
         txtEmail.setText(provider.email);
-        txtHours.setText(provider.hours);
+        if (provider.hours != null) txtHours.setText(provider.hours.today());
 
         layoutName.setVisibility(editable ? View.VISIBLE : View.GONE);
         layoutLocation.setVisibility(editable ? View.VISIBLE : View.GONE);
