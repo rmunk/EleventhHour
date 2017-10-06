@@ -35,8 +35,8 @@ dependencies {
     compile project(':auth')
     compile project(':common')
 
-    compile 'org.androidannotations:androidannotations-api:4.3.1'
-    apt 'org.androidannotations:androidannotations:4.3.1'
+    compile "org.androidannotations:androidannotations-api:$androidAnnotationsVersion"
+    apt "org.androidannotations:androidannotations:$androidAnnotationsVersion"
 
     compile 'com.github.alamkanak:android-week-view:1.2.6'
     compile 'com.wdullaer:materialdatetimepicker:2.5.0'

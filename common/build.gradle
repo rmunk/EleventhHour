@@ -24,8 +24,8 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'org.androidannotations:androidannotations-api:4.3.1'
-    apt 'org.androidannotations:androidannotations:4.3.1'
+    compile "org.androidannotations:androidannotations-api:$androidAnnotationsVersion"
+    apt "org.androidannotations:androidannotations:$androidAnnotationsVersion"
 
     compile "com.android.support:support-v4:$supportLibraryVersion"
     compile "com.android.support:appcompat-v7:$supportLibraryVersion"
