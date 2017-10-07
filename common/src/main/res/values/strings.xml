@@ -112,6 +112,8 @@
     <string name="hours_unknown">Unknown</string>
     <string name="hours_open_today">Open today: %s</string>
     <string name="hours_closed_today">Closed today</string>
+    <string name="hours_opens_at">Opens at</string>
+    <string name="hours_closes_at">Closes at</string>
 
     <!-- Misc -->
     <string name="currency_regex">^(\\W\\d{1,3}(?:\\d*(?:[.,]\\d{2})?|(?:,\\d{3})*(?:\\.\\d{2})?|(?:\\.\\d{3})*(?:,\\d{2})?))|(\\d{1,3}(?:\\d*(?:[.,]\\d{2})?|(?:,\\d{3})*(?:\\.\\d{2})?|(?:\\.\\d{3})*(?:,\\d{2})?) [\\D]{2,3})?</string>
