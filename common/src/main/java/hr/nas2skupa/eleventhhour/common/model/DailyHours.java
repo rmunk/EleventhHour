@@ -1,5 +1,7 @@
 package hr.nas2skupa.eleventhhour.common.model;
 
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
 import android.text.format.DateFormat;
 
 import com.google.firebase.database.Exclude;
@@ -10,18 +12,49 @@ import java.util.Date;
 import java.util.Locale;
 
 import hr.nas2skupa.eleventhhour.common.App;
+import hr.nas2skupa.eleventhhour.common.BR;
 import hr.nas2skupa.eleventhhour.common.R;
 
 /**
  * Created by nas2skupa on 04/10/2017.
  */
-public class DailyHours {
-    public String from;
-    public String to;
-    public boolean open;
+public class DailyHours extends BaseObservable {
+    private String from;
+    private String to;
+    private boolean open;
 
     public DailyHours() {
         // Required empty public constructor
+    }
+
+    @Bindable
+    public String getFrom() {
+        return from;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
+        notifyPropertyChanged(BR.from);
+    }
+
+    @Bindable
+    public String getTo() {
+        return to;
+    }
+
+    public void setTo(String to) {
+        this.to = to;
+        notifyPropertyChanged(BR.to);
+    }
+
+    @Bindable
+    public boolean isOpen() {
+        return open;
+    }
+
+    public void setOpen(boolean open) {
+        this.open = open;
+        notifyPropertyChanged(BR.open);
     }
 
     @Exclude
@@ -48,7 +81,7 @@ public class DailyHours {
     @Override
     public String toString() {
         if (open) {
-            if (from == null || to == null) {
+            if (getFromDate() == null || getToDate() == null) {
                 return App.getAppContext().getString(R.string.hours_unknown);
             }
             java.text.DateFormat timeFormat = DateFormat.getTimeFormat(App.getAppContext());

@@ -461,10 +461,15 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
         if (dialogOpen || event.getAction() != MotionEvent.ACTION_UP) return true;
         dialogOpen = true;
 
-        HoursEditDialog hoursEditDialog = HoursEditDialog_.builder().build();
+        HoursEditDialog hoursEditDialog = HoursEditDialog_.builder().providerKey(providerKey).build();
         hoursEditDialog.setHoursEditDialogListener(new HoursEditDialog.HoursEditDialogListener() {
             @Override
-            public void onHoursSet(OpenHours hours) {
+            public void onHoursSaved(OpenHours hours) {
+                dialogOpen = false;
+            }
+
+            @Override
+            public void onError(Throwable error) {
                 dialogOpen = false;
             }
 
