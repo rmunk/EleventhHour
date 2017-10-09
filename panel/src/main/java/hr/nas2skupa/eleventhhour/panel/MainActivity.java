@@ -18,7 +18,6 @@ import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.auth.SignInActivity;
-import hr.nas2skupa.eleventhhour.common.ui.HoursEditDialog_;
 import hr.nas2skupa.eleventhhour.common.ui.provider.ProviderDetailsActivity_;
 
 @EActivity(R.layout.activity_main)
@@ -38,8 +37,6 @@ public class MainActivity extends DrawerActivity implements FirebaseAuth.AuthSta
         super.onCreate(savedInstanceState);
 
         handleIntent(getIntent());
-
-        HoursEditDialog_.builder().build().show(getSupportFragmentManager(), "HoursEditDialog");
     }
 
     @Override

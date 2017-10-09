@@ -49,6 +49,7 @@ import java.util.Map;
 
 import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.R;
+import hr.nas2skupa.eleventhhour.common.R2;
 import hr.nas2skupa.eleventhhour.common.model.Category;
 import hr.nas2skupa.eleventhhour.common.model.City;
 import hr.nas2skupa.eleventhhour.common.model.Location;
@@ -65,7 +66,7 @@ import static android.app.Activity.RESULT_OK;
  * Created by nas2skupa on 06/03/2017.
  */
 
-@EFragment(resName = "fragment_provider")
+@EFragment(R2.layout.fragment_provider)
 public class ProviderFragment extends Fragment implements ValueEventListener {
     private static final int PLACE_PICKER_REQUEST = 1001;
     private static final int GOOGLE_PLAY_SERVICES_REPAIRABLE_REQUEST = 1002;
@@ -148,12 +149,12 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
         }
     }
 
-    @Touch(resName = "editing_shroud")
+    @Touch(R2.id.editing_shroud)
     boolean consumeClick() {
         return !editable;
     }
 
-    @Touch(resName = "txt_category")
+    @Touch(R2.id.txt_category)
     boolean pickCategory(View v, MotionEvent event) {
         if (dialogOpen || event.getAction() != MotionEvent.ACTION_UP) return true;
         dialogOpen = true;
@@ -232,7 +233,7 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
         return true;
     }
 
-    @Touch(resName = "txt_subcategories")
+    @Touch(R2.id.txt_subcategories)
     boolean pickSubcategory(View view, MotionEvent event) {
         if (dialogOpen || event.getAction() != MotionEvent.ACTION_UP) return true;
         dialogOpen = true;
@@ -324,7 +325,7 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
         return true;
     }
 
-    @Touch(resName = "txt_location")
+    @Touch(R2.id.txt_location)
     boolean editLocation(View v, MotionEvent event) {
         if (locationPickerStarted || event.getAction() != MotionEvent.ACTION_UP) return true;
         startLocationPicker();
@@ -455,7 +456,7 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
         });
     }
 
-    @Touch(resName = "txt_hours")
+    @Touch(R2.id.txt_hours)
     boolean editHours(MotionEvent event) {
         if (dialogOpen || event.getAction() != MotionEvent.ACTION_UP) return true;
         dialogOpen = true;

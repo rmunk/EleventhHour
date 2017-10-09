@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'android-apt'
 
 android {
     compileSdkVersion compileSdk
@@ -41,12 +40,7 @@ dependencies {
     compile project(':auth')
     compile project(':common')
 
-    compile "org.androidannotations:androidannotations-api:$androidAnnotationsVersion"
-    apt "org.androidannotations:androidannotations:$androidAnnotationsVersion"
-
     compile 'org.greenrobot:eventbus:3.0.0'
-
-    compile 'com.wdullaer:materialdatetimepicker:2.5.0'
     compile 'com.github.sundeepk:compact-calendar-view:1.9.2'
 
     // Testing

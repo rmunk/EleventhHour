@@ -13,9 +13,10 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.common.R;
+import hr.nas2skupa.eleventhhour.common.R2;
 
 
-@EActivity(resName = "activity_provider_edit")
+@EActivity(R2.layout.activity_provider_edit)
 public class ProviderEditActivity extends AppCompatActivity {
     @Extra String providerKey;
 
@@ -40,7 +41,7 @@ public class ProviderEditActivity extends AppCompatActivity {
     }
 
     @SuppressWarnings("ConstantConditions")
-    void setToolbar(@ViewById(resName = "toolbar") Toolbar toolbar) {
+    void setToolbar(@ViewById(R2.id.toolbar) Toolbar toolbar) {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setHomeButtonEnabled(false);

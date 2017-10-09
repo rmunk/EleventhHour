@@ -45,6 +45,7 @@ import java.util.List;
 
 import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.R;
+import hr.nas2skupa.eleventhhour.common.R2;
 import hr.nas2skupa.eleventhhour.common.model.City;
 import hr.nas2skupa.eleventhhour.common.model.User;
 import hr.nas2skupa.eleventhhour.common.ui.helpers.DelayedProgressDialog;
@@ -53,7 +54,7 @@ import hr.nas2skupa.eleventhhour.common.ui.helpers.DelayedProgressDialog;
  * Created by nas2skupa on 06/03/2017.
  */
 
-@EFragment(resName = "fragment_user")
+@EFragment(R2.layout.fragment_user)
 public class UserFragment extends Fragment {
     private static final long PROGRESS_DELAY = 500L;
     private static final String[] sexes = new String[]{"female", "male"};
@@ -102,12 +103,12 @@ public class UserFragment extends Fragment {
         setupCityPicker();
     }
 
-    @Touch(resName = "editing_shroud")
+    @Touch(R2.id.editing_shroud)
     boolean consumeClick() {
         return !editable;
     }
 
-    @FocusChange(resName = "txt_age")
+    @FocusChange(R2.id.txt_age)
     void pickAge(View v, boolean hasFocus) {
         if (pickingAge || !hasFocus) return;
         pickingAge = true;
@@ -173,7 +174,7 @@ public class UserFragment extends Fragment {
                 );
     }
 
-    @FocusChange(resName = "txt_sex")
+    @FocusChange(R2.id.txt_sex)
     void pickSex(View view, boolean hasFocus) {
         if (pickingSex || !hasFocus) return;
         pickingSex = true;

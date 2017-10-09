@@ -37,6 +37,7 @@ import java.util.Objects;
 
 import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.R;
+import hr.nas2skupa.eleventhhour.common.R2;
 import hr.nas2skupa.eleventhhour.common.model.City;
 import hr.nas2skupa.eleventhhour.common.utils.Utils;
 
@@ -44,7 +45,7 @@ import hr.nas2skupa.eleventhhour.common.utils.Utils;
  * Created by nas2skupa on 25/09/2017.
  */
 
-@EFragment(resName = "dialog_city_picker")
+@EFragment(R2.layout.dialog_city_picker)
 public class CityPickerDialog extends DialogFragment implements SearchView.OnQueryTextListener {
     @FragmentArg String selectedCityKey;
     @Pref Preferences_ preferences;
@@ -100,13 +101,13 @@ public class CityPickerDialog extends DialogFragment implements SearchView.OnQue
         return view;
     }
 
-    @ViewById(resName = "search_view")
+    @ViewById(R2.id.search_view)
     void setSearchView(SearchView searchView) {
         searchView.setQueryHint(getString(R.string.pick_city_search_hint));
         searchView.setOnQueryTextListener(this);
     }
 
-    @ViewById(resName = "recycler_view")
+    @ViewById(R2.id.recycler_view)
     void setRecyclerView(final RecyclerView recyclerView) {
         this.recyclerView = recyclerView;
 

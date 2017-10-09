@@ -27,13 +27,14 @@ import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.common.R;
+import hr.nas2skupa.eleventhhour.common.R2;
 import hr.nas2skupa.eleventhhour.common.model.Service;
 
 /**
  * Created by nas2skupa on 15/03/2017.
  */
 
-@EFragment(resName = "dialog_service")
+@EFragment(R2.layout.dialog_service)
 public class ServiceDialog extends DialogFragment implements DialogInterface.OnShowListener {
     @FragmentArg String providerKey;
     @FragmentArg String serviceKey;
