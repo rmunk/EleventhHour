@@ -38,28 +38,31 @@ public class TimeEditText extends android.support.v7.widget.AppCompatEditText {
     @Override
     protected void onSelectionChanged(int selStart, int selEnd) {
         if (cursor == selStart) return;
-        Pattern pattern = Pattern.compile("^\\d+:*\\d*");
-        Matcher matcher = pattern.matcher(getText());
-        cursor = matcher.find() ? matcher.end() : 0;
-        setSelection(cursor);
+        adjustSelection();
     }
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        if (time == null) time = HH_MM.toCharArray();
-        if (Objects.equals(s.toString(), String.valueOf(time))) return;
-
-        if (start >= time.length) {
+        // for some reason time cannot be set on declaration or in constructor
+        if (time == null) {
+            time = HH_MM.toCharArray();
             setText(String.valueOf(time));
             return;
         }
+        if (Objects.equals(s.toString(), String.valueOf(time))) return;
 
-        for (int i = start; i > start - before && i >= 0; i--) {
-            if (time[i] == ':') i--;
-            if (i >= 0) time[i] = HH_MM.charAt(i);
+        if (count == 1 && start < HH_MM.length()) {                             // User typed a character
+            time[start] = s.charAt(start);
+        } else if (before == 1) {                                               // User deleted a character
+            if (time[start] == ':') start--;
+            time[start] = HH_MM.charAt(start);
+        } else if (count == 5
+                && s.toString().matches("^([0-1]\\d|2[0-3]):[0-5]\\d$")) {      // Time was set form code
+            time = s.toString().toCharArray();
+        } else {                                                                // Text is bullshit so drop it
+            setText(String.valueOf(time));
+            return;
         }
-
-        if (s.length() == time.length + 1) time[start] = s.charAt(start);
 
         try {
             int hour = Integer.parseInt(String.valueOf(time, 0, 2));
@@ -79,5 +82,13 @@ public class TimeEditText extends android.support.v7.widget.AppCompatEditText {
         }
 
         setText(String.valueOf(time));
+        adjustSelection();
+    }
+
+    private void adjustSelection() {
+        Pattern pattern = Pattern.compile("^\\d{2}:\\d{0,2}|^\\d");
+        Matcher matcher = pattern.matcher(getText());
+        cursor = matcher.find() ? matcher.end() : 0;
+        setSelection(cursor);
     }
 }
