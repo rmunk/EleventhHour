@@ -46,6 +46,7 @@
     <string name="provider_error_location">You must set your location</string>
     <string name="provider_error_city">You must pick a city from the list</string>
     <string name="provider_error_address">You must enter your address</string>
+    <string name="provider_error_hours">You must define open hours for all days</string>
     <string name="provider_pick_category_title">Pick category</string>
     <string name="provider_pick_subcategory_title">Pick subcategory</string>
     <string name="msg_provider_location_selected">Selected location:\n%s</string>

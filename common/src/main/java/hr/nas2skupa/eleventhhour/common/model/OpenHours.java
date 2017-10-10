@@ -130,4 +130,15 @@ public class OpenHours extends BaseObservable {
             } else return App.getAppContext().getString(R.string.hours_closed_today);
         }
     }
+
+    @Exclude
+    public boolean areValid() {
+        return mon.isValid() &&
+                tue.isValid() &&
+                wed.isValid() &&
+                thu.isValid() &&
+                fri.isValid() &&
+                sat.isValid() &&
+                sun.isValid();
+    }
 }

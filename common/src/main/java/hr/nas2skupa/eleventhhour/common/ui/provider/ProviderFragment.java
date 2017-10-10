@@ -96,6 +96,7 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
     @ViewById TextInputLayout layoutLocation;
     @ViewById TextInputLayout layoutCity;
     @ViewById TextInputLayout layoutAddress;
+    @ViewById TextInputLayout layoutHours;
 
     private boolean locationPickerStarted;
     private boolean dialogOpen;
@@ -106,6 +107,7 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
     private String pickedCategory;
     private HashMap<String, Boolean> pickedSubcategories;
     private String pickedCity;
+    private OpenHours setHours;
 
     public ProviderFragment() {
     }
@@ -464,12 +466,8 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
         HoursEditDialog hoursEditDialog = HoursEditDialog_.builder().providerKey(providerKey).build();
         hoursEditDialog.setHoursEditDialogListener(new HoursEditDialog.HoursEditDialogListener() {
             @Override
-            public void onHoursSaved(OpenHours hours) {
-                dialogOpen = false;
-            }
-
-            @Override
-            public void onError(Throwable error) {
+            public void onHoursSet(OpenHours hours) {
+                setHours = hours;
                 dialogOpen = false;
             }
 
@@ -509,6 +507,10 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
             layoutCity.setError(getString(R.string.provider_error_city));
             valid = false;
         }
+        if (setHours == null || !setHours.areValid()) {
+            layoutHours.setError(getString(R.string.provider_error_hours));
+            valid = false;
+        }
         return valid;
     }
 
@@ -521,7 +523,7 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
         provider.phone = txtPhone.getText().toString();
         provider.web = txtWeb.getText().toString();
         provider.email = txtEmail.getText().toString();
-//        provider.hours = txtHours.getText().toString();
+        provider.hours = setHours;
 
         progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_saving), 500L);
         final HashMap<String, Object> childUpdates = new HashMap<>();

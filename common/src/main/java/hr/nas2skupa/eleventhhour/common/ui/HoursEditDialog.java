@@ -6,6 +6,8 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BaseTransientBottomBar;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -13,8 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -75,26 +75,11 @@ public class HoursEditDialog extends DialogFragment {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Edit hours");
         builder.setView(view)
-                .setPositiveButton(R.string.action_save, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
-                        // TODO: 09/10/2017 Add validation
-
-                        hoursReference.setValue(binding.getHours())
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        if (listener != null)
-                                            listener.onHoursSaved(binding.getHours());
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        if (listener != null) listener.onError(e);
-                                    }
-                                });
+                        // This is handled in onResume to avoid
+                        // automatic dismissal of the dialog
                     }
                 })
                 .setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
@@ -116,6 +101,25 @@ public class HoursEditDialog extends DialogFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        final AlertDialog dialog = (AlertDialog) getDialog();
+        if (dialog != null) {
+            dialog.getButton(Dialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (binding.getHours() != null && binding.getHours().areValid()) {
+                        if (listener != null) listener.onHoursSet(binding.getHours());
+                        dialog.dismiss();
+                    } else {
+                        Snackbar.make(getView(), R.string.provider_error_hours, BaseTransientBottomBar.LENGTH_LONG).show();
+                    }
+                }
+            });
+        }
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding.unbind();
@@ -130,29 +134,27 @@ public class HoursEditDialog extends DialogFragment {
 
     @AfterViews
     void fetchProviderHours() {
-
-        // TODO: 09/10/2017 Add spinner
-
         hoursReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            OpenHours hours = dataSnapshot.getValue(OpenHours.class);
-                            if (hours != null) binding.setHours(hours);
-                        }
-                    }
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                binding.progressBar.setVisibility(View.GONE);
+                binding.scrollView.setVisibility(View.VISIBLE);
+                if (dataSnapshot.exists()) {
+                    OpenHours hours = dataSnapshot.getValue(OpenHours.class);
+                    if (hours != null) binding.setHours(hours);
+                }
+            }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                binding.progressBar.setVisibility(View.GONE);
+                binding.scrollView.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     public interface HoursEditDialogListener {
-        void onHoursSaved(OpenHours hours);
-
-        void onError(Throwable error);
+        void onHoursSet(OpenHours hours);
 
         void onCancelled();
     }

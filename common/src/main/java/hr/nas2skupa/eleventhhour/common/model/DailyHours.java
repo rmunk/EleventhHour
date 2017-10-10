@@ -88,4 +88,9 @@ public class DailyHours extends BaseObservable {
             return timeFormat.format(getFromDate()) + "–" + timeFormat.format(getToDate());
         } else return App.getAppContext().getString(R.string.hours_closed);
     }
+
+    @Exclude
+    public boolean isValid() {
+        return !open || (getFromDate() != null && getToDate() != null);
+    }
 }
