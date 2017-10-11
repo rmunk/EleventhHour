@@ -35,6 +35,7 @@
     <!-- ServicesFragment -->
     <string name="msg_booking_failed">Sorry, your booking did not go through. Please try again later.</string>
     <string name="msg_booking_sent">Your booking has been sent.</string>
+    <string name="msg_services_provider_always_closed">Sorry, this provider does not take any appointments.</string>
 
     <!-- ProvidersFragment -->
     <string name="providers_search_by_name">Search by name</string>

@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
@@ -18,6 +20,7 @@ import android.transition.Fade;
 import android.transition.Slide;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,7 +31,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
-import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
+import com.wdullaer.materialdatetimepicker.date.DateRangeLimiter;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import org.androidannotations.annotations.EFragment;
@@ -38,6 +41,7 @@ import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,6 +50,7 @@ import hr.nas2skupa.eleventhhour.R;
 import hr.nas2skupa.eleventhhour.ReminderService;
 import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.model.Booking;
+import hr.nas2skupa.eleventhhour.common.model.OpenHours;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
 import hr.nas2skupa.eleventhhour.common.model.Service;
 import hr.nas2skupa.eleventhhour.common.ui.MakeBookingDialog;
@@ -75,6 +80,7 @@ public class ServicesFragment extends Fragment implements
     private GregorianCalendar pickedDateTime;
     private boolean undo = false;
     private FirebaseRecyclerAdapter<Service, ServiceViewHolder> adapter;
+    private OpenHours hours;
 
     public ServicesFragment() {
         // Required empty public constructor
@@ -85,13 +91,6 @@ public class ServicesFragment extends Fragment implements
         super.onCreate(savedInstanceState);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) setTransitions();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if (adapter != null) adapter.cleanup();
     }
 
     @Override
@@ -131,38 +130,152 @@ public class ServicesFragment extends Fragment implements
         recyclerView.setAdapter(adapter);
     }
 
-    private void showDatePicker(Service service) {
-        Calendar now = Calendar.getInstance();
-        DatePickerDialog dpd = DatePickerDialog.newInstance(
-                ServicesFragment.this,
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        FirebaseDatabase.getInstance().getReference()
+                .child("providers")
+                .child(preferences.country().get())
+                .child("data")
+                .child(providerKey)
+                .child("hours")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            hours = dataSnapshot.getValue(OpenHours.class);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (adapter != null) adapter.cleanup();
+    }
+
+    private void showDatePicker(final Service service) {
+        final Calendar now = Calendar.getInstance();
+        final Calendar closes = Calendar.getInstance();
+        final Calendar today = new GregorianCalendar(
                 now.get(Calendar.YEAR),
                 now.get(Calendar.MONTH),
-                now.get(Calendar.DAY_OF_MONTH)
-        );
+                now.get(Calendar.DAY_OF_MONTH));
+
+        Date closesDate = hours.getHoursToday().getToDate();
+        if (closesDate != null) {
+            closes.setTime(closesDate);
+            closes.set(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
+        } else closes.setTime(today.getTime());
+
+        final DatePickerDialog dpd = DatePickerDialog.newInstance(ServicesFragment.this);
         dpd.setTitle(service.name);
         dpd.setMinDate(now);
-        dpd.show(getActivity().getFragmentManager(), "Datepickerdialog");
+        dpd.setVersion(DatePickerDialog.Version.VERSION_2);
+        dpd.setDateRangeLimiter(new DateRangeLimiter() {
+            @Override
+            public int getMinYear() {
+                return now.get(Calendar.YEAR);
+            }
+
+            @Override
+            public int getMaxYear() {
+                return 2100;
+            }
+
+            @NonNull
+            @Override
+            public Calendar getStartDate() {
+                return now;
+            }
+
+            @NonNull
+            @Override
+            public Calendar getEndDate() {
+                Calendar output = Calendar.getInstance();
+                output.set(Calendar.YEAR, 2100);
+                output.set(Calendar.DAY_OF_MONTH, 1);
+                output.set(Calendar.MONTH, Calendar.JANUARY);
+                return output;
+            }
+
+            @Override
+            public boolean isOutOfRange(int year, int month, int day) {
+                Calendar calendar = new GregorianCalendar(year, month, day);
+                return calendar.before(today)
+                        || !hours.getHours(calendar.get(Calendar.DAY_OF_WEEK)).isOpen()
+                        || (Utils.isSameDay(calendar, now) && now.after(closes));
+            }
+
+            @NonNull
+            @Override
+            public Calendar setToNearestDate(@NonNull Calendar calendar) {
+                final int startDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+                while (isOutOfRange(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))) {
+                    calendar.add(Calendar.DAY_OF_MONTH, 1);
+                    // Don't loop forever if all days are closed
+                    if (calendar.get(Calendar.DAY_OF_WEEK) == startDayOfWeek) {
+                        Toast.makeText(getContext(), R.string.msg_services_provider_always_closed, Toast.LENGTH_LONG).show();
+                        dpd.dismiss();
+                        break;
+                    }
+                }
+                return calendar;
+            }
+
+            @Override
+            public int describeContents() {
+                return 0;
+            }
+
+            @Override
+            public void writeToParcel(Parcel dest, int flags) {
+
+            }
+        });
+
+        dpd.show(getActivity().getFragmentManager(), "DatePickerDialog");
     }
 
     @Override
     public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
         pickedDateTime = new GregorianCalendar(year, monthOfYear, dayOfMonth);
+
         Calendar now = Calendar.getInstance();
-        TimePickerDialog tpd = TimePickerDialog.newInstance(
-                ServicesFragment.this,
-                now.get(Calendar.HOUR_OF_DAY),
-                now.get(Calendar.MINUTE),
-                now.get(Calendar.SECOND),
-                true);
+        now.add(Calendar.MINUTE, 15 - now.get(Calendar.MINUTE) % 15);
+        now.set(Calendar.SECOND, 0);
+
+        Calendar opens = Calendar.getInstance();
+        opens.setTime(hours.getHoursToday().getFromDate());
+        Calendar closes = Calendar.getInstance();
+        closes.setTime(hours.getHoursToday().getToDate());
+
+        TimePickerDialog tpd = TimePickerDialog.newInstance(ServicesFragment.this, true);
         tpd.setTitle(selectedService.name);
         tpd.setTimeInterval(1, 15);
-        if (now.get(Calendar.YEAR) == year && now.get(Calendar.MONTH) == monthOfYear && now.get(Calendar.DAY_OF_MONTH) == dayOfMonth)
-            tpd.setMinTime(now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), now.get(Calendar.SECOND));
+        tpd.setMaxTime(closes.get(Calendar.HOUR_OF_DAY), closes.get(Calendar.MINUTE), closes.get(Calendar.SECOND));
+        if (Utils.isSameDay(pickedDateTime, now)
+                && (now.get(Calendar.HOUR_OF_DAY) > opens.get(Calendar.HOUR_OF_DAY)
+                || now.get(Calendar.HOUR_OF_DAY) == opens.get(Calendar.HOUR_OF_DAY)
+                && now.get(Calendar.MINUTE) >= opens.get(Calendar.MINUTE))) {
+            tpd.setMinTime(now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), 0);
+        } else {
+            tpd.setMinTime(opens.get(Calendar.HOUR_OF_DAY), opens.get(Calendar.MINUTE), 0);
+        }
         tpd.show(getActivity().getFragmentManager(), "TimePickerDialog");
     }
 
+
     @Override
-    public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute, int second) {
+    public void onTimeSet(TimePickerDialog timePickerDialog, int hourOfDay, int minute, int second) {
         pickedDateTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
         pickedDateTime.set(Calendar.MINUTE, minute);
         pickedDateTime.set(Calendar.SECOND, second);

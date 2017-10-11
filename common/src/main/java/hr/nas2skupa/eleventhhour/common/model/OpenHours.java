@@ -99,7 +99,7 @@ public class OpenHours extends BaseObservable {
     }
 
     @Exclude
-    public DailyHours getDailyHours(int dayOfWeek) {
+    public DailyHours getHours(int dayOfWeek) {
         switch (dayOfWeek) {
             case Calendar.MONDAY:
                 return mon;
@@ -121,8 +121,13 @@ public class OpenHours extends BaseObservable {
     }
 
     @Exclude
-    public String today() {
-        DailyHours today = getDailyHours(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
+    public DailyHours getHoursToday() {
+        return getHours(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
+    }
+
+    @Exclude
+    public String printHoursToday() {
+        DailyHours today = getHoursToday();
         if (today == null) return App.getAppContext().getString(R.string.hours_unknown);
         else {
             if (today.isOpen()) {

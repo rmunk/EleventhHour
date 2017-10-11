@@ -618,7 +618,7 @@ public class ProviderFragment extends Fragment implements ValueEventListener {
         txtPhone.setText(provider.phone);
         txtWeb.setText(provider.web);
         txtEmail.setText(provider.email);
-        if (provider.hours != null) txtHours.setText(provider.hours.today());
+        if (provider.hours != null) txtHours.setText(provider.hours.printHoursToday());
 
         layoutName.setVisibility(editable ? View.VISIBLE : View.GONE);
         layoutLocation.setVisibility(editable ? View.VISIBLE : View.GONE);
