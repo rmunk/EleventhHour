@@ -25,6 +25,7 @@ public class MainActivity extends DrawerActivity implements FirebaseAuth.AuthSta
 
     public static final String ACTION_PLANER = "hr.nas2skupa.eleventhhour.panel.ACTION_PLANER";
     public static final String ACTION_PROFILE = "hr.nas2skupa.eleventhhour.panel.ACTION_PROFILE";
+    public static final String ACTION_CLIENTS = "hr.nas2skupa.eleventhhour.panel.ACTION_CLIENTS";
     public static final String ACTION_HELP = "hr.nas2skupa.eleventhhour.panel.ACTION_HELP";
 
     @Extra
@@ -105,6 +106,14 @@ public class MainActivity extends DrawerActivity implements FirebaseAuth.AuthSta
                 break;
             case ACTION_PROFILE:
                 ProviderDetailsActivity_.intent(this).providerKey(providerKey).start();
+                break;
+            case ACTION_CLIENTS:
+                if (getSupportFragmentManager().findFragmentByTag("ClientsFragment") == null) {
+                    ClientsFragment clientsFragment = ClientsFragment_.builder().providerKey(providerKey).build();
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, clientsFragment, "ClientsFragment")
+                            .commit();
+                }
                 break;
             case ACTION_HELP:
                 try {

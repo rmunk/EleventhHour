@@ -16,6 +16,7 @@
     <!-- Navigation drawer -->
     <string name="menu_planer">Planer</string>
     <string name="menu_profile">Company profile</string>
+    <string name="menu_clients">Clients</string>
 
     <!-- AuthActivity -->
     <string name="user_without_providers">%s is not associated with any of providers we know about.</string>

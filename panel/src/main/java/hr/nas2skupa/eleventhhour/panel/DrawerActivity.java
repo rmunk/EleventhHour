@@ -30,6 +30,9 @@ public class DrawerActivity extends AbstractDrawerActivity {
             case R.id.nav_profile:
                 MainActivity_.intent(this).flags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP).action(MainActivity.ACTION_PROFILE).start();
                 break;
+            case R.id.nav_clients:
+                MainActivity_.intent(this).flags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP).action(MainActivity.ACTION_CLIENTS).start();
+                break;
             case R.id.nav_help:
                 MainActivity_.intent(this).flags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP).action(MainActivity.ACTION_HELP).start();
                 break;
