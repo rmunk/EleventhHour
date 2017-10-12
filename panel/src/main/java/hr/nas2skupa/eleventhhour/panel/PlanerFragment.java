@@ -27,7 +27,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
-import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import org.androidannotations.annotations.Click;
@@ -455,7 +454,7 @@ public class PlanerFragment extends Fragment
     }
 
     @Override
-    public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute, int second) {
+    public void onTimeSet(TimePickerDialog timePickerDialog, int hourOfDay, int minute, int second) {
         pickedDateTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
         pickedDateTime.set(Calendar.MINUTE, minute);
         pickedDateTime.set(Calendar.SECOND, second);
