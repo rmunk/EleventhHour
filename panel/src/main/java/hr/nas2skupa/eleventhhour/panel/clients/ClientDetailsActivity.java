@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -31,13 +30,15 @@ import org.androidannotations.annotations.res.DimensionPixelOffsetRes;
 
 import hr.nas2skupa.eleventhhour.common.model.Booking;
 import hr.nas2skupa.eleventhhour.common.model.User;
+import hr.nas2skupa.eleventhhour.panel.BookingDetailsDialog_;
+import hr.nas2skupa.eleventhhour.panel.DrawerActivity;
 import hr.nas2skupa.eleventhhour.panel.MainActivity;
 import hr.nas2skupa.eleventhhour.panel.R;
 import hr.nas2skupa.eleventhhour.panel.databinding.ItemClientBookingBinding;
 
 @EActivity(R.layout.activity_client_details)
 @OptionsMenu(R.menu.menu_client_details)
-public class ClientDetailsActivity extends AppCompatActivity {
+public class ClientDetailsActivity extends DrawerActivity {
     @Extra String userKey;
 
     @ViewById ViewGroup layoutMain;
@@ -142,9 +143,16 @@ public class ClientDetailsActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void populateViewHolder(final ClientBookingViewHolder viewHolder, final Booking model, final int position) {
-            model.key = getRef(position).getKey();
-            viewHolder.bind(model);
+        protected void populateViewHolder(final ClientBookingViewHolder viewHolder, final Booking booking, final int position) {
+            booking.key = getRef(position).getKey();
+            viewHolder.bind(booking);
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    BookingDetailsDialog_.builder().bookingKey(booking.key).build()
+                            .show(getSupportFragmentManager(), "BookingDetailsDialog");
+                }
+            });
         }
     }
 
