@@ -191,7 +191,7 @@ public class ProviderActivity extends DrawerActivity implements RatingBar.OnRati
         txtWeb.setVisibility(txtWeb.getText().length() > 0 ? View.VISIBLE : View.GONE);
         txtEmail.setText(provider.email);
         txtEmail.setVisibility(txtEmail.getText().length() > 0 ? View.VISIBLE : View.GONE);
-        txtHours.setText(provider.hours);
+        if (provider.hours != null) txtHours.setText(provider.hours.printHoursToday());
         txtHours.setVisibility(txtHours.getText().length() > 0 ? View.VISIBLE : View.GONE);
     }
 

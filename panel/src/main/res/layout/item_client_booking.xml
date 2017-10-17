@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <import type="hr.nas2skupa.eleventhhour.common.utils.StringUtils"/>
+
+        <import type="hr.nas2skupa.eleventhhour.common.model.BookingStatus"/>
+
+        <variable
+            name="booking"
+            type="hr.nas2skupa.eleventhhour.common.model.Booking"/>
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_booking"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="4dp"
+            app:contentPadding="8dp">
+
+            <android.support.constraint.ConstraintLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/layout_main"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/txt_booking_service"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginStart="8dp"
+                    android:enabled="@{booking.status == BookingStatus.PROVIDER_ACCEPTED}"
+                    android:text="@{booking.serviceName}"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                    android:textColor="@{booking.status == BookingStatus.PROVIDER_ACCEPTED ? @color/colorPrimary : booking.status == BookingStatus.PENDING ? @color/colorAccent : @color/material_text_color_black_secondary_text}"
+                    android:textSize="20sp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Mamografija"/>
+
+                <TextView
+                    android:id="@+id/txt_booking_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="4dp"
+                    android:drawableLeft="@drawable/ic_date_black_18dp"
+                    android:drawablePadding="4dp"
+                    android:text="@{booking.date}"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    app:layout_constraintLeft_toLeftOf="@+id/txt_booking_service"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/txt_booking_service"
+                    tools:text="October 4, 2017"/>
+
+                <TextView
+                    android:id="@+id/txt_booking_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_time_black_18dp"
+                    android:drawablePadding="4dp"
+                    android:text="@{booking.time}"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    app:layout_constraintLeft_toLeftOf="@+id/txt_booking_date"
+                    app:layout_constraintTop_toBottomOf="@+id/txt_booking_date"
+                    tools:text="15:30 - 16:15"/>
+
+                <TextView
+                    android:id="@+id/txt_booking_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_info_black_18dp"
+                    android:drawablePadding="4dp"
+                    android:text="@{StringUtils.printBookingStatus(booking.status)}"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    app:layout_constraintLeft_toLeftOf="@+id/txt_booking_date"
+                    app:layout_constraintTop_toBottomOf="@+id/txt_booking_time"
+                    tools:text="Waiting..."/>
+
+            </android.support.constraint.ConstraintLayout>
+        </android.support.v7.widget.CardView>
+
+    </LinearLayout>
+</layout>

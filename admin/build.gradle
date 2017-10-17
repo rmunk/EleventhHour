@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'android-apt'
 
 android {
     compileSdkVersion compileSdk
@@ -35,18 +34,8 @@ dependencies {
     compile project(':auth')
     compile project(':common')
 
-    compile 'org.androidannotations:androidannotations-api:4.3.1'
-    apt 'org.androidannotations:androidannotations:4.3.1'
-
     testCompile 'junit:junit:4.12'
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-}
-
-apt {
-    arguments {
-        androidManifestFile variant.outputs[0]?.processResources?.manifestFile
-        resourcePackageName "hr.nas2skupa.eleventhhour.admin"
-    }
 }

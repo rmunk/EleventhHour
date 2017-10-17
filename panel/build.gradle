@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'android-apt'
 
 android {
     compileSdkVersion compileSdk
@@ -35,11 +34,7 @@ dependencies {
     compile project(':auth')
     compile project(':common')
 
-    compile 'org.androidannotations:androidannotations-api:4.3.1'
-    apt 'org.androidannotations:androidannotations:4.3.1'
-
     compile 'com.github.alamkanak:android-week-view:1.2.6'
-    compile 'com.wdullaer:materialdatetimepicker:2.5.0'
 
     testCompile 'junit:junit:4.12'
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {

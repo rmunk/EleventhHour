@@ -1,9 +1,8 @@
 package hr.nas2skupa.eleventhhour.common.utils;
 
-import android.content.Context;
-
 import java.util.Locale;
 
+import hr.nas2skupa.eleventhhour.common.App;
 import hr.nas2skupa.eleventhhour.common.R;
 import hr.nas2skupa.eleventhhour.common.model.BookingStatus;
 
@@ -12,22 +11,22 @@ import hr.nas2skupa.eleventhhour.common.model.BookingStatus;
  */
 
 public class StringUtils {
-    public static String printBookingStatus(Context context, @BookingStatus int status) {
+    public static String printBookingStatus(@BookingStatus int status) {
         switch (status) {
             case BookingStatus.PENDING:
-                return context.getString(R.string.booking_status_pending) + " \uD83D\uDCA4";
+                return App.getAppContext().getString(R.string.booking_status_pending) + " \uD83D\uDCA4";
             case BookingStatus.PROVIDER_ACCEPTED:
-                return context.getString(R.string.booking_status_confirmed) + " \uD83D\uDC4D";
+                return App.getAppContext().getString(R.string.booking_status_confirmed) + " \uD83D\uDC4D";
             case BookingStatus.PROVIDER_REJECTED:
-                return context.getString(R.string.booking_status_rejected) + " \uD83D\uDC4E";
+                return App.getAppContext().getString(R.string.booking_status_rejected) + " \uD83D\uDC4E";
             case BookingStatus.USER_CANCELED:
-                return context.getString(R.string.booking_status_user_canceled) + " ✘";
+                return App.getAppContext().getString(R.string.booking_status_user_canceled) + " ✘";
             case BookingStatus.PROVIDER_CANCELED:
-                return context.getString(R.string.booking_status_provider_canceled) + " ✘";
+                return App.getAppContext().getString(R.string.booking_status_provider_canceled) + " ✘";
             case BookingStatus.FINISHED:
-                return context.getString(R.string.booking_status_finished) + " ✔︎";
+                return App.getAppContext().getString(R.string.booking_status_finished) + " ✔︎";
             default:
-                return context.getString(R.string.booking_status_unknown);
+                return App.getAppContext().getString(R.string.booking_status_unknown);
         }
     }
 

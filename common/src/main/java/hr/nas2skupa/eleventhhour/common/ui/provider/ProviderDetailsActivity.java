@@ -44,10 +44,11 @@ import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.R;
+import hr.nas2skupa.eleventhhour.common.R2;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
 
-@EActivity(resName = "activity_provider_details")
-@OptionsMenu(resName = "menu_provider_details")
+@EActivity(R2.layout.activity_provider_details)
+@OptionsMenu(R2.menu.menu_provider_details)
 public class ProviderDetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
     @Pref Preferences_ preferences;
 
@@ -118,12 +119,12 @@ public class ProviderDetailsActivity extends AppCompatActivity implements OnMapR
         onBackPressed();
     }
 
-    @OptionsItem(resName = "action_edit")
+    @OptionsItem(R2.id.action_edit)
     void editProvider() {
         ProviderEditActivity_.intent(this).providerKey(providerKey).start();
     }
 
-    @OptionsItem(resName = "action_delete")
+    @OptionsItem(R2.id.action_delete)
     void deleteProvider() {
         new AlertDialog.Builder(this)
                 .setTitle(String.format(getString(R.string.action_delete_title), provider.name))
@@ -142,7 +143,7 @@ public class ProviderDetailsActivity extends AppCompatActivity implements OnMapR
     }
 
     @SuppressWarnings("ConstantConditions")
-    void setToolbar(@ViewById(resName = "toolbar") Toolbar toolbar) {
+    void setToolbar(@ViewById(R2.id.toolbar) Toolbar toolbar) {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -150,7 +151,7 @@ public class ProviderDetailsActivity extends AppCompatActivity implements OnMapR
         getSupportActionBar().setTitle("");
     }
 
-    void setAppBar(@ViewById(resName = "app_bar") AppBarLayout appBar) {
+    void setAppBar(@ViewById(R2.id.app_bar) AppBarLayout appBar) {
         appBar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
@@ -192,7 +193,7 @@ public class ProviderDetailsActivity extends AppCompatActivity implements OnMapR
         }
     }
 
-    @Click(resName = "fab_services")
+    @Click(R2.id.fab_services)
     void editServices() {
         appBar.setExpanded(false);
         nestedScroll.setNestedScrollingEnabled(false);
@@ -216,7 +217,7 @@ public class ProviderDetailsActivity extends AppCompatActivity implements OnMapR
         fabAddService.show();
     }
 
-    @Click(resName = "fab_add_service")
+    @Click(R2.id.fab_add_service)
     void addService() {
         ServiceDialog_.builder()
                 .providerKey(providerKey)

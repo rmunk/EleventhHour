@@ -16,7 +16,6 @@ import android.support.v7.widget.util.SortedListAdapterCallback;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckedTextView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 
@@ -26,6 +25,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 
@@ -37,6 +37,7 @@ import java.util.Objects;
 
 import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.R;
+import hr.nas2skupa.eleventhhour.common.R2;
 import hr.nas2skupa.eleventhhour.common.model.City;
 import hr.nas2skupa.eleventhhour.common.utils.Utils;
 
@@ -44,16 +45,17 @@ import hr.nas2skupa.eleventhhour.common.utils.Utils;
  * Created by nas2skupa on 25/09/2017.
  */
 
-@EFragment(resName = "dialog_city_picker")
+@EFragment(R2.layout.dialog_city_picker)
 public class CityPickerDialog extends DialogFragment implements SearchView.OnQueryTextListener {
+    @FragmentArg String selectedCityKey;
     @Pref Preferences_ preferences;
-
     @ViewById ProgressBar progressBar;
 
     private View view;
     private CitiesAdapter adapter;
     private City pickedCity;
     private CityPickerDialogListener listener;
+    private RecyclerView recyclerView;
 
     public void setCityPickerDialogListener(CityPickerDialogListener listener) {
         this.listener = listener;
@@ -74,24 +76,19 @@ public class CityPickerDialog extends DialogFragment implements SearchView.OnQue
                 .setPositiveButton(R.string.action_pick, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (pickedCity == null) return;
-
                         if (listener != null) listener.onCityPicked(pickedCity);
-                        CityPickerDialog.this.dismiss();
                     }
                 })
                 .setNeutralButton(R.string.pick_city_all_cities, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         if (listener != null) listener.onAllSelected();
-                        CityPickerDialog.this.dismiss();
                     }
                 })
                 .setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (listener != null) listener.onCancelled();
-                        CityPickerDialog.this.dismiss();
                     }
                 });
 
@@ -104,33 +101,22 @@ public class CityPickerDialog extends DialogFragment implements SearchView.OnQue
         return view;
     }
 
-    @ViewById(resName = "search_view")
+    @ViewById(R2.id.search_view)
     void setSearchView(SearchView searchView) {
         searchView.setQueryHint(getString(R.string.pick_city_search_hint));
         searchView.setOnQueryTextListener(this);
     }
 
-    @ViewById(resName = "recycler_view")
-    void setRecyclerView(RecyclerView recyclerView) {
+    @ViewById(R2.id.recycler_view)
+    void setRecyclerView(final RecyclerView recyclerView) {
+        this.recyclerView = recyclerView;
+
         Query query = FirebaseDatabase.getInstance().getReference()
                 .child("app/cities")
                 .child(preferences.country().get())
                 .orderByChild("name/" + Utils.getLanguageIso());
 
-        adapter = new CitiesAdapter(City.class, R.layout.item_city, CitiesAdapter.CityViewHolder.class, query);
-        adapter.setCitiesAdapterListener(new CitiesAdapter.CitiesAdapterListener() {
-            @Override
-            public void onLoadingFinished() {
-                progressBar.setVisibility(View.GONE);
-                ((AlertDialog) getDialog()).getButton(Dialog.BUTTON_POSITIVE).setEnabled(false);
-            }
-
-            @Override
-            public void onCityPicked(City city) {
-                pickedCity = city;
-                ((AlertDialog) getDialog()).getButton(Dialog.BUTTON_POSITIVE).setEnabled(true);
-            }
-        });
+        adapter = new CitiesAdapter(City.class, R.layout.item_city, CityViewHolder.class, query);
 
         final LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(manager);
@@ -149,8 +135,7 @@ public class CityPickerDialog extends DialogFragment implements SearchView.OnQue
         return true;
     }
 
-    private static class CitiesAdapter extends FirebaseRecyclerAdapter<City, CitiesAdapter.CityViewHolder> {
-        private CitiesAdapterListener listener;
+    public class CitiesAdapter extends FirebaseRecyclerAdapter<City, CityViewHolder> {
         private boolean loaded = false;
         private String query = "";
         private int selectedPosition = -1;
@@ -173,17 +158,21 @@ public class CityPickerDialog extends DialogFragment implements SearchView.OnQue
             }
         });
 
-        void setCitiesAdapterListener(CitiesAdapterListener listener) {
-            this.listener = listener;
-        }
-
         CitiesAdapter(Class<City> modelClass, @LayoutRes int modelLayout, Class<CityViewHolder> viewHolderClass, Query query) {
             super(modelClass, modelLayout, viewHolderClass, query);
         }
 
         @Override
+        public CityViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_city, parent, false);
+            RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(parent.getWidth(), ViewGroup.LayoutParams.WRAP_CONTENT);
+            rootView.setLayoutParams(lp);
+            return new CityViewHolder(rootView);
+        }
+
+        @Override
         protected void populateViewHolder(CityViewHolder viewHolder, City model, final int position) {
-            RadioButton text = viewHolder.itemView.findViewById(R.id.text1);
+            RadioButton text = viewHolder.itemView.findViewById(R.id.txt_name);
             text.setText(model.getLocalName());
             text.setChecked(position == selectedPosition);
             text.setOnClickListener(new View.OnClickListener() {
@@ -191,7 +180,8 @@ public class CityPickerDialog extends DialogFragment implements SearchView.OnQue
                 public void onClick(View view) {
                     selectedPosition = position;
                     notifyDataSetChanged();
-                    if (listener != null) listener.onCityPicked(getItem(position));
+                    pickedCity = getItem(position);
+                    ((AlertDialog) getDialog()).getButton(Dialog.BUTTON_POSITIVE).setEnabled(true);
                 }
             });
         }
@@ -200,15 +190,21 @@ public class CityPickerDialog extends DialogFragment implements SearchView.OnQue
         public void onChildChanged(EventType type, DataSnapshot snapshot, int index, int oldIndex) {
             super.onChildChanged(type, snapshot, index, oldIndex);
             super.getItem(index).key = snapshot.getKey();
+            if (!loaded && Objects.equals(snapshot.getKey(), selectedCityKey)) {
+                selectedPosition = index;
+                pickedCity = snapshot.getValue(City.class);
+            }
         }
 
         @Override
         public void onDataChanged() {
             super.onDataChanged();
             refreshFilter();
-            if (listener != null && !loaded) {
-                listener.onLoadingFinished();
+            if (!loaded) {
                 loaded = true;
+                progressBar.setVisibility(View.GONE);
+                if (selectedPosition > 0) recyclerView.scrollToPosition(selectedPosition);
+                ((AlertDialog) getDialog()).getButton(Dialog.BUTTON_POSITIVE).setEnabled(selectedPosition > 0);
             }
         }
 
@@ -251,19 +247,11 @@ public class CityPickerDialog extends DialogFragment implements SearchView.OnQue
             filter(query);
         }
 
-        static class CityViewHolder extends RecyclerView.ViewHolder {
-            private CheckedTextView txtName;
+    }
 
-            public CityViewHolder(View itemView) {
-                super(itemView);
-                txtName = itemView.findViewById(android.R.id.text1);
-            }
-        }
-
-        interface CitiesAdapterListener {
-            void onLoadingFinished();
-
-            void onCityPicked(City city);
+    public static class CityViewHolder extends RecyclerView.ViewHolder {
+        public CityViewHolder(View itemView) {
+            super(itemView);
         }
     }
 

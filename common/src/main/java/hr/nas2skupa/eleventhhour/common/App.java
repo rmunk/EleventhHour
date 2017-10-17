@@ -1,6 +1,7 @@
 package hr.nas2skupa.eleventhhour.common;
 
 import android.app.Application;
+import android.content.Context;
 import android.util.Log;
 
 import com.google.firebase.FirebaseException;
@@ -14,9 +15,18 @@ import timber.log.Timber;
  */
 
 public class App extends Application {
+
+    private static Context appContext;
+
+    public static Context getAppContext() {
+        return appContext;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
+
+        appContext = getApplicationContext();
 
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 

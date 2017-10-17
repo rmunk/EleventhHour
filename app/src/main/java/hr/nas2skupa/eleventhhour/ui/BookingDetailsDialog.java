@@ -165,7 +165,7 @@ public class BookingDetailsDialog extends DialogFragment implements OnMapReadyCa
                 txtBookingService.setText(booking.serviceName);
                 txtBookingProvider.setText(booking.providerName);
                 txtBookingTime.setText(booking.getTime());
-                txtBookingStatus.setText(StringUtils.printBookingStatus(getContext(), booking.getStatus()));
+                txtBookingStatus.setText(StringUtils.printBookingStatus(booking.getStatus()));
                 txtBookingPrice.setText(booking.price);
                 txtBookingNote.setText(booking.note);
                 txtBookingNote.setVisibility(booking.note.isEmpty() ? View.GONE : View.VISIBLE);

@@ -23,12 +23,13 @@ import org.androidannotations.annotations.ViewById;
 import java.util.Calendar;
 
 import hr.nas2skupa.eleventhhour.common.R;
+import hr.nas2skupa.eleventhhour.common.R2;
 import hr.nas2skupa.eleventhhour.common.model.Booking;
 
 /**
  * Dialog for booking a service.
  */
-@EFragment(resName = "dialog_make_booking")
+@EFragment(R2.layout.dialog_make_booking)
 public class MakeBookingDialog extends DialogFragment {
     @FragmentArg
     String userKey;

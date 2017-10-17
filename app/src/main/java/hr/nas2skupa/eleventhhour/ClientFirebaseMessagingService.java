@@ -82,6 +82,25 @@ public class ClientFirebaseMessagingService extends FirebaseMessagingService {
         final int id = booking.key.hashCode();
         final String when = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT).format(new Date(booking.from));
 
+        String title;
+        String details;
+        switch (booking.getStatus()) {
+            case BookingStatus.PROVIDER_ACCEPTED:
+                title = getString(R.string.notification_title_accepted);
+                details = getString(R.string.notification_text_accepted, booking.providerName, booking.serviceName, when);
+                break;
+            case BookingStatus.PROVIDER_REJECTED:
+                title = getString(R.string.notification_title_rejected);
+                details = getString(R.string.notification_text_rejected, booking.providerName, booking.serviceName, when);
+                break;
+            case BookingStatus.PROVIDER_CANCELED:
+                title = getString(R.string.notification_title_cancelled);
+                details = getString(R.string.notification_text_cancelled, booking.providerName, booking.serviceName, when);
+                break;
+            default:
+                return;
+        }
+
         Intent intent = new Intent(this, MainActivity_.class);
         intent.setAction(MainActivity.ACTION_CALENDAR);
         intent.putExtra("bookingKey", booking.key);
@@ -91,29 +110,16 @@ public class ClientFirebaseMessagingService extends FirebaseMessagingService {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "eleventh_hour_client")
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
-
-        switch (booking.getStatus()) {
-            case BookingStatus.PROVIDER_ACCEPTED:
-                builder.setContentTitle(getString(R.string.notification_title_accepted))
-                        .setContentText(getString(R.string.notification_text_accepted, booking.providerName, booking.serviceName, when));
-                break;
-            case BookingStatus.PROVIDER_REJECTED:
-                builder.setContentTitle(getString(R.string.notification_title_rejected))
-                        .setContentText(getString(R.string.notification_text_rejected, booking.providerName, booking.serviceName, when));
-                break;
-            case BookingStatus.PROVIDER_CANCELED:
-                builder.setContentTitle(getString(R.string.notification_title_cancelled))
-                        .setContentText(getString(R.string.notification_text_cancelled, booking.providerName, booking.serviceName, when));
-                break;
-            default:
-                return;
-        }
-
+                .setAutoCancel(true)
+                .setContentTitle(title)
+                .setContentText(details)
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .setBigContentTitle(title)
+                        .bigText(details));
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(id, builder.build());
     }

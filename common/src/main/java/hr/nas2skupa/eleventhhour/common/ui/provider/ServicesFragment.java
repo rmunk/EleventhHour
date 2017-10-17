@@ -17,6 +17,7 @@ import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.common.R;
+import hr.nas2skupa.eleventhhour.common.R2;
 import hr.nas2skupa.eleventhhour.common.model.Service;
 import hr.nas2skupa.eleventhhour.common.ui.helpers.SimpleDividerItemDecoration;
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
@@ -24,7 +25,7 @@ import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 /**
  * A simple {@link Fragment} subclass.
  */
-@EFragment(resName = "fragment_services")
+@EFragment(R2.layout.fragment_services)
 public class ServicesFragment extends Fragment {
     @FragmentArg String providerKey;
 

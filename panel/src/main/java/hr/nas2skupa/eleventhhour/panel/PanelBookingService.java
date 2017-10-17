@@ -58,6 +58,9 @@ public class PanelBookingService extends Service {
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put(String.format("/providerAppointments/%s/data/%s/status", providerKey, bookingKey), status);
         childUpdates.put(String.format("/userAppointments/%s/data/%s/status", userKey, bookingKey), status);
+        if (status == BookingStatus.PROVIDER_ACCEPTED) {
+            childUpdates.put(String.format("/users/providerClients/%s/%s", providerKey, userKey), true);
+        }
         reference.updateChildren(childUpdates).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {

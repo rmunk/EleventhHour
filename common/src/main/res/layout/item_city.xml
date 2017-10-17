@@ -5,7 +5,7 @@
              android:layout_height="wrap_content">
 
     <RadioButton
-        android:id="@+id/text1"
+        android:id="@+id/txt_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"

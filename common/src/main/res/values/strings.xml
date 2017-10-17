@@ -14,6 +14,8 @@
     <string name="action_pick">Pick</string>
     <string name="action_all">All</string>
     <string name="action_undo">Undo</string>
+    <string name="action_rate">Rate</string>
+    <string name="action_flag">Flag</string>
 
     <!-- Navigation drawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -46,10 +48,12 @@
     <string name="provider_error_location">You must set your location</string>
     <string name="provider_error_city">You must pick a city from the list</string>
     <string name="provider_error_address">You must enter your address</string>
+    <string name="provider_error_hours">You must define open hours for all days</string>
     <string name="provider_pick_category_title">Pick category</string>
     <string name="provider_pick_subcategory_title">Pick subcategory</string>
     <string name="msg_provider_location_selected">Selected location:\n%s</string>
     <string name="msg_provider_starting_location_picker">Starting location picker</string>
+    <string name="msg_provider_loading_cities">Fetching cities</string>
     <string name="msg_provider_loading_subcategories">Fetching subcategories</string>
     <string name="msg_provider_loading_categories">Fetching categories</string>
     <string name="msg_provider_saving">Saving provider</string>
@@ -105,6 +109,22 @@
     <string name="pick_city_search_hint">Search cities</string>
     <string name="pick_city_all_cities">All cities</string>
 
+    <!-- OpenHours -->
+    <string name="hours_open">Open</string>
+    <string name="hours_closed">Closed</string>
+    <string name="hours_unknown">Unknown</string>
+    <string name="hours_open_today">Open today: %s</string>
+    <string name="hours_closed_today">Closed today</string>
+    <string name="hours_opens_at">Opens at</string>
+    <string name="hours_closes_at">Closes at</string>
+
     <!-- Misc -->
     <string name="currency_regex">^(\\W\\d{1,3}(?:\\d*(?:[.,]\\d{2})?|(?:,\\d{3})*(?:\\.\\d{2})?|(?:\\.\\d{3})*(?:,\\d{2})?))|(\\d{1,3}(?:\\d*(?:[.,]\\d{2})?|(?:,\\d{3})*(?:\\.\\d{2})?|(?:\\.\\d{3})*(?:,\\d{2})?) [\\D]{2,3})?</string>
+    <string name="mon">Mon</string>
+    <string name="tue">Tue</string>
+    <string name="wed">Wed</string>
+    <string name="thu">Thu</string>
+    <string name="fri">Fri</string>
+    <string name="sat">Sat</string>
+    <string name="sun">Sun</string>
 </resources>

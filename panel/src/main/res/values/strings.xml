@@ -4,6 +4,7 @@
 
     <!-- Activity and fragment titles -->
     <string name="title_fragment_planer">Planer</string>
+    <string name="title_fragment_clients">Clients</string>
 
     <!-- Actions -->
     <string name="action_display_range">Display range</string>
@@ -16,6 +17,7 @@
     <!-- Navigation drawer -->
     <string name="menu_planer">Planer</string>
     <string name="menu_profile">Company profile</string>
+    <string name="menu_clients">Clients</string>
 
     <!-- AuthActivity -->
     <string name="user_without_providers">%s is not associated with any of providers we know about.</string>

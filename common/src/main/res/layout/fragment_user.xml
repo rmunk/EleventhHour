@@ -101,7 +101,8 @@
     <FrameLayout
         android:id="@+id/editing_shroud"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:focusableInTouchMode="true">
 
     </FrameLayout>
 

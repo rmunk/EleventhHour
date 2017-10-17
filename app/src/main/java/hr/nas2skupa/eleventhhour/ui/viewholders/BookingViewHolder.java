@@ -1,6 +1,5 @@
 package hr.nas2skupa.eleventhhour.ui.viewholders;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
@@ -28,11 +27,11 @@ public class BookingViewHolder extends RecyclerView.ViewHolder {
     public BookingViewHolder(View itemView) {
         super(itemView);
 
-        txtService = (TextView) itemView.findViewById(R.id.txt_booking_service);
-        txtProvider = (TextView) itemView.findViewById(R.id.txt_booking_provider);
-        txtTime = (TextView) itemView.findViewById(R.id.txt_booking_time);
-        txtStatus = (TextView) itemView.findViewById(R.id.txt_booking_status);
-        imgMore = (ImageView) itemView.findViewById(R.id.img_more);
+        txtService = itemView.findViewById(R.id.txt_booking_service);
+        txtProvider = itemView.findViewById(R.id.txt_booking_provider);
+        txtTime = itemView.findViewById(R.id.txt_booking_time);
+        txtStatus = itemView.findViewById(R.id.txt_booking_status);
+        imgMore = itemView.findViewById(R.id.img_more);
         imgMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -41,12 +40,12 @@ public class BookingViewHolder extends RecyclerView.ViewHolder {
         });
     }
 
-    public void bind(Context context, Booking booking) {
+    public void bind(Booking booking) {
         this.booking = booking;
         txtService.setText(booking.serviceName);
         txtService.setEnabled(booking.getStatus() >= 0);
         txtProvider.setText(booking.providerName);
         txtTime.setText(booking.getTime());
-        txtStatus.setText(StringUtils.printBookingStatus(context, booking.getStatus()));
+        txtStatus.setText(StringUtils.printBookingStatus(booking.getStatus()));
     }
 }

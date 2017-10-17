@@ -136,6 +136,9 @@ public class BookingDetailsDialog extends DialogFragment {
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put(String.format("/providerAppointments/%s/data/%s", booking.providerId, key), bookingValues);
         childUpdates.put(String.format("/userAppointments/%s/data/%s", booking.userId, key), bookingValues);
+        if (booking.status == BookingStatus.PROVIDER_ACCEPTED) {
+            childUpdates.put(String.format("/users/providerClients/%s/%s", booking.providerId, booking.userId), true);
+        }
         reference.updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
@@ -161,7 +164,7 @@ public class BookingDetailsDialog extends DialogFragment {
                 txtBookingService.setText(booking.serviceName);
                 txtBookingUser.setText(booking.userName);
                 txtBookingTime.setText(booking.getTime());
-                txtBookingStatus.setText(StringUtils.printBookingStatus(getContext(), booking.getStatus()));
+                txtBookingStatus.setText(StringUtils.printBookingStatus(booking.getStatus()));
                 txtBookingPrice.setText(booking.price);
                 txtBookingNote.setText(booking.note);
 

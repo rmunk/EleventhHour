@@ -26,7 +26,7 @@ public class Provider {
     public String address;
     public String web;
     public String email;
-    public String hours;
+    public OpenHours hours;
     public HashMap<String, Boolean> payment = new HashMap<>();
 
     // User related properties

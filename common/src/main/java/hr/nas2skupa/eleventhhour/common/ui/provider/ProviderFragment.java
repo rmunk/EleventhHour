@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
@@ -26,7 +28,6 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -48,11 +49,15 @@ import java.util.Map;
 
 import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.R;
+import hr.nas2skupa.eleventhhour.common.R2;
 import hr.nas2skupa.eleventhhour.common.model.Category;
 import hr.nas2skupa.eleventhhour.common.model.City;
 import hr.nas2skupa.eleventhhour.common.model.Location;
+import hr.nas2skupa.eleventhhour.common.model.OpenHours;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
 import hr.nas2skupa.eleventhhour.common.model.Subcategory;
+import hr.nas2skupa.eleventhhour.common.ui.HoursEditDialog;
+import hr.nas2skupa.eleventhhour.common.ui.HoursEditDialog_;
 import hr.nas2skupa.eleventhhour.common.ui.helpers.DelayedProgressDialog;
 
 import static android.app.Activity.RESULT_OK;
@@ -61,8 +66,8 @@ import static android.app.Activity.RESULT_OK;
  * Created by nas2skupa on 06/03/2017.
  */
 
-@EFragment(resName = "fragment_provider")
-public class ProviderFragment extends Fragment {
+@EFragment(R2.layout.fragment_provider)
+public class ProviderFragment extends Fragment implements ValueEventListener {
     private static final int PLACE_PICKER_REQUEST = 1001;
     private static final int GOOGLE_PLAY_SERVICES_REPAIRABLE_REQUEST = 1002;
     private static final int GOOGLE_PLAY_SERVICES_NOT_AVAILABLE_REQUEST = 1003;
@@ -91,43 +96,70 @@ public class ProviderFragment extends Fragment {
     @ViewById TextInputLayout layoutLocation;
     @ViewById TextInputLayout layoutCity;
     @ViewById TextInputLayout layoutAddress;
+    @ViewById TextInputLayout layoutHours;
 
     private boolean locationPickerStarted;
-    private boolean pickingCategory;
-    private boolean pickingSubcategory;
+    private boolean dialogOpen;
     private ProgressDialog progressDialog;
 
     private Provider provider = new Provider();
-    private DatabaseReference providerReference = FirebaseDatabase.getInstance().getReference()
-            .child("providers")
-            .child(preferences.country().get())
-            .child("data")
-            .child(providerKey);
+    private DatabaseReference providerReference;
+    private String pickedCategory;
+    private HashMap<String, Boolean> pickedSubcategories;
+    private String pickedCity;
+    private OpenHours setHours;
 
     public ProviderFragment() {
     }
 
-    @AfterViews
-    void loadProvider() {
-        if (providerKey != null) {
-            if (editable) {
-                providerReference.addListenerForSingleValueEvent(new ProviderChangedListener());
-            } else {
-                providerReference.addValueEventListener(new ProviderChangedListener());
-            }
-        }
-        if (editable) setupCityPicker();
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        providerReference = FirebaseDatabase.getInstance().getReference()
+                .child("providers")
+                .child(preferences.country().get())
+                .child("data")
+                .child(providerKey);
     }
 
-    @Touch(resName = "editing_shroud")
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (!editable && providerKey != null) {
+            providerReference.addValueEventListener(this);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if (!editable && providerKey != null) {
+            providerReference.removeEventListener(this);
+        }
+    }
+
+    @AfterViews
+    void loadProvider() {
+        if (editable) {
+            if (providerKey != null) {
+                providerReference.addListenerForSingleValueEvent(this);
+            }
+            setupCityPicker();
+        }
+    }
+
+    @Touch(R2.id.editing_shroud)
     boolean consumeClick() {
         return !editable;
     }
 
-    @Touch(resName = "txt_category")
+    @Touch(R2.id.txt_category)
     boolean pickCategory(View v, MotionEvent event) {
-        if (pickingCategory || event.getAction() != MotionEvent.ACTION_UP) return true;
-        pickingCategory = true;
+        if (dialogOpen || event.getAction() != MotionEvent.ACTION_UP) return true;
+        dialogOpen = true;
         progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_loading_categories), PROGRESS_DELAY);
 
         FirebaseDatabase.getInstance().getReference()
@@ -148,7 +180,7 @@ public class ProviderFragment extends Fragment {
                                     if (category != null) {
                                         keys[i] = child.getKey();
                                         names[i] = category.getLocalName();
-                                        if (provider.category != null && provider.category.equals(keys[i])) {
+                                        if (pickedCategory != null && pickedCategory.equals(keys[i])) {
                                             selected[0] = i;
                                         }
                                         i++;
@@ -170,10 +202,10 @@ public class ProviderFragment extends Fragment {
                                         .setPositiveButton(R.string.action_pick, new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
-                                                pickingCategory = false;
+                                                dialogOpen = false;
 
-                                                provider.category = keys[selected[0]];
-                                                provider.subcategories = null;
+                                                pickedCategory = keys[selected[0]];
+                                                pickedSubcategories = null;
                                                 txtCategory.setText(names[selected[0]]);
                                                 txtSubcategories.setText(null);
                                             }
@@ -181,7 +213,13 @@ public class ProviderFragment extends Fragment {
                                         .setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
-                                                pickingCategory = false;
+                                                dialogOpen = false;
+                                            }
+                                        })
+                                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                            @Override
+                                            public void onCancel(DialogInterface dialog) {
+                                                dialogOpen = false;
                                             }
                                         })
                                         .create()
@@ -190,28 +228,28 @@ public class ProviderFragment extends Fragment {
 
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
-                                pickingCategory = false;
+                                dialogOpen = false;
                             }
                         }
                 );
         return true;
     }
 
-    @Touch(resName = "txt_subcategories")
+    @Touch(R2.id.txt_subcategories)
     boolean pickSubcategory(View view, MotionEvent event) {
-        if (pickingSubcategory || event.getAction() != MotionEvent.ACTION_UP) return true;
-        pickingSubcategory = true;
+        if (dialogOpen || event.getAction() != MotionEvent.ACTION_UP) return true;
+        dialogOpen = true;
 
-        if (provider.category == null) {
+        if (pickedCategory == null) {
             Snackbar.make(view, R.string.msg_pick_category_first, Snackbar.LENGTH_SHORT).show();
-            pickingSubcategory = false;
+            dialogOpen = false;
             return true;
         }
 
         progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_loading_subcategories), 500L);
         FirebaseDatabase.getInstance().getReference()
                 .child("app/subcategories")
-                .child(provider.category)
+                .child(pickedCategory)
                 .addListenerForSingleValueEvent(
                         new ValueEventListener() {
                             @Override
@@ -228,7 +266,7 @@ public class ProviderFragment extends Fragment {
                                     if (subcategory != null) {
                                         keys[i] = child.getKey();
                                         names[i] = subcategory.getLocalName();
-                                        checked[i] = provider.subcategories != null && provider.subcategories.containsKey(child.getKey());
+                                        checked[i] = pickedSubcategories != null && pickedSubcategories.containsKey(child.getKey());
                                         i++;
                                     }
                                 }
@@ -248,7 +286,7 @@ public class ProviderFragment extends Fragment {
                                         .setPositiveButton(R.string.action_pick, new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
-                                                pickingSubcategory = false;
+                                                dialogOpen = false;
                                                 HashMap<String, Boolean> subcategories = new HashMap<>();
                                                 StringBuilder builder = new StringBuilder();
                                                 for (int j = 0; j < checked.length; j++) {
@@ -257,7 +295,7 @@ public class ProviderFragment extends Fragment {
                                                         builder.append(names[j]).append(", ");
                                                     }
                                                 }
-                                                provider.subcategories = subcategories;
+                                                pickedSubcategories = subcategories;
                                                 String txt = builder.toString();
                                                 if (txt.length() > 0) {
                                                     txtSubcategories.setText(txt.substring(0, txt.length() - 2));
@@ -267,7 +305,13 @@ public class ProviderFragment extends Fragment {
                                         .setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
-                                                pickingSubcategory = false;
+                                                dialogOpen = false;
+                                            }
+                                        })
+                                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                            @Override
+                                            public void onCancel(DialogInterface dialog) {
+                                                dialogOpen = false;
                                             }
                                         })
                                         .create()
@@ -276,14 +320,14 @@ public class ProviderFragment extends Fragment {
 
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
-                                pickingSubcategory = false;
+                                dialogOpen = false;
                             }
                         }
                 );
         return true;
     }
 
-    @Touch(resName = "txt_location")
+    @Touch(R2.id.txt_location)
     boolean editLocation(View v, MotionEvent event) {
         if (locationPickerStarted || event.getAction() != MotionEvent.ACTION_UP) return true;
         startLocationPicker();
@@ -335,50 +379,24 @@ public class ProviderFragment extends Fragment {
     }
 
     private void setupCityPicker() {
-        final List<String> cityNames = new ArrayList<>();
-        final ArrayAdapter<City> cityArrayAdapter = new ArrayAdapter<>(
-                getActivity(), android.R.layout.simple_list_item_1,
-                new ArrayList<City>());
-
-        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_loading_subcategories), 500L);
-        FirebaseDatabase.getInstance().getReference()
-                .child("app/cities")
-                .child(preferences.country().get())
-                .addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        final City city = dataSnapshot.getValue(City.class);
-                        city.key = dataSnapshot.getKey();
-                        cityArrayAdapter.add(city);
-                        cityNames.add(city.getLocalName());
-                    }
-
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                    }
-
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
+        progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_loading_cities), 500L);
         FirebaseDatabase.getInstance().getReference()
                 .child("app/cities")
                 .child(preferences.country().get())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
+                        final List<String> cityNames = new ArrayList<>();
+                        final ArrayAdapter<City> cityArrayAdapter = new ArrayAdapter<>(
+                                getActivity(), android.R.layout.simple_list_item_1,
+                                new ArrayList<City>());
+
+                        for (DataSnapshot child : dataSnapshot.getChildren()) {
+                            final City city = child.getValue(City.class);
+                            city.key = child.getKey();
+                            cityArrayAdapter.add(city);
+                            cityNames.add(city.getLocalName());
+                        }
                         progressDialog.dismiss();
                         progressDialog.cancel();
                         setCityListeners(cityNames, cityArrayAdapter);
@@ -403,7 +421,7 @@ public class ProviderFragment extends Fragment {
         txtCity.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                provider.city = cityArrayAdapter.getItem(position).key;
+                pickedCity = cityArrayAdapter.getItem(position).key;
                 txtCity.onEditorAction(EditorInfo.IME_ACTION_NEXT);
             }
         });
@@ -411,7 +429,7 @@ public class ProviderFragment extends Fragment {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 txtCity.dismissDropDown();
-                if (provider.city == null) {
+                if (pickedCity == null) {
                     layoutCity.setError(getString(R.string.provider_error_city));
                     layoutCity.setErrorEnabled(true);
                     return true;
@@ -434,10 +452,33 @@ public class ProviderFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
                 int position = cityNames.indexOf(s.toString());
-                if (position < 0 || cityArrayAdapter.getCount() <= position) provider.city = null;
-                else provider.city = cityArrayAdapter.getItem(position).key;
+                if (position < 0 || cityArrayAdapter.getCount() <= position) pickedCity = null;
+                else pickedCity = cityArrayAdapter.getItem(position).key;
             }
         });
+    }
+
+    @Touch(R2.id.txt_hours)
+    boolean editHours(MotionEvent event) {
+        if (dialogOpen || event.getAction() != MotionEvent.ACTION_UP) return true;
+        dialogOpen = true;
+
+        HoursEditDialog hoursEditDialog = HoursEditDialog_.builder().providerKey(providerKey).build();
+        hoursEditDialog.setHoursEditDialogListener(new HoursEditDialog.HoursEditDialogListener() {
+            @Override
+            public void onHoursSet(OpenHours hours) {
+                setHours = hours;
+                dialogOpen = false;
+            }
+
+            @Override
+            public void onCancelled() {
+                dialogOpen = false;
+            }
+        });
+        hoursEditDialog.show(getFragmentManager(), "HoursEditDialog");
+
+        return true;
     }
 
     private boolean validate() {
@@ -462,8 +503,12 @@ public class ProviderFragment extends Fragment {
             layoutAddress.setError(getString(R.string.provider_error_address));
             valid = false;
         }
-        if (provider.city == null) {
+        if (pickedCity == null) {
             layoutCity.setError(getString(R.string.provider_error_city));
+            valid = false;
+        }
+        if (setHours == null || !setHours.areValid()) {
+            layoutHours.setError(getString(R.string.provider_error_hours));
             valid = false;
         }
         return valid;
@@ -478,71 +523,84 @@ public class ProviderFragment extends Fragment {
         provider.phone = txtPhone.getText().toString();
         provider.web = txtWeb.getText().toString();
         provider.email = txtEmail.getText().toString();
-        provider.hours = txtHours.getText().toString();
+        provider.hours = setHours;
 
         progressDialog = DelayedProgressDialog.show(getContext(), null, getString(R.string.msg_provider_saving), 500L);
+        final HashMap<String, Object> childUpdates = new HashMap<>();
+
+        final GeoLocation location = new GeoLocation(provider.location.latitude, provider.location.longitude);
+        GeoHash geoHash = new GeoHash(location);
+        Map<String, Object> geoUpdates = new HashMap<>();
+        geoUpdates.put(".priority", geoHash.getGeoHashString());
+        geoUpdates.put("g", geoHash.getGeoHashString());
+        geoUpdates.put("l", Arrays.asList(location.latitude, location.longitude));
+
+        if (providerKey == null) {
+            providerKey = FirebaseDatabase.getInstance().getReference()
+                    .child("providers")
+                    .child(preferences.country().get())
+                    .child("data")
+                    .push().getKey();
+        } else {
+            // Remove from old locations
+            for (String subcategoryKey : provider.subcategories.keySet()) {
+                childUpdates.put(String.format("/providers/%s/bySubcategory/%s/%s/",
+                        preferences.country().get(),
+                        subcategoryKey,
+                        providerKey),
+                        null);
+                childUpdates.put(String.format("/providers/%s/bySubcategoryAndCity/%s/%s/",
+                        preferences.country().get(),
+                        subcategoryKey + provider.city,
+                        providerKey),
+                        null);
+                childUpdates.put(String.format("/geofire/providers/bySubcategory/%s/%s",
+                        subcategoryKey,
+                        providerKey),
+                        null);
+            }
+            childUpdates.put(String.format("/geofire/providers/byCategory/%s/%s/",
+                    provider.category,
+                    providerKey),
+                    null);
+        }
+
+        provider.city = pickedCity;
+        provider.category = pickedCategory;
+        provider.subcategories = pickedSubcategories;
+
+        childUpdates.put(String.format("/providers/%s/data/%s/",
+                preferences.country().get(),
+                providerKey),
+                provider.toMap());
+
+
+        for (String subcategoryKey : provider.subcategories.keySet()) {
+            childUpdates.put(String.format("/providers/%s/bySubcategory/%s/%s/",
+                    preferences.country().get(),
+                    subcategoryKey,
+                    providerKey),
+                    true);
+            childUpdates.put(String.format("/providers/%s/bySubcategoryAndCity/%s/%s/",
+                    preferences.country().get(),
+                    subcategoryKey + provider.city,
+                    providerKey),
+                    true);
+            childUpdates.put(String.format("/geofire/providers/bySubcategory/%s/%s",
+                    subcategoryKey,
+                    providerKey),
+                    geoUpdates);
+        }
+        childUpdates.put(String.format("/geofire/providers/byCategory/%s/%s/",
+                provider.category,
+                providerKey),
+                geoUpdates);
+
         FirebaseDatabase.getInstance().getReference()
-                .child("app/subcategories")
-                .child(provider.category)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+                .updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        final Iterable<DataSnapshot> children = dataSnapshot.getChildren();
-                        final HashMap<String, Object> childUpdates = new HashMap<>();
-
-                        final GeoLocation location = new GeoLocation(provider.location.latitude, provider.location.longitude);
-                        GeoHash geoHash = new GeoHash(location);
-                        Map<String, Object> geoUpdates = new HashMap<>();
-                        geoUpdates.put(".priority", geoHash.getGeoHashString());
-                        geoUpdates.put("g", geoHash.getGeoHashString());
-                        geoUpdates.put("l", Arrays.asList(location.latitude, location.longitude));
-
-                        if (providerKey == null) {
-                            providerKey = FirebaseDatabase.getInstance().getReference()
-                                    .child("providers")
-                                    .child(preferences.country().get())
-                                    .child("data")
-                                    .push().getKey();
-                        }
-
-                        childUpdates.put(String.format("/providers/%s/data/%s/",
-                                preferences.country().get(),
-                                providerKey),
-                                provider.toMap());
-
-                        for (DataSnapshot child : children) {
-                            String subcategory = child.getKey();
-                            boolean isInSubcategory = provider.subcategories.containsKey(subcategory);
-                            childUpdates.put(String.format("/providers/%s/bySubcategory/%s/%s/",
-                                    preferences.country().get(),
-                                    subcategory,
-                                    providerKey),
-                                    isInSubcategory ? true : null);
-                            childUpdates.put(String.format("/geofire/providers/byCategory/%s/%s/",
-                                    provider.category,
-                                    providerKey),
-                                    isInSubcategory ? geoUpdates : null);
-                            childUpdates.put(String.format("/geofire/providers/bySubcategory/%s/%s",
-                                    subcategory,
-                                    providerKey),
-                                    isInSubcategory ? geoUpdates : null);
-                        }
-
-                        FirebaseDatabase.getInstance().getReference()
-                                .updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
-                                    @Override
-                                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                                        listener.onProviderSavedListener(providerKey, databaseError == null);
-
-                                        progressDialog.dismiss();
-                                        progressDialog.cancel();
-                                    }
-                                });
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        listener.onProviderSavedListener(providerKey, false);
+                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                        listener.onProviderSavedListener(providerKey, databaseError == null);
 
                         progressDialog.dismiss();
                         progressDialog.cancel();
@@ -560,7 +618,7 @@ public class ProviderFragment extends Fragment {
         txtPhone.setText(provider.phone);
         txtWeb.setText(provider.web);
         txtEmail.setText(provider.email);
-        txtHours.setText(provider.hours);
+        if (provider.hours != null) txtHours.setText(provider.hours.printHoursToday());
 
         layoutName.setVisibility(editable ? View.VISIBLE : View.GONE);
         layoutLocation.setVisibility(editable ? View.VISIBLE : View.GONE);
@@ -634,21 +692,23 @@ public class ProviderFragment extends Fragment {
         }
     }
 
-    private class ProviderChangedListener implements ValueEventListener {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            final Provider newProvider = dataSnapshot.getValue(Provider.class);
-            if (newProvider == null) return;
+    @Override
+    public void onDataChange(DataSnapshot dataSnapshot) {
+        final Provider newProvider = dataSnapshot.getValue(Provider.class);
+        if (newProvider == null) return;
 
-            provider = newProvider;
-            provider.key = dataSnapshot.getKey();
-            bindToProvider(provider);
-        }
+        provider = newProvider;
+        provider.key = dataSnapshot.getKey();
+        bindToProvider(provider);
 
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
+        pickedCategory = provider.category;
+        pickedSubcategories = provider.subcategories;
+        pickedCity = provider.city;
+    }
 
-        }
+    @Override
+    public void onCancelled(DatabaseError databaseError) {
+
     }
 
     @SuppressWarnings("WeakerAccess")

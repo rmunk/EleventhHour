@@ -88,7 +88,7 @@ public class PanelFirebaseMessagingService extends FirebaseMessagingService {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "eleventh_hour_panel")
                 .setSmallIcon(R.drawable.ic_icon_panel)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent)
