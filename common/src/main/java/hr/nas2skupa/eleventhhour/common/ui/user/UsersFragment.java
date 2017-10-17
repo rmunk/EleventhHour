@@ -9,7 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
-import android.widget.TextView;
+import android.widget.ProgressBar;
 
 import com.firebase.ui.database.FirebaseIndexRecyclerAdapter;
 import com.google.firebase.database.DataSnapshot;
@@ -35,7 +35,10 @@ public abstract class UsersFragment extends Fragment {
 
     protected abstract Query getKeyRef();
 
-    protected abstract boolean showAddUser();
+    protected abstract void onUserSelected(User user);
+
+    @ViewById
+    protected ProgressBar loader;
 
     public UsersFragment() {
         // Required empty public constructor
@@ -62,7 +65,7 @@ public abstract class UsersFragment extends Fragment {
     }
 
     @ViewById
-    public void recyclerView(RecyclerView recyclerView) {
+    protected void recyclerView(RecyclerView recyclerView) {
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(manager);
         recyclerView.setItemAnimator(new SlideInUpAnimator(new OvershootInterpolator(0.1f)));
@@ -71,22 +74,16 @@ public abstract class UsersFragment extends Fragment {
         recyclerView.setAdapter(adapter);
     }
 
-/*
-    @ViewById
-    void fabAddUser(FloatingActionButton fabAddUser) {
-        fabAddUser.setVisibility(showAddUser() ? View.VISIBLE : View.GONE);
-    }
-
-    @Click(resName = "fab_add_user")
-    void addUser() {
-        // TODO: 13/10/2017 Add provider
-    }
-*/
-
-    public static class UsersAdapter extends FirebaseIndexRecyclerAdapter<User, UserViewHolder> {
+    protected class UsersAdapter extends FirebaseIndexRecyclerAdapter<User, UserViewHolder> {
 
         public UsersAdapter(Class<User> modelClass, @LayoutRes int modelLayout, Class<UserViewHolder> viewHolderClass, Query keyQuery, DatabaseReference dataRef) {
             super(modelClass, modelLayout, viewHolderClass, keyQuery, dataRef);
+        }
+
+        @Override
+        public void onDataChanged() {
+            super.onDataChanged();
+            loader.setVisibility(View.GONE);
         }
 
         @Override
@@ -95,27 +92,13 @@ public abstract class UsersFragment extends Fragment {
         }
 
         @Override
-        protected void populateViewHolder(UserViewHolder holder, User user, int position) {
+        protected void populateViewHolder(UserViewHolder holder, final User user, int position) {
             user.key = getRef(position).getKey();
             holder.bindToUser(user);
-        }
-    }
-
-    public static class UserViewHolder extends RecyclerView.ViewHolder {
-        private TextView titleView;
-
-        public UserViewHolder(View itemView) {
-            super(itemView);
-
-            titleView = itemView.findViewById(R.id.txt_name);
-        }
-
-        public void bindToUser(User user) {
-            titleView.setText(user.name);
-            itemView.setOnClickListener(new View.OnClickListener() {
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO: 13/10/2017 Open user details
+                    onUserSelected(user);
                 }
             });
         }

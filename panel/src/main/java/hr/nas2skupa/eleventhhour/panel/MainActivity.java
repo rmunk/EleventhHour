@@ -19,6 +19,8 @@ import org.androidannotations.annotations.ViewById;
 
 import hr.nas2skupa.eleventhhour.auth.SignInActivity;
 import hr.nas2skupa.eleventhhour.common.ui.provider.ProviderDetailsActivity_;
+import hr.nas2skupa.eleventhhour.panel.clients.ClientsFragment;
+import hr.nas2skupa.eleventhhour.panel.clients.ClientsFragment_;
 
 @EActivity(R.layout.activity_main)
 public class MainActivity extends DrawerActivity implements FirebaseAuth.AuthStateListener {
@@ -108,6 +110,7 @@ public class MainActivity extends DrawerActivity implements FirebaseAuth.AuthSta
                 ProviderDetailsActivity_.intent(this).providerKey(providerKey).start();
                 break;
             case ACTION_CLIENTS:
+                toolbar.setTitle(R.string.title_fragment_clients);
                 if (getSupportFragmentManager().findFragmentByTag("ClientsFragment") == null) {
                     ClientsFragment clientsFragment = ClientsFragment_.builder().providerKey(providerKey).build();
                     getSupportFragmentManager().beginTransaction()

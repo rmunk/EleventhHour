@@ -220,7 +220,7 @@ public class CalendarFragment extends Fragment {
             @Override
             protected void populateViewHolder(final BookingViewHolder viewHolder, final Booking model, final int position) {
                 model.key = getRef(position).getKey();
-                viewHolder.bind(getContext(), model);
+                viewHolder.bind(model);
             }
         };
         recyclerView.setAdapter(adapter);

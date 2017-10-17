@@ -32,6 +32,9 @@
             android:name=".MainActivity_"
             android:screenOrientation="portrait">
         </activity>
+        <activity
+            android:name=".clients.ClientDetailsActivity_"
+            android:screenOrientation="portrait"/>
 
         <service android:name=".PanelBookingService"/>
         <service

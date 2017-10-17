@@ -1,4 +1,4 @@
-package hr.nas2skupa.eleventhhour.panel;
+package hr.nas2skupa.eleventhhour.panel.clients;
 
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
@@ -6,6 +6,7 @@ import com.google.firebase.database.Query;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 
+import hr.nas2skupa.eleventhhour.common.model.User;
 import hr.nas2skupa.eleventhhour.common.ui.user.UsersFragment;
 
 /**
@@ -24,7 +25,7 @@ public class ClientsFragment extends UsersFragment {
     }
 
     @Override
-    protected boolean showAddUser() {
-        return false;
+    protected void onUserSelected(User user) {
+        ClientDetailsActivity_.intent(getContext()).userKey(user.key).start();
     }
 }

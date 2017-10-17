@@ -14,6 +14,8 @@
     <string name="action_pick">Pick</string>
     <string name="action_all">All</string>
     <string name="action_undo">Undo</string>
+    <string name="action_rate">Rate</string>
+    <string name="action_flag">Flag</string>
 
     <!-- Navigation drawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
