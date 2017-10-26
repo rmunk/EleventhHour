@@ -16,6 +16,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateFormat;
 import android.transition.Fade;
 import android.transition.Slide;
 import android.view.Gravity;
@@ -247,13 +248,13 @@ public class ServicesFragment extends Fragment implements
         LocalDate pickedDate = new LocalDate(year, monthOfYear + 1, dayOfMonth);
         DailyHours pickedHours = this.hours.getHours(pickedDate.getDayOfWeek());
         LocalDateTime now = new LocalDateTime();
-        now = now.withMinuteOfHour(15 - now.getMinuteOfHour() % 15).withSecondOfMinute(0).withMillisOfSecond(0);
+        now = now.plusMinutes(15 - now.getMinuteOfHour() % 15).withSecondOfMinute(0).withMillisOfSecond(0);
 
         LocalDateTime opens = new LocalDateTime().withFields(pickedDate).withFields(pickedHours.getFromDate());
         LocalDateTime closes = new LocalDateTime().withFields(pickedDate).withFields(pickedHours.getToDate())
                 .minusMinutes(selectedService.duration);
 
-        TimePickerDialog tpd = TimePickerDialog.newInstance(ServicesFragment.this, true);
+        TimePickerDialog tpd = TimePickerDialog.newInstance(ServicesFragment.this, DateFormat.is24HourFormat(getContext()));
         tpd.setTitle(selectedService.name);
         tpd.setTimeInterval(1, 15);
 
