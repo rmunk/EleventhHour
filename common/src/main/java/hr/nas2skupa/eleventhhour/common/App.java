@@ -8,6 +8,8 @@ import com.google.firebase.FirebaseException;
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.FirebaseDatabase;
 
+import net.danlew.android.joda.JodaTimeAndroid;
+
 import timber.log.Timber;
 
 /**
@@ -35,6 +37,8 @@ public class App extends Application {
         } else {
             Timber.plant(new CrashReportingTree());
         }
+
+        JodaTimeAndroid.init(this);
     }
 
     /**

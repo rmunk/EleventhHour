@@ -57,6 +57,7 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:2.7.5'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.7.5'
 
+    compile 'net.danlew:android.joda:2.9.9'
     compile 'com.jakewharton.timber:timber:4.5.1'
     compile 'jp.wasabeef:recyclerview-animators:2.2.4'
     compile 'com.mikepenz:materialize:1.0.0@aar'
