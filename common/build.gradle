@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.jakewharton.butterknife'
+apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion compileSdk
@@ -47,11 +48,14 @@ dependencies {
     compile "com.google.firebase:firebase-core:$firebaseVersion"
     compile "com.google.firebase:firebase-auth:$firebaseVersion"
     compile "com.google.firebase:firebase-database:$firebaseVersion"
-    compile "com.google.firebase:firebase-crash:$firebaseVersion"
     compile "com.google.firebase:firebase-messaging:$firebaseVersion"
 
     compile "com.firebaseui:firebase-ui-database:$firebaseUIVersion"
     compile 'com.firebase:geofire-android:2.1.1'
+
+    compile('com.crashlytics.sdk.android:crashlytics:2.7.1@aar') {
+        transitive = true
+    }
 
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.okhttp:okhttp:2.7.5'

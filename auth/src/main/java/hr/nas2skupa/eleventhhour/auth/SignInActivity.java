@@ -4,12 +4,15 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
@@ -60,7 +63,13 @@ public class SignInActivity extends AppCompatActivity {
 
             // Successfully signed in
             if (resultCode == RESULT_OK && auth.getCurrentUser() != null) {
-                saveUserInfo(auth.getCurrentUser());
+                FirebaseUser user = auth.getCurrentUser();
+
+                Crashlytics.setUserIdentifier(user.getUid());
+                Crashlytics.setUserName(user.getDisplayName());
+                Crashlytics.setUserEmail(user.getEmail());
+
+                saveUserInfo(user);
                 startApplication();
                 return;
             } else {
@@ -97,7 +106,13 @@ public class SignInActivity extends AppCompatActivity {
         FirebaseDatabase.getInstance().getReference()
                 .child("users/data")
                 .child(currentUser.getUid())
-                .updateChildren(userMap);
+                .updateChildren(userMap)
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Timber.e(e, "Failed to save user data to database");
+                    }
+                });
     }
 
     private void startApplication() {

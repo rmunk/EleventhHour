@@ -4,12 +4,12 @@ import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.firebase.FirebaseException;
-import com.google.firebase.crash.FirebaseCrash;
+import com.crashlytics.android.Crashlytics;
 import com.google.firebase.database.FirebaseDatabase;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
+import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 
 /**
@@ -35,6 +35,7 @@ public class App extends Application {
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         } else {
+            Fabric.with(this, new Crashlytics());
             Timber.plant(new CrashReportingTree());
         }
 
@@ -50,9 +51,9 @@ public class App extends Application {
             if (priority == Log.VERBOSE || priority == Log.DEBUG) {
                 return;
             }
-            FirebaseCrash.logcat(priority, tag, message);
-            if (t != null) FirebaseCrash.report(t);
-            else if (priority == Log.ERROR) FirebaseCrash.report(new FirebaseException(message));
+            Crashlytics.log(priority, tag, message);
+            if (t != null) Crashlytics.logException(t);
+            else if (priority == Log.ERROR) Crashlytics.logException(new RuntimeException(message));
         }
     }
 }
