@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.perf.FirebasePerformance;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
@@ -36,6 +37,7 @@ public class App extends Application {
             Timber.plant(new Timber.DebugTree());
         } else {
             Fabric.with(this, new Crashlytics());
+            FirebasePerformance.getInstance().setPerformanceCollectionEnabled(true);
             Timber.plant(new CrashReportingTree());
         }
 
@@ -48,12 +50,9 @@ public class App extends Application {
     private static class CrashReportingTree extends Timber.Tree {
         @Override
         protected void log(int priority, String tag, String message, Throwable t) {
-            if (priority == Log.VERBOSE || priority == Log.DEBUG) {
-                return;
-            }
-            Crashlytics.log(priority, tag, message);
             if (t != null) Crashlytics.logException(t);
             else if (priority == Log.ERROR) Crashlytics.logException(new RuntimeException(message));
+            else if (priority >= Log.INFO) Crashlytics.log(priority, tag, message);
         }
     }
 }
