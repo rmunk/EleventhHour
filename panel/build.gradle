@@ -22,10 +22,8 @@ android {
         }
     }
     applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-            output.outputFile = new File(
-                    output.outputFile.parent,
-                    "eleventh-hour-panel-${variant.versionName}.apk")
+        variant.outputs.all {
+            outputFileName = "eleventh-hour-panel-${variant.versionName}.apk"
         }
     }
 }
