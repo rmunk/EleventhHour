@@ -8,6 +8,7 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 buildscript {
     repositories {
         jcenter()
+        google()
         maven { url 'https://maven.fabric.io/public' }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     }
@@ -67,6 +68,16 @@ subprojects {
         dependencies {
             annotationProcessor "org.androidannotations:androidannotations:$androidAnnotationsVersion"
             compile "org.androidannotations:androidannotations-api:$androidAnnotationsVersion"
+        }
+        configurations.all {
+            resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+                def requested = details.requested
+                if (requested.group == 'com.android.support') {
+                    if (!requested.name.startsWith("multidex")) {
+                        details.useVersion "$supportLibraryVersion"
+                    }
+                }
+            }
         }
     }
 }

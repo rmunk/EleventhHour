@@ -213,6 +213,50 @@
           "status": 2
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:941408115461:android:728fed3654f318d1",
+        "android_client_info": {
+          "package_name": "hr.nas2skupa.eleventhhour.common"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "941408115461-t7qqh1r02ukngc44juo5169sashgd4t2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "hr.nas2skupa.eleventhhour.common",
+            "certificate_hash": "5c38578aa02b4058d8373ddad65a5cbb1eb5cc37"
+          }
+        },
+        {
+          "client_id": "941408115461-nvs2ho150otl1c4p7shhs6bkalc2fjm8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAl-foVHAxkoSOrgOIjb1u7xrtsXzSMvFQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "941408115461-nvs2ho150otl1c4p7shhs6bkalc2fjm8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
     }
   ],
   "configuration_version": "1"
