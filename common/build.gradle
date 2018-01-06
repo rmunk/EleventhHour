@@ -32,47 +32,48 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    api fileTree(dir: 'libs', include: ['*.jar'])
 
     api "com.android.support:support-v4:$supportLibraryVersion"
+    api "com.android.support:support-v13:$supportLibraryVersion"
     api "com.android.support:appcompat-v7:$supportLibraryVersion"
-    implementation "com.android.support:design:$supportLibraryVersion"
-    implementation "com.android.support:customtabs:$supportLibraryVersion"
-    implementation "com.android.support:cardview-v7:$supportLibraryVersion"
-    implementation "com.android.support:recyclerview-v7:$supportLibraryVersion"
-    implementation "com.android.support:palette-v7:$supportLibraryVersion"
-    implementation "com.android.support.constraint:constraint-layout:$constraintLayoutVersion"
+    api "com.android.support:design:$supportLibraryVersion"
+    api "com.android.support:customtabs:$supportLibraryVersion"
+    api "com.android.support:cardview-v7:$supportLibraryVersion"
+    api "com.android.support:recyclerview-v7:$supportLibraryVersion"
+    api "com.android.support:palette-v7:$supportLibraryVersion"
+    api "com.android.support.constraint:constraint-layout:$constraintLayoutVersion"
 
-    implementation "com.google.android.gms:play-services-auth:$playServicesVersion"
-    implementation "com.google.android.gms:play-services-maps:$playServicesVersion"
-    implementation "com.google.android.gms:play-services-location:$playServicesVersion"
-    implementation "com.google.android.gms:play-services-places:$playServicesVersion"
+    api "com.google.android.gms:play-services-auth:$playServicesVersion"
+    api "com.google.android.gms:play-services-maps:$playServicesVersion"
+    api "com.google.android.gms:play-services-location:$playServicesVersion"
+    api "com.google.android.gms:play-services-places:$playServicesVersion"
 
-    implementation "com.google.firebase:firebase-core:$firebaseVersion"
-    implementation "com.google.firebase:firebase-auth:$firebaseVersion"
-    implementation "com.google.firebase:firebase-database:$firebaseVersion"
-    implementation "com.google.firebase:firebase-messaging:$firebaseVersion"
-    implementation "com.google.firebase:firebase-perf:$firebaseVersion"
+    api "com.google.firebase:firebase-core:$firebaseVersion"
+    api "com.google.firebase:firebase-auth:$firebaseVersion"
+    api "com.google.firebase:firebase-database:$firebaseVersion"
+    api "com.google.firebase:firebase-messaging:$firebaseVersion"
+    api "com.google.firebase:firebase-perf:$firebaseVersion"
 
-    implementation "com.firebaseui:firebase-ui-auth:$firebaseUIVersion"
-    implementation "com.firebaseui:firebase-ui-database:$firebaseUIVersion"
-    implementation 'com.firebase:geofire-android:2.2.0'
+    api "com.firebaseui:firebase-ui-auth:$firebaseUIVersion"
+    api "com.firebaseui:firebase-ui-database:$firebaseUIVersion"
+    api 'com.firebase:geofire-android:2.2.0'
 
-    implementation('com.crashlytics.sdk.android:crashlytics:2.8.0@aar') {
+    api('com.crashlytics.sdk.android:crashlytics:2.8.0@aar') {
         transitive = true
     }
 
-    implementation 'com.squareup.picasso:picasso:2.5.2'
-//    implementation 'com.squareup.okhttp3:okhttp:3.9.1'
-//    implementation 'com.squareup.okhttp:okhttp-urlconnection:3.9.1'
+    api 'com.squareup.picasso:picasso:2.5.2'
+//    api 'com.squareup.okhttp3:okhttp:3.9.1'
+//    api 'com.squareup.okhttp:okhttp-urlconnection:3.9.1'
 
-    implementation 'net.danlew:android.joda:2.9.9'
-    implementation 'com.jakewharton.timber:timber:4.5.1'
-    implementation 'jp.wasabeef:recyclerview-animators:2.2.7'
-    implementation 'com.mikepenz:materialize:1.0.0@aar'
-    implementation 'com.wdullaer:materialdatetimepicker:3.3.1'
+    api 'net.danlew:android.joda:2.9.9'
+    api 'com.jakewharton.timber:timber:4.5.1'
+    api 'jp.wasabeef:recyclerview-animators:2.2.7'
+    api 'com.mikepenz:materialize:1.0.0@aar'
+    api 'com.wdullaer:materialdatetimepicker:3.3.1'
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
+    api "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
 }
 
 apply plugin: 'com.google.gms.google-services'
