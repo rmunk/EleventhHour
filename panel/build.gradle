@@ -21,26 +21,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-            output.outputFile = new File(
-                    output.outputFile.parent,
-                    "eleventh-hour-panel-${variant.versionName}.apk")
-        }
-    }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':auth')
-    compile project(':common')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(':auth')
+    implementation project(':common')
 
-    compile 'com.github.alamkanak:android-week-view:1.2.6'
-
-    testCompile 'junit:junit:4.12'
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
+    implementation 'com.github.alamkanak:android-week-view:1.2.6'
 }
 
 apply plugin: 'com.google.gms.google-services'
