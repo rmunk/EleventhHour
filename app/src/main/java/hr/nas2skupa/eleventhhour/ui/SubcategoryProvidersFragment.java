@@ -103,7 +103,7 @@ public class SubcategoryProvidersFragment extends ProvidersFragment implements V
             @Override
             public void onCityPicked(City city) {
                 preferences.city().put(city.key);
-                adapter.cleanup();
+                adapter.stopListening();
                 adapter = new ProvidersAdapter(filterSale, sortByName);
                 recyclerView.swapAdapter(adapter, false);
                 menuPickCity.setTitle(city.getLocalName());
@@ -113,7 +113,7 @@ public class SubcategoryProvidersFragment extends ProvidersFragment implements V
             @Override
             public void onAllSelected() {
                 preferences.city().remove();
-                adapter.cleanup();
+                adapter.stopListening();
                 adapter = new ProvidersAdapter(filterSale, sortByName);
                 recyclerView.swapAdapter(adapter, false);
                 menuPickCity.setTitle(R.string.pick_city_all_cities);

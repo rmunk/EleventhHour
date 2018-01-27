@@ -20,10 +20,13 @@ import android.text.format.DateFormat;
 import android.transition.Fade;
 import android.transition.Slide;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -83,7 +86,6 @@ public class ServicesFragment extends Fragment implements
     private Service selectedService;
     private GregorianCalendar pickedDateTime;
     private boolean undo = false;
-    private FirebaseRecyclerAdapter<Service, ServiceViewHolder> adapter;
     private OpenHours hours;
 
     public ServicesFragment() {
@@ -111,23 +113,25 @@ public class ServicesFragment extends Fragment implements
                 .child(providerKey)
                 .child("data")
                 .orderByChild("name");
-        adapter = new FirebaseRecyclerAdapter<Service, ServiceViewHolder>(
-                Service.class,
-                R.layout.item_service,
-                ServiceViewHolder.class,
-                query) {
-            @Override
-            protected void populateViewHolder(final ServiceViewHolder viewHolder, final Service model, final int position) {
-                viewHolder.bindToService(model);
-                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        final DatabaseReference categoryRef = getRef(position);
-                        serviceKey = categoryRef.getKey();
-                        selectedService = model;
+        FirebaseRecyclerOptions<Service> options = new FirebaseRecyclerOptions.Builder<Service>()
+                .setQuery(query, Service.class)
+                .setLifecycleOwner(this)
+                .build();
+        FirebaseRecyclerAdapter<Service, ServiceViewHolder> adapter = new FirebaseRecyclerAdapter<Service, ServiceViewHolder>(options) {
 
-                        showDatePicker(model);
-                    }
+            @Override
+            public ServiceViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                return new ServiceViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_service, parent, false));
+            }
+
+            @Override
+            protected void onBindViewHolder(final ServiceViewHolder viewHolder, final int position, final Service model) {
+                viewHolder.bind(model);
+                viewHolder.itemView.setOnClickListener(view -> {
+                    final DatabaseReference categoryRef = getRef(position);
+                    serviceKey = categoryRef.getKey();
+                    selectedService = model;
+                    showDatePicker(model);
                 });
             }
         };
@@ -157,13 +161,6 @@ public class ServicesFragment extends Fragment implements
 
                     }
                 });
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if (adapter != null) adapter.cleanup();
     }
 
     private void showDatePicker(final Service service) {

@@ -9,10 +9,13 @@ import android.support.v4.util.Pair;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
@@ -30,8 +33,6 @@ public class HomeFragment extends Fragment {
     @ViewById(R.id.categories_list)
     RecyclerView recyclerView;
 
-    private FirebaseRecyclerAdapter<Category, CategoryViewHolder> adapter;
-
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -48,14 +49,22 @@ public class HomeFragment extends Fragment {
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         Query query = database.child("app/categories");
-        adapter = new FirebaseRecyclerAdapter<Category, CategoryViewHolder>(Category.class, R.layout.item_category
-                , CategoryViewHolder.class, query) {
+        FirebaseRecyclerOptions<Category> options = new FirebaseRecyclerOptions.Builder<Category>()
+                .setQuery(query, Category.class)
+                .setLifecycleOwner(this)
+                .build();
+        FirebaseRecyclerAdapter<Category, CategoryViewHolder> adapter = new FirebaseRecyclerAdapter<Category, CategoryViewHolder>(options) {
             @Override
-            protected void populateViewHolder(final CategoryViewHolder viewHolder, final Category model, int position) {
+            public CategoryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                return new CategoryViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_category, parent, false));
+            }
+
+            @Override
+            protected void onBindViewHolder(final CategoryViewHolder viewHolder, int position, final Category model) {
                 final DatabaseReference categoryRef = getRef(position);
                 final String categoryKey = categoryRef.getKey();
 
-                viewHolder.bindToCategory(model);
+                viewHolder.bind(model);
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -65,13 +74,6 @@ public class HomeFragment extends Fragment {
             }
         };
         recyclerView.setAdapter(adapter);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if (adapter != null) adapter.cleanup();
     }
 
     private void startCategoryActivity(View card, String categoryKey) {

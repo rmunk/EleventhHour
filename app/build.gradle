@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.firebase.firebase-perf'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion compileSdk
@@ -9,6 +11,7 @@ android {
         applicationId "hr.nas2skupa.eleventhhour"
         minSdkVersion minSdk
         targetSdkVersion targetSdk
+        multiDexEnabled true
         versionCode unifiedVersionCode
         versionName unifiedVersionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

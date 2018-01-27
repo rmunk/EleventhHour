@@ -9,6 +9,7 @@ android {
         applicationId "hr.nas2skupa.eleventhhour.panel"
         minSdkVersion minSdk
         targetSdkVersion targetSdk
+        multiDexEnabled true
         versionCode unifiedVersionCode
         versionName unifiedVersionName
 

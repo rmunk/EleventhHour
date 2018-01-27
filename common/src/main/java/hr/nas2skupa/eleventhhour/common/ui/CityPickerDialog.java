@@ -1,9 +1,7 @@
 package hr.nas2skupa.eleventhhour.common.ui;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -19,7 +17,9 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 
+import com.firebase.ui.common.ChangeEventType;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
@@ -68,28 +68,19 @@ public class CityPickerDialog extends DialogFragment implements SearchView.OnQue
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         final LayoutInflater inflater = getActivity().getLayoutInflater();
         view = inflater.inflate(R.layout.dialog_city_picker, null);
 
         builder.setView(view)
-                .setPositiveButton(R.string.action_pick, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (listener != null) listener.onCityPicked(pickedCity);
-                    }
+                .setPositiveButton(R.string.action_pick, (dialog, which) -> {
+                    if (listener != null) listener.onCityPicked(pickedCity);
                 })
-                .setNeutralButton(R.string.pick_city_all_cities, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        if (listener != null) listener.onAllSelected();
-                    }
+                .setNeutralButton(R.string.pick_city_all_cities, (dialogInterface, i) -> {
+                    if (listener != null) listener.onAllSelected();
                 })
-                .setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (listener != null) listener.onCancelled();
-                    }
+                .setNegativeButton(R.string.action_cancel, (dialog, which) -> {
+                    if (listener != null) listener.onCancelled();
                 });
 
         return builder.create();
@@ -116,7 +107,11 @@ public class CityPickerDialog extends DialogFragment implements SearchView.OnQue
                 .child(preferences.country().get())
                 .orderByChild("name/" + Utils.getLanguageIso());
 
-        adapter = new CitiesAdapter(City.class, R.layout.item_city, CityViewHolder.class, query);
+        FirebaseRecyclerOptions<City> options = new FirebaseRecyclerOptions.Builder<City>()
+                .setQuery(query, City.class)
+                .setLifecycleOwner(this)
+                .build();
+        adapter = new CitiesAdapter(options);
 
         final LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(manager);
@@ -158,9 +153,10 @@ public class CityPickerDialog extends DialogFragment implements SearchView.OnQue
             }
         });
 
-        CitiesAdapter(Class<City> modelClass, @LayoutRes int modelLayout, Class<CityViewHolder> viewHolderClass, Query query) {
-            super(modelClass, modelLayout, viewHolderClass, query);
+        public CitiesAdapter(FirebaseRecyclerOptions<City> options) {
+            super(options);
         }
+
 
         @Override
         public CityViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -171,23 +167,20 @@ public class CityPickerDialog extends DialogFragment implements SearchView.OnQue
         }
 
         @Override
-        protected void populateViewHolder(CityViewHolder viewHolder, City model, final int position) {
+        protected void onBindViewHolder(CityViewHolder viewHolder, int position, City city) {
             RadioButton text = viewHolder.itemView.findViewById(R.id.txt_name);
-            text.setText(model.getLocalName());
+            text.setText(city.getLocalName());
             text.setChecked(position == selectedPosition);
-            text.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    selectedPosition = position;
-                    notifyDataSetChanged();
-                    pickedCity = getItem(position);
-                    ((AlertDialog) getDialog()).getButton(Dialog.BUTTON_POSITIVE).setEnabled(true);
-                }
+            text.setOnClickListener(view -> {
+                selectedPosition = viewHolder.getAdapterPosition();
+                notifyDataSetChanged();
+                pickedCity = getItem(viewHolder.getAdapterPosition());
+                ((AlertDialog) getDialog()).getButton(Dialog.BUTTON_POSITIVE).setEnabled(true);
             });
         }
 
         @Override
-        public void onChildChanged(EventType type, DataSnapshot snapshot, int index, int oldIndex) {
+        public void onChildChanged(ChangeEventType type, DataSnapshot snapshot, int index, int oldIndex) {
             super.onChildChanged(type, snapshot, index, oldIndex);
             super.getItem(index).key = snapshot.getKey();
             if (!loaded && Objects.equals(snapshot.getKey(), selectedCityKey)) {

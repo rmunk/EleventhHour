@@ -1,7 +1,7 @@
 package hr.nas2skupa.eleventhhour.common;
 
-import android.app.Application;
 import android.content.Context;
+import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -17,7 +17,7 @@ import timber.log.Timber;
  * Created by nas2skupa on 06/04/2017.
  */
 
-public class App extends Application {
+public class App extends MultiDexApplication {
 
     private static Context appContext;
 

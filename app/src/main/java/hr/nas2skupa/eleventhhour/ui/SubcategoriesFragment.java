@@ -3,6 +3,7 @@ package hr.nas2skupa.eleventhhour.ui;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
@@ -11,9 +12,11 @@ import android.support.v7.widget.RecyclerView;
 import android.transition.Fade;
 import android.transition.Slide;
 import android.view.Gravity;
-import android.view.View;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
@@ -41,8 +44,6 @@ public class SubcategoriesFragment extends Fragment {
     @ViewById(R.id.recycler_view)
     RecyclerView recyclerView;
 
-    private FirebaseRecyclerAdapter<Subcategory, SubcategoryViewHolder> adapter;
-
     public SubcategoriesFragment() {
         // Required empty public constructor
     }
@@ -65,33 +66,26 @@ public class SubcategoriesFragment extends Fragment {
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         Query query = database.child("app/subcategories").child(categoryKey).orderByChild("name/" + Utils.getLanguageIso());
-        adapter = new FirebaseRecyclerAdapter<Subcategory, SubcategoryViewHolder>(
-                Subcategory.class,
-                R.layout.item_subcategory,
-                SubcategoryViewHolder.class,
-                query) {
+        FirebaseRecyclerOptions<Subcategory> options = new FirebaseRecyclerOptions.Builder<Subcategory>()
+                .setQuery(query, Subcategory.class)
+                .setLifecycleOwner(this)
+                .build();
+        FirebaseRecyclerAdapter<Subcategory, SubcategoryViewHolder> adapter = new FirebaseRecyclerAdapter<Subcategory, SubcategoryViewHolder>(options) {
             @Override
-            protected void populateViewHolder(final SubcategoryViewHolder viewHolder, Subcategory model, int position) {
+            public SubcategoryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                return new SubcategoryViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_subcategory, parent, false));
+            }
+
+            @Override
+            protected void onBindViewHolder(@NonNull final SubcategoryViewHolder viewHolder, int position, @NonNull Subcategory model) {
                 final DatabaseReference categoryRef = getRef(position);
                 final String subcategoryKey = categoryRef.getKey();
 
-                viewHolder.bindToSubcategory(model);
-                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        EventBus.getDefault().post(new SubcategorySelectedEvent(subcategoryKey));
-                    }
-                });
+                viewHolder.bind(model);
+                viewHolder.itemView.setOnClickListener(view -> EventBus.getDefault().post(new SubcategorySelectedEvent(subcategoryKey)));
             }
         };
         recyclerView.setAdapter(adapter);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if (adapter != null) adapter.cleanup();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)

@@ -4,10 +4,13 @@ package hr.nas2skupa.eleventhhour.common.ui.provider;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
@@ -31,18 +34,10 @@ public class ServicesFragment extends Fragment {
 
     @ViewById RecyclerView recyclerView;
 
-    private FirebaseRecyclerAdapter<Service, ServiceViewHolder> adapter;
     private OnServiceClickListener listener;
 
     public ServicesFragment() {
         // Required empty public constructor
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if (adapter != null) adapter.cleanup();
     }
 
     @AfterViews
@@ -57,7 +52,11 @@ public class ServicesFragment extends Fragment {
                 .child(providerKey)
                 .child("data")
                 .orderByChild("name");
-        adapter = new ServicesAdapter(Service.class, R.layout.item_service, ServiceViewHolder.class, query);
+        FirebaseRecyclerOptions<Service> options = new FirebaseRecyclerOptions.Builder<Service>()
+                .setQuery(query, Service.class)
+                .setLifecycleOwner(this)
+                .build();
+        FirebaseRecyclerAdapter<Service, ServiceViewHolder> adapter = new ServicesAdapter(options);
         recyclerView.setAdapter(adapter);
     }
 
@@ -66,20 +65,23 @@ public class ServicesFragment extends Fragment {
     }
 
     private class ServicesAdapter extends FirebaseRecyclerAdapter<Service, ServiceViewHolder> {
-        public ServicesAdapter(Class<Service> modelClass, int modelLayout, Class<ServiceViewHolder> viewHolderClass, Query ref) {
-            super(modelClass, modelLayout, viewHolderClass, ref);
+        public ServicesAdapter(FirebaseRecyclerOptions<Service> options) {
+            super(options);
         }
 
         @Override
-        protected void populateViewHolder(ServiceViewHolder viewHolder, final Service model, int position) {
-            viewHolder.bindToService(model);
-            model.key = getRef(position).getKey();
-            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (listener != null) listener.onServiceClick(view, providerKey, model.key);
-                }
+        protected void onBindViewHolder(ServiceViewHolder viewHolder, int position, Service service) {
+            super.onBindViewHolder(viewHolder, position);
+            viewHolder.bindToService(service);
+            service.key = getRef(position).getKey();
+            viewHolder.itemView.setOnClickListener(view -> {
+                if (listener != null) listener.onServiceClick(view, providerKey, service.key);
             });
+        }
+
+        @Override
+        public ServiceViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            return new ServiceViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_service, parent, false));
         }
     }
 
