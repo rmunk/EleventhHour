@@ -1,6 +1,7 @@
 package hr.nas2skupa.eleventhhour.panel.clients;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -14,6 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.RatingBar;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -84,12 +86,6 @@ public class ClientDetailsActivity extends DrawerActivity {
         userReference.removeEventListener(userListener);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        adapter.cleanup();
-    }
-
     @OptionsItem(android.R.id.home)
     void homeSelected() {
         onBackPressed();
@@ -126,7 +122,10 @@ public class ClientDetailsActivity extends DrawerActivity {
     private class BookingAdapter extends FirebaseRecyclerAdapter<Booking, ClientBookingViewHolder> {
 
         public BookingAdapter(Query bookingsQuery) {
-            super(Booking.class, R.layout.item_client_booking, ClientBookingViewHolder.class, bookingsQuery);
+            super(new FirebaseRecyclerOptions.Builder<Booking>()
+                    .setQuery(bookingsQuery, Booking.class)
+                    .setLifecycleOwner(ClientDetailsActivity.this)
+                    .build());
         }
 
         @Override
@@ -136,23 +135,18 @@ public class ClientDetailsActivity extends DrawerActivity {
         }
 
         @Override
+        protected void onBindViewHolder(@NonNull final ClientBookingViewHolder viewHolder, int position, @NonNull Booking booking) {
+            booking.key = getRef(position).getKey();
+            viewHolder.bind(booking);
+            viewHolder.itemView.setOnClickListener(v -> BookingDetailsDialog_.builder().bookingKey(booking.key).build()
+                    .show(getSupportFragmentManager(), "BookingDetailsDialog"));
+        }
+
+        @Override
         public ClientBookingViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
             ItemClientBookingBinding itemBinding = ItemClientBookingBinding.inflate(layoutInflater, parent, false);
             return new ClientBookingViewHolder(itemBinding);
-        }
-
-        @Override
-        protected void populateViewHolder(final ClientBookingViewHolder viewHolder, final Booking booking, final int position) {
-            booking.key = getRef(position).getKey();
-            viewHolder.bind(booking);
-            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    BookingDetailsDialog_.builder().bookingKey(booking.key).build()
-                            .show(getSupportFragmentManager(), "BookingDetailsDialog");
-                }
-            });
         }
     }
 
