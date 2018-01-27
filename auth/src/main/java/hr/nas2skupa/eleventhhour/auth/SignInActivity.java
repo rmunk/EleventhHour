@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
@@ -17,6 +18,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 
 public class SignInActivity extends AppCompatActivity {
@@ -42,10 +44,11 @@ public class SignInActivity extends AppCompatActivity {
                 // Get an instance of AuthUI based on the default app
                 AuthUI.getInstance().createSignInIntentBuilder()
                         .setAvailableProviders(Arrays.asList(
-                                new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
-                                new AuthUI.IdpConfig.Builder(AuthUI.PHONE_VERIFICATION_PROVIDER).build(),
-                                new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build(),
-                                new AuthUI.IdpConfig.Builder(AuthUI.FACEBOOK_PROVIDER).build()))
+                                new AuthUI.IdpConfig.EmailBuilder().build(),
+                                new AuthUI.IdpConfig.PhoneBuilder().build(),
+                                new AuthUI.IdpConfig.GoogleBuilder().build(),
+//                                new AuthUI.IdpConfig.TwitterBuilder().build(),
+                                new AuthUI.IdpConfig.FacebookBuilder().build()))
                         .setLogo(R.drawable.logo)
                         .setTheme(R.style.SignInTheme)
                         .build(),
@@ -60,7 +63,15 @@ public class SignInActivity extends AppCompatActivity {
 
             // Successfully signed in
             if (resultCode == RESULT_OK && auth.getCurrentUser() != null) {
-                saveUserInfo(auth.getCurrentUser());
+                FirebaseUser user = auth.getCurrentUser();
+
+                if (Fabric.isInitialized()) {
+                    Crashlytics.setUserIdentifier(user.getUid());
+                    Crashlytics.setUserName(user.getDisplayName());
+                    Crashlytics.setUserEmail(user.getEmail());
+                }
+
+                saveUserInfo(user);
                 startApplication();
                 return;
             } else {
@@ -97,7 +108,8 @@ public class SignInActivity extends AppCompatActivity {
         FirebaseDatabase.getInstance().getReference()
                 .child("users/data")
                 .child(currentUser.getUid())
-                .updateChildren(userMap);
+                .updateChildren(userMap)
+                .addOnFailureListener(e -> Timber.e(e, "Failed to save user data to database"));
     }
 
     private void startApplication() {

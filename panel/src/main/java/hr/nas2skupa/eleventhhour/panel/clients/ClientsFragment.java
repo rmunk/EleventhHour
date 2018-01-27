@@ -25,7 +25,8 @@ public class ClientsFragment extends UsersFragment {
     }
 
     @Override
-    protected void onUserSelected(User user) {
+    protected Void onUserSelected(User user) {
         ClientDetailsActivity_.intent(getContext()).userKey(user.key).start();
+        return null;
     }
 }

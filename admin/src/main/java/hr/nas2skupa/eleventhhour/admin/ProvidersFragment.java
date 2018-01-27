@@ -1,14 +1,16 @@
 package hr.nas2skupa.eleventhhour.admin;
 
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
+import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
@@ -18,6 +20,7 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 
+import hr.nas2skupa.eleventhhour.admin.viewholders.ProviderViewHolder;
 import hr.nas2skupa.eleventhhour.common.Preferences_;
 import hr.nas2skupa.eleventhhour.common.model.Provider;
 import hr.nas2skupa.eleventhhour.common.ui.helpers.SimpleDividerItemDecoration;
@@ -37,8 +40,6 @@ public class ProvidersFragment extends Fragment {
     @ViewById ViewGroup layoutMain;
     @ViewById RecyclerView recyclerView;
 
-    private FirebaseRecyclerAdapter<Provider, ProviderViewHolder> adapter;
-
     public ProvidersFragment() {
         // Required empty public constructor
     }
@@ -55,35 +56,27 @@ public class ProvidersFragment extends Fragment {
                 .child(preferences.country().get())
                 .child("data")
                 .orderByChild("name");
-        adapter = new FirebaseRecyclerAdapter<Provider, ProviderViewHolder>(
-                Provider.class,
-                R.layout.item_provider,
-                ProviderViewHolder.class,
-                query) {
+        FirebaseRecyclerOptions<Provider> options = new FirebaseRecyclerOptions.Builder<Provider>()
+                .setQuery(query, Provider.class)
+                .setLifecycleOwner(this)
+                .build();
+        FirebaseRecyclerAdapter<Provider, ProviderViewHolder> adapter = new FirebaseRecyclerAdapter<Provider, ProviderViewHolder>(options) {
             @Override
-            protected void populateViewHolder(final ProviderViewHolder viewHolder, final Provider model, int position) {
-                viewHolder.bindToProvider(model);
+            public ProviderViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                return new ProviderViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_provider, parent, false));
+            }
+
+            @Override
+            protected void onBindViewHolder(@NonNull final ProviderViewHolder viewHolder, int position, @NonNull Provider model) {
+                viewHolder.bind(model);
                 model.key = getRef(position).getKey();
-                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        ProviderDetailsActivity_.intent(getContext())
-                                .providerKey(model.key)
-                                .start();
-                    }
-                });
+                viewHolder.itemView.setOnClickListener(view -> ProviderDetailsActivity_.intent(getContext())
+                        .providerKey(model.key)
+                        .start());
             }
         };
         recyclerView.setAdapter(adapter);
     }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if (adapter != null) adapter.cleanup();
-    }
-
 
     @Click(R.id.fab_add_provider)
     void addProvider() {

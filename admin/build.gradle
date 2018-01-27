@@ -1,4 +1,7 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.firebase.firebase-perf'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion compileSdk
@@ -7,6 +10,7 @@ android {
     defaultConfig {
         applicationId "hr.nas2skupa.eleventhhour.admin"
         minSdkVersion minSdk
+        multiDexEnabled true
         targetSdkVersion targetSdk
         versionCode unifiedVersionCode
         versionName unifiedVersionName
@@ -20,22 +24,19 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    lintOptions {
+        disable 'MissingTranslation'
+        abortOnError false
+    }
     applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-            output.outputFile = new File(
-                    output.outputFile.parent,
-                    "eleventh-hour-admin-${variant.versionName}.apk")
+        variant.outputs.all {
+            outputFileName = "Eleventh Hour Admin ${variant.versionName}.apk"
         }
     }
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile project(':auth')
-    compile project(':common')
-
-    testCompile 'junit:junit:4.12'
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation project(':auth')
+    implementation project(':common')
 }

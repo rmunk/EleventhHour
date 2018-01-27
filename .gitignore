@@ -1,10 +1,27 @@
-*.iml
-.gradle
+# App signing files
+*.jks
+keystore.properties
+
+# Build files
+.externalNativeBuild/
+build/
+
+# Android Studio files
 /local.properties
+/.gradle/
+/captures/
+/testResults/
+/projectFilesBackup*/
+
+# JetBrains files
+*.iml
+/.idea/gradle.xml
+/.idea/misc.xml
 /.idea/workspace.xml
-/.idea/libraries
-/.idea/shelf
-.DS_Store
-/build
-/captures
-.externalNativeBuild
+/.idea/libraries/
+/.idea/shelf/
+
+# Plugin-specific files
+
+# Misc user files
+*.patch

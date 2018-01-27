@@ -2,10 +2,12 @@ package hr.nas2skupa.eleventhhour.common.model;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.support.annotation.IntRange;
 
 import com.google.firebase.database.Exclude;
 
-import java.util.Calendar;
+import org.joda.time.DateTimeConstants;
+import org.joda.time.LocalDateTime;
 
 import hr.nas2skupa.eleventhhour.common.App;
 import hr.nas2skupa.eleventhhour.common.BR;
@@ -99,21 +101,21 @@ public class OpenHours extends BaseObservable {
     }
 
     @Exclude
-    public DailyHours getHours(int dayOfWeek) {
+    public DailyHours getHours(@IntRange(from = 1L, to = 7L) int dayOfWeek) {
         switch (dayOfWeek) {
-            case Calendar.MONDAY:
+            case DateTimeConstants.MONDAY:
                 return mon;
-            case Calendar.TUESDAY:
+            case DateTimeConstants.TUESDAY:
                 return tue;
-            case Calendar.WEDNESDAY:
+            case DateTimeConstants.WEDNESDAY:
                 return wed;
-            case Calendar.THURSDAY:
+            case DateTimeConstants.THURSDAY:
                 return thu;
-            case Calendar.FRIDAY:
+            case DateTimeConstants.FRIDAY:
                 return fri;
-            case Calendar.SATURDAY:
+            case DateTimeConstants.SATURDAY:
                 return sat;
-            case Calendar.SUNDAY:
+            case DateTimeConstants.SUNDAY:
                 return sun;
             default:
                 return null;
@@ -122,7 +124,7 @@ public class OpenHours extends BaseObservable {
 
     @Exclude
     public DailyHours getHoursToday() {
-        return getHours(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
+        return getHours(new LocalDateTime().getDayOfWeek());
     }
 
     @Exclude

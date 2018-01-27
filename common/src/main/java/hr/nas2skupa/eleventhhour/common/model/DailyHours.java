@@ -2,14 +2,12 @@ package hr.nas2skupa.eleventhhour.common.model;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.text.format.DateFormat;
 
 import com.google.firebase.database.Exclude;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import net.danlew.android.joda.DateUtils;
+
+import org.joda.time.LocalTime;
 
 import hr.nas2skupa.eleventhhour.common.App;
 import hr.nas2skupa.eleventhhour.common.BR;
@@ -58,21 +56,21 @@ public class DailyHours extends BaseObservable {
     }
 
     @Exclude
-    public Date getFromDate() {
+    public LocalTime getFromDate() {
         if (!open) return null;
         try {
-            return new SimpleDateFormat("HH:mm", Locale.US).parse(from);
-        } catch (ParseException e) {
+            return LocalTime.parse(from);
+        } catch (Exception e) {
             return null;
         }
     }
 
     @Exclude
-    public Date getToDate() {
+    public LocalTime getToDate() {
         if (!open) return null;
         try {
-            return new SimpleDateFormat("HH:mm", Locale.US).parse(to);
-        } catch (ParseException e) {
+            return LocalTime.parse(to);
+        } catch (Exception e) {
             return null;
         }
     }
@@ -84,8 +82,7 @@ public class DailyHours extends BaseObservable {
             if (getFromDate() == null || getToDate() == null) {
                 return App.getAppContext().getString(R.string.hours_unknown);
             }
-            java.text.DateFormat timeFormat = DateFormat.getTimeFormat(App.getAppContext());
-            return timeFormat.format(getFromDate()) + "–" + timeFormat.format(getToDate());
+            return DateUtils.formatDateRange(App.getAppContext(), getFromDate(), getToDate(), DateUtils.FORMAT_SHOW_TIME);
         } else return App.getAppContext().getString(R.string.hours_closed);
     }
 

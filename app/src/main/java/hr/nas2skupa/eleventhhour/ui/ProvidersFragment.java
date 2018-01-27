@@ -23,13 +23,15 @@ import android.transition.Slide;
 import android.transition.Transition;
 import android.transition.TransitionManager;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 
-import com.firebase.ui.database.FirebaseIndexRecyclerAdapter;
+import com.firebase.ui.common.ChangeEventType;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -81,6 +83,7 @@ public abstract class ProvidersFragment extends Fragment implements SearchView.O
     private HashMap<String, Boolean> favorites = new HashMap<>();
 
     ProvidersAdapter adapter;
+    private FirebaseRecyclerOptions<Provider> options;
     private String providerPhone;
     boolean filterSale;
     boolean sortByName;
@@ -117,6 +120,16 @@ public abstract class ProvidersFragment extends Fragment implements SearchView.O
         recyclerView.getItemAnimator().setRemoveDuration(500);
         recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(getContext(), 8));
 
+
+        options = new FirebaseRecyclerOptions.Builder<Provider>()
+                .setIndexedQuery(ProvidersFragment.this.getKeyRef(),
+                        FirebaseDatabase.getInstance().getReference()
+                                .child("providers")
+                                .child(preferences.country().get())
+                                .child("data"),
+                        Provider.class)
+                .setLifecycleOwner(this)
+                .build();
         adapter = new ProvidersAdapter(filterSale, sortByName);
         recyclerView.setAdapter(adapter);
     }
@@ -142,7 +155,7 @@ public abstract class ProvidersFragment extends Fragment implements SearchView.O
         item.getIcon().setAlpha(item.isChecked() ? 255 : 138);
 
         filterSale = item.isChecked();
-        adapter.cleanup();
+        adapter.stopListening();
         adapter = new ProvidersAdapter(filterSale, sortByName);
         recyclerView.swapAdapter(adapter, false);
     }
@@ -153,7 +166,7 @@ public abstract class ProvidersFragment extends Fragment implements SearchView.O
         item.getIcon().setAlpha(item.isChecked() ? 255 : 138);
 
         sortByName = item.isChecked();
-        adapter.cleanup();
+        adapter.stopListening();
         adapter = new ProvidersAdapter(filterSale, sortByName);
         recyclerView.swapAdapter(adapter, false);
     }
@@ -172,16 +185,6 @@ public abstract class ProvidersFragment extends Fragment implements SearchView.O
 
         if (myFavoriteChangedListener != null)
             favoriteReference.removeEventListener(myFavoriteChangedListener);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if (adapter != null) {
-            adapter.cleanup();
-            adapter = null;
-        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -220,7 +223,7 @@ public abstract class ProvidersFragment extends Fragment implements SearchView.O
         return true;
     }
 
-    class ProvidersAdapter extends FirebaseIndexRecyclerAdapter<Provider, ProviderViewHolder> {
+    class ProvidersAdapter extends FirebaseRecyclerAdapter<Provider, ProviderViewHolder> {
         private int expandedPosition = -1;
         private final boolean filterSale;
         private final boolean sortByName;
@@ -232,8 +235,7 @@ public abstract class ProvidersFragment extends Fragment implements SearchView.O
                     Collator collator = Collator.getInstance(new Locale(Utils.getLanguageIso()));
                     collator.setStrength(Collator.PRIMARY);
                     return collator.compare(o1.name, o2.name);
-                }
-                else return Float.compare(o2.rating, o1.rating);
+                } else return Float.compare(o2.rating, o1.rating);
             }
 
             @Override
@@ -249,14 +251,7 @@ public abstract class ProvidersFragment extends Fragment implements SearchView.O
 
 
         ProvidersAdapter(boolean filterSale, boolean sortByName) {
-            super(Provider.class,
-                    R.layout.item_provider,
-                    ProviderViewHolder.class,
-                    ProvidersFragment.this.getKeyRef(),
-                    FirebaseDatabase.getInstance().getReference()
-                            .child("providers")
-                            .child(preferences.country().get())
-                            .child("data"));
+            super(options);
             this.filterSale = filterSale;
             this.sortByName = sortByName;
         }
@@ -272,9 +267,9 @@ public abstract class ProvidersFragment extends Fragment implements SearchView.O
         }
 
         @Override
-        public void onChildChanged(EventType type, DataSnapshot snapshot, int index, int oldIndex) {
+        public void onChildChanged(@NonNull ChangeEventType type, @NonNull DataSnapshot snapshot, int newIndex, int oldIndex) {
             Provider oldProvider;
-            Provider provider = super.getItem(index);
+            Provider provider = super.getItem(newIndex);
             provider.key = snapshot.getKey();
 
             switch (type) {
@@ -319,7 +314,12 @@ public abstract class ProvidersFragment extends Fragment implements SearchView.O
         }
 
         @Override
-        protected void populateViewHolder(final ProviderViewHolder viewHolder, final Provider provider, final int position) {
+        public ProviderViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            return new ProviderViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_provider, parent, false));
+        }
+
+        @Override
+        protected void onBindViewHolder(final ProviderViewHolder viewHolder, final int position, final Provider provider) {
             provider.favorite = favorites.containsKey(provider.key)
                     ? favorites.get(provider.key)
                     : false;
@@ -329,59 +329,42 @@ public abstract class ProvidersFragment extends Fragment implements SearchView.O
             final boolean isExpanded = position == expandedPosition;
             viewHolder.showDetails(isExpanded);
             viewHolder.itemView.setActivated(isExpanded);
-            viewHolder.imgExpand.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-                        animateCardExpansion(viewHolder.getAdapterPosition());
-                    else recyclerView.scrollToPosition(viewHolder.getAdapterPosition());
+            viewHolder.imgExpand.setOnClickListener(view -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                    animateCardExpansion(viewHolder.getAdapterPosition());
+                else recyclerView.scrollToPosition(viewHolder.getAdapterPosition());
 
-                    expandedPosition = isExpanded ? -1 : viewHolder.getAdapterPosition();
-                    notifyDataSetChanged();
+                expandedPosition = isExpanded ? -1 : viewHolder.getAdapterPosition();
+                notifyDataSetChanged();
+            });
+            viewHolder.txtPhone.setOnClickListener(view -> {
+                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                    providerPhone = provider.phone;
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CALL_PHONE}, REQUEST_PHONE_PERMISSION);
+                    return;
+                }
+                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + provider.phone));
+                if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                    startActivity(intent);
                 }
             });
-            viewHolder.txtPhone.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                        providerPhone = provider.phone;
-                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CALL_PHONE}, REQUEST_PHONE_PERMISSION);
-                        return;
-                    }
-                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + provider.phone));
-                    if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-                        startActivity(intent);
-                    }
+            viewHolder.txtWeb.setOnClickListener(view -> {
+                String url = provider.web;
+                if (!url.startsWith("http://") && !url.startsWith("https://"))
+                    url = "http://" + url;
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                    startActivity(intent);
                 }
             });
-            viewHolder.txtWeb.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    String url = provider.web;
-                    if (!url.startsWith("http://") && !url.startsWith("https://"))
-                        url = "http://" + url;
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-                        startActivity(intent);
-                    }
-                }
-            });
-            viewHolder.txtEmail.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + provider.email));
-                    if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-                        startActivity(Intent.createChooser(intent, "Email"));
-                    }
+            viewHolder.txtEmail.setOnClickListener(view -> {
+                Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + provider.email));
+                if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                    startActivity(Intent.createChooser(intent, "Email"));
                 }
             });
 
-            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ProviderActivity_.intent(getContext()).providerKey(provider.key).start();
-                }
-            });
+            viewHolder.itemView.setOnClickListener(view -> ProviderActivity_.intent(getContext()).providerKey(provider.key).start());
         }
 
         @RequiresApi(api = Build.VERSION_CODES.KITKAT)

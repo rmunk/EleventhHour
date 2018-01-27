@@ -1,13 +1,16 @@
 package hr.nas2skupa.eleventhhour.admin;
 
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
@@ -18,6 +21,7 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
 
+import hr.nas2skupa.eleventhhour.admin.viewholders.SubcategoryViewHolder;
 import hr.nas2skupa.eleventhhour.common.model.Subcategory;
 import hr.nas2skupa.eleventhhour.common.ui.helpers.SimpleDividerItemDecoration;
 import hr.nas2skupa.eleventhhour.common.utils.Utils;
@@ -32,17 +36,8 @@ public class SubcategoriesFragment extends Fragment {
 
     @ViewById RecyclerView recyclerView;
 
-    private FirebaseRecyclerAdapter<Subcategory, SubcategoryViewHolder> adapter;
-
     public SubcategoriesFragment() {
         // Required empty public constructor
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if (adapter != null) adapter.cleanup();
     }
 
     @AfterViews
@@ -54,7 +49,27 @@ public class SubcategoriesFragment extends Fragment {
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         Query query = database.child("app/subcategories").child(categoryKey).orderByChild("name/" + Utils.getLanguageIso());
-        adapter = new SubcategoriesAdapter(Subcategory.class, R.layout.item_subcategory, SubcategoryViewHolder.class, query);
+        FirebaseRecyclerOptions<Subcategory> options = new FirebaseRecyclerOptions.Builder<Subcategory>()
+                .setQuery(query, Subcategory.class)
+                .setLifecycleOwner(this)
+                .build();
+        FirebaseRecyclerAdapter<Subcategory, SubcategoryViewHolder> adapter = new FirebaseRecyclerAdapter<Subcategory, SubcategoryViewHolder>(options) {
+            @Override
+            public SubcategoryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                return new SubcategoryViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_subcategory, parent, false));
+            }
+
+            @Override
+            protected void onBindViewHolder(@NonNull final SubcategoryViewHolder viewHolder, int position, @NonNull Subcategory model) {
+                viewHolder.bind(model);
+                model.key = getRef(position).getKey();
+                viewHolder.itemView.setOnClickListener(view -> SubcategoryDialog_.builder()
+                        .categoryKey(categoryKey)
+                        .subcategoryKey(model.key)
+                        .build()
+                        .show(getFragmentManager(), "SubcategoryDialog"));
+            }
+        };
         recyclerView.setAdapter(adapter);
     }
 
@@ -65,29 +80,5 @@ public class SubcategoriesFragment extends Fragment {
                 .subcategoryKey(null)
                 .build()
                 .show(getFragmentManager(), "SubcategoryDialog");
-    }
-
-
-    private class SubcategoriesAdapter extends FirebaseRecyclerAdapter<Subcategory, SubcategoryViewHolder> {
-
-        public SubcategoriesAdapter(Class<Subcategory> modelClass, int modelLayout, Class<SubcategoryViewHolder> viewHolderClass, Query ref) {
-            super(modelClass, modelLayout, viewHolderClass, ref);
-        }
-
-        @Override
-        protected void populateViewHolder(SubcategoryViewHolder viewHolder, final Subcategory model, int position) {
-            viewHolder.bindToSubcategory(model);
-            model.key = getRef(position).getKey();
-            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    SubcategoryDialog_.builder()
-                            .categoryKey(categoryKey)
-                            .subcategoryKey(model.key)
-                            .build()
-                            .show(getFragmentManager(), "SubcategoryDialog");
-                }
-            });
-        }
     }
 }

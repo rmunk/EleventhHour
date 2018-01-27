@@ -1,20 +1,23 @@
 package hr.nas2skupa.eleventhhour.common;
 
-import android.app.Application;
 import android.content.Context;
+import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 
-import com.google.firebase.FirebaseException;
-import com.google.firebase.crash.FirebaseCrash;
+import com.crashlytics.android.Crashlytics;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.perf.FirebasePerformance;
 
+import net.danlew.android.joda.JodaTimeAndroid;
+
+import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 
 /**
  * Created by nas2skupa on 06/04/2017.
  */
 
-public class App extends Application {
+public class App extends MultiDexApplication {
 
     private static Context appContext;
 
@@ -33,8 +36,12 @@ public class App extends Application {
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         } else {
+            Fabric.with(this, new Crashlytics());
+            FirebasePerformance.getInstance().setPerformanceCollectionEnabled(true);
             Timber.plant(new CrashReportingTree());
         }
+
+        JodaTimeAndroid.init(this);
     }
 
     /**
@@ -43,12 +50,9 @@ public class App extends Application {
     private static class CrashReportingTree extends Timber.Tree {
         @Override
         protected void log(int priority, String tag, String message, Throwable t) {
-            if (priority == Log.VERBOSE || priority == Log.DEBUG) {
-                return;
-            }
-            FirebaseCrash.logcat(priority, tag, message);
-            if (t != null) FirebaseCrash.report(t);
-            else if (priority == Log.ERROR) FirebaseCrash.report(new FirebaseException(message));
+            if (t != null) Crashlytics.logException(t);
+            else if (priority == Log.ERROR) Crashlytics.logException(new RuntimeException(message));
+            else if (priority >= Log.INFO) Crashlytics.log(priority, tag, message);
         }
     }
 }

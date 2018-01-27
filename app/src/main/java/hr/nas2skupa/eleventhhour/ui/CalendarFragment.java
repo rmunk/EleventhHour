@@ -1,6 +1,7 @@
 package hr.nas2skupa.eleventhhour.ui;
 
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,11 +10,13 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
+import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
 import com.google.firebase.database.ChildEventListener;
@@ -50,6 +53,7 @@ import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
  * A simple {@link Fragment} subclass.
  */
 @EFragment(R.layout.fragment_calendar)
+@SuppressLint("WrongConstant")
 public class CalendarFragment extends Fragment {
 
     @ColorRes(R.color.event_active)
@@ -69,7 +73,6 @@ public class CalendarFragment extends Fragment {
     private DatabaseReference bookingsReference;
     private Query bookingsQuery;
     private ChildEventListener bookingsChangedListener;
-    private FirebaseRecyclerAdapter<Booking, BookingViewHolder> adapter;
 
     public CalendarFragment() {
         // Required empty public constructor
@@ -94,7 +97,6 @@ public class CalendarFragment extends Fragment {
             bookingsQuery.removeEventListener(bookingsChangedListener);
             bookingsChangedListener = null;
         }
-        if (adapter != null) adapter.cleanup();
     }
 
     @Override
@@ -210,15 +212,18 @@ public class CalendarFragment extends Fragment {
                 .orderByChild("from")
                 .startAt(start.getTime())
                 .endAt(end.getTime());
-
-        if (adapter != null) adapter.cleanup();
-        adapter = new FirebaseRecyclerAdapter<Booking, BookingViewHolder>(
-                Booking.class,
-                R.layout.item_booking,
-                BookingViewHolder.class,
-                query) {
+        FirebaseRecyclerOptions<Booking> options = new FirebaseRecyclerOptions.Builder<Booking>()
+                .setQuery(query, Booking.class)
+                .setLifecycleOwner(this)
+                .build();
+        FirebaseRecyclerAdapter<Booking, BookingViewHolder> adapter = new FirebaseRecyclerAdapter<Booking, BookingViewHolder>(options) {
             @Override
-            protected void populateViewHolder(final BookingViewHolder viewHolder, final Booking model, final int position) {
+            public BookingViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                return new BookingViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_booking, parent, false));
+            }
+
+            @Override
+            protected void onBindViewHolder(final BookingViewHolder viewHolder, final int position, final Booking model) {
                 model.key = getRef(position).getKey();
                 viewHolder.bind(model);
             }
