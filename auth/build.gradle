@@ -26,7 +26,7 @@ dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
     api project(':common')
 
-    api 'com.facebook.android:facebook-android-sdk:4.29.0'
+    api 'com.facebook.android:facebook-login:4.29.0'
     api('com.twitter.sdk.android:twitter:3.2.0@aar') {
         transitive = true
     }
