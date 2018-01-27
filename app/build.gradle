@@ -30,6 +30,15 @@ android {
             proguardFiles 'proguard-rules.pro'
         }
     }
+    lintOptions {
+        disable 'MissingTranslation'
+        abortOnError false
+    }
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "Eleventh Hour ${variant.versionName}.apk"
+        }
+    }
 }
 
 dependencies {
