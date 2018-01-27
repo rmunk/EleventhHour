@@ -20,6 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 
 public class SignInActivity extends AppCompatActivity {
@@ -65,9 +66,11 @@ public class SignInActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK && auth.getCurrentUser() != null) {
                 FirebaseUser user = auth.getCurrentUser();
 
-                Crashlytics.setUserIdentifier(user.getUid());
-                Crashlytics.setUserName(user.getDisplayName());
-                Crashlytics.setUserEmail(user.getEmail());
+                if (Fabric.isInitialized()) {
+                    Crashlytics.setUserIdentifier(user.getUid());
+                    Crashlytics.setUserName(user.getDisplayName());
+                    Crashlytics.setUserEmail(user.getEmail());
+                }
 
                 saveUserInfo(user);
                 startApplication();

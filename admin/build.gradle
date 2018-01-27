@@ -10,6 +10,7 @@ android {
     defaultConfig {
         applicationId "hr.nas2skupa.eleventhhour.admin"
         minSdkVersion minSdk
+        multiDexEnabled true
         targetSdkVersion targetSdk
         versionCode unifiedVersionCode
         versionName unifiedVersionName

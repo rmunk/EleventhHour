@@ -11,6 +11,7 @@ android {
     defaultConfig {
         minSdkVersion minSdk
         targetSdkVersion targetSdk
+        multiDexEnabled true
         versionCode unifiedVersionCode
         versionName unifiedVersionName
 
